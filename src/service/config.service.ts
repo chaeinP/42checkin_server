@@ -4,6 +4,7 @@ import httpStatus from 'http-status';
 import { Config, Config as IConfig } from '@models/config';
 import { Op } from 'sequelize';
 import moment from 'moment-timezone';
+import logger from "@modules/logger";
 
 /**
  *
@@ -15,20 +16,28 @@ export const getConfig = async (date: string) => {
     const start_at = moment(date).tz('Asia/Seoul');
     const end_at = moment(date).tz('Asia/Seoul');
 
+    if (!date) {
+        logger.error(`Invalid Date: ${date}`);
+        date = new Date().toISOString();
+    }
+
     start_at.set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
     end_at.set({ hour: 23, minute: 59, second: 59, millisecond: 0 })
 	const setting = await Config.findOne({
         where: {
             env: node_env,
             begin_at: {
-                [Op.between]: [start_at.toDate(), end_at.toDate()]
-            }
+                [Op.lte]: date
+            },
+            end_at: {
+                [Op.gte]: date
+            },
         } });
 	if (setting) {
 		return setting;
 	} else {
-		throw new ApiError(httpStatus.NOT_FOUND, '해당 환경에 대한 설정값이 존재하지 않습니다.');
-	};
+		throw new ApiError(httpStatus.NOT_FOUND, `해당 환경에 대한 설정값이 존재하지 않습니다-${date},${setting}`);
+	}
 };
 
 export const setConfig = async (body: { env: Partial<IConfig>, date: string }) => {

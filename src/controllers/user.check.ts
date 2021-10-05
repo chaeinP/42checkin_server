@@ -9,7 +9,7 @@ import logger from '@modules/logger';
  */
 export const checkIn = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 	const body = await userService.checkIn(req.user.jwt, req.params.cardid);
-	logger.logginResponse({ body, statusCode: httpStatus.OK });
+	logger.res({ body, statusCode: httpStatus.OK });
 	res.status(httpStatus.OK).json(body);
 });
 
@@ -18,6 +18,6 @@ export const checkIn = catchAsync(async (req: Request, res: Response, next: Next
  */
 export const checkOut = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 	const result = await userService.checkOut(req.user.jwt);
-	logger.logginResponse({ body: result, statusCode: httpStatus.OK });
+	logger.res({ body: result, statusCode: httpStatus.OK });
 	res.status(httpStatus.OK).json({ result });
 });

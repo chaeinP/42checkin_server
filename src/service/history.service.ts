@@ -64,7 +64,7 @@ export const getCardHistory = async (id: number, page: number, listSize: number)
 /**
  * 로그정보를 생성한다.
  */
-export const createHistory = async (user: Users, type: string): Promise<void> => {
+export const create = async (user: Users, type: string): Promise<void> => {
     logger.info({
         type: 'get',
         message: 'create log',

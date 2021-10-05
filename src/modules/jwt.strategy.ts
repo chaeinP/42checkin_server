@@ -35,7 +35,7 @@ const strategyCallback = (jwt_payload: { sub: any; username: any }, done: any) =
 
 export const JwtStrategy = () => new Strategy(opts, strategyCallback);
 
-export const generateToken = async (user: Users): Promise<string> => {
+export const generateToken = (user: Users): string => {
 	try {
 		const payload = {
 			username: user.login,

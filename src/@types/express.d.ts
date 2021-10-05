@@ -8,5 +8,6 @@ declare module "express" {
 		jwt: IJwtUser,
 		ft: Users,
 	}
+    query: any
   }
 }

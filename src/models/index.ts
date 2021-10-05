@@ -2,16 +2,18 @@ import database from 'sequelize';
 import type {configAttributes, configCreationAttributes} from "./config";
 import type {historyAttributes, historyCreationAttributes} from "./history";
 import type {usersAttributes, usersCreationAttributes} from "./users";
+import type {usageAttributes, usageCreationAttributes} from "./usage";
 
-import {Config} from "./config";
+import { Config } from "./config";
 import { History } from './history';
-import {Users} from "./users";
+import { Users } from "./users";
+import { Usage } from "./usage";
 
 import env from '@modules/env';
 import logger from "../modules/logger";
 
 /*
-sequelize-auto -o "./models" -d checkin_dev -h localhost -u root -p  -x Daiso523! -e mysql -l ts
+sequelize-auto -o "./models" -d checkin_dev -h localhost -u root -p  -x XXXX -e mysql -l ts
  */
 const {host, username, password, name, port} = env.database;
 const sequelize = new database.Sequelize(name, username, password, {
@@ -53,13 +55,14 @@ export type {
     historyCreationAttributes,
     usersAttributes,
     usersCreationAttributes,
+    usageAttributes,
+    usageCreationAttributes,
 };
 
 export function Sequelize() {
     Config.initModel(sequelize);
     History.initModel(sequelize);
     Users.initModel(sequelize);
-    History.belongsTo(Users, { foreignKey: 'login', targetKey: 'login' });
-    Users.hasMany(History, { foreignKey: 'login', sourceKey: 'login' });
+    Usage.initModel(sequelize);
     return sequelize;
 }
