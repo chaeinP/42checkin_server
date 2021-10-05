@@ -3,7 +3,7 @@ import { now } from '@modules/util';
 import * as Sequelize from 'sequelize';
 import { DataTypes, Model, Optional } from 'sequelize';
 
-export interface usersAttributes {
+export interface UsersAttributes {
     _id: number;
     login: string;
     type?: string;
@@ -32,9 +32,9 @@ export type usersOptionalAttributes =
     | "deleted_at"
     | "updated_at"
     | "created_at";
-export type usersCreationAttributes = Optional<usersAttributes, usersOptionalAttributes>;
+export type usersCreationAttributes = Optional<UsersAttributes, usersOptionalAttributes>;
 
-export class Users extends Model<usersAttributes, usersCreationAttributes> implements usersAttributes {
+export class Users extends Model<UsersAttributes, usersCreationAttributes> implements UsersAttributes {
     _id!: number;
     login!: string;
     type?: string;

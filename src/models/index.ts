@@ -1,8 +1,8 @@
 import database from 'sequelize';
-import type {configAttributes, configCreationAttributes} from "./config";
-import type {historyAttributes, historyCreationAttributes} from "./history";
-import type {usersAttributes, usersCreationAttributes} from "./users";
-import type {usageAttributes, usageCreationAttributes} from "./usage";
+import type { ConfigAttributes, configCreationAttributes } from "./config";
+import type { HistoryAttributes, historyCreationAttributes } from "./history";
+import type { UsersAttributes, usersCreationAttributes } from "./users";
+import type { UsageAttributes, usageCreationAttributes } from "./usage";
 
 import { Config } from "./config";
 import { History } from './history';
@@ -49,13 +49,13 @@ export {
 };
 
 export type {
-    configAttributes,
+    ConfigAttributes,
     configCreationAttributes,
-    historyAttributes,
+    HistoryAttributes,
     historyCreationAttributes,
-    usersAttributes,
+    UsersAttributes,
     usersCreationAttributes,
-    usageAttributes,
+    UsageAttributes,
     usageCreationAttributes,
 };
 

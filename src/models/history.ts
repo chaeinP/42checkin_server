@@ -2,7 +2,7 @@ import * as Sequelize from 'sequelize';
 import {Association, DataTypes, Model, Optional} from 'sequelize';
 import { Users } from './users';
 
-export interface historyAttributes {
+export interface HistoryAttributes {
     _id: number;
     login?: string;
     type?: string;
@@ -22,9 +22,9 @@ export type historyOptionalAttributes =
     | "deleted_at"
     | "updated_at"
     | "created_at";
-export type historyCreationAttributes = Optional<historyAttributes, historyOptionalAttributes>;
+export type historyCreationAttributes = Optional<HistoryAttributes, historyOptionalAttributes>;
 
-export class History extends Model<historyAttributes, historyCreationAttributes> implements historyAttributes {
+export class History extends Model<HistoryAttributes, historyCreationAttributes> implements HistoryAttributes {
     _id!: number;
     login?: string;
     type?: string;
