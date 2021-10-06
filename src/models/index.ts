@@ -34,10 +34,10 @@ const sequelize = new database.Sequelize(name, username, password, {
 
 sequelize
     .authenticate()
-    .then(() => {
+    .then(function SequelizeAuthCallback() {
         logger.log('Connection has been established successfully.');
     })
-    .catch(err => {
+    .catch(function SequelizeAuthCallback (err) {
         logger.error('Unable to connect to the database:', err);
     });
 
@@ -64,5 +64,9 @@ export function Sequelize() {
     History.initModel(sequelize);
     Users.initModel(sequelize);
     Usage.initModel(sequelize);
+
+    History.belongsTo(Users, { foreignKey: 'login', targetKey: 'login' });
+    Users.hasMany(History, { foreignKey: 'login', sourceKey: 'login' });
+
     return sequelize;
 }

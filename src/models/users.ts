@@ -1,7 +1,8 @@
 import { CHECK_STATE, CLUSTER_CODE, CLUSTER_TYPE } from '@modules/cluster';
 import { now } from '@modules/util';
 import * as Sequelize from 'sequelize';
-import { DataTypes, Model, Optional } from 'sequelize';
+import {Association, DataTypes, Model, Optional} from 'sequelize';
+import { History } from './history';
 
 export interface UsersAttributes {
     _id: number;
@@ -134,6 +135,10 @@ export class Users extends Model<UsersAttributes, usersCreationAttributes> imple
         });
         return Users;
     }
+
+    public static associations: {
+        projects: Association<Users, History>;
+    };
 
     get cardType() {
         return this.getClusterType(this.card_no);

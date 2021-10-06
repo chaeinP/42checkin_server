@@ -1,23 +1,33 @@
 import { Request, Response, NextFunction } from 'express';
 import * as userService from '@service/user.service';
-import { catchAsync } from '@modules/error';
+import { errorHandler} from '@modules/error';
 import httpStatus from 'http-status';
 import logger from '@modules/logger';
+import ApiError from "@modules/api.error";
 
 /**
  * 카드 체크인
  */
-export const checkIn = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-	const body = await userService.checkIn(req.user.jwt, req.params.cardid);
-	logger.res({ body, statusCode: httpStatus.OK });
-	res.status(httpStatus.OK).json(body);
-});
+export const checkIn = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const body = await userService.checkIn(req.user.jwt, req.params.cardid);
+        logger.res({ body, statusCode: httpStatus.OK });
+        res.status(httpStatus.OK).json(body);
+    } catch (e) {
+        errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack}), req, res, next);
+    }
+
+};
 
 /**
  * 카드 체크아웃
  */
-export const checkOut = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-	const result = await userService.checkOut(req.user.jwt);
-	logger.res({ body: result, statusCode: httpStatus.OK });
-	res.status(httpStatus.OK).json({ result });
-});
+export const checkOut = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const result = await userService.checkOut(req.user.jwt);
+        logger.res({body: result, statusCode: httpStatus.OK});
+        res.status(httpStatus.OK).json({result});
+    } catch (e) {
+        errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack}), req, res, next);
+    }
+};

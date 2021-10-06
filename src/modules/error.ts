@@ -28,7 +28,7 @@ export const errorHandler = (err: ApiError, req: Request, res: Response, next: N
 	const response: { code: number, message: string, stack: string } = {
 		code: statusCode,
 		message,
-        stack: undefined
+        stack: ''
 	};
 
 	if (['development', 'devtest'].includes(env.node_env)) {
@@ -47,8 +47,4 @@ export const errorHandler = (err: ApiError, req: Request, res: Response, next: N
 	}
 
 	res.status(statusCode).send(response);
-};
-
-export const catchAsync = (fn: Function) => (req: Request, res: Response, next: NextFunction) => {
-	Promise.resolve(fn(req, res, next)).catch((err) => next(err));
 };

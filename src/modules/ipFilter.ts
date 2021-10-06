@@ -3,7 +3,7 @@ import httpStatus from 'http-status';
 import logger from '@modules/logger';
 import env from '@modules/env';
 import ApiError from '@modules/api.error';
-import { catchAsync } from '@modules/error';
+import {errorHandler} from '@modules/error';
 
 const ipFilter = (rules: Function[]) => async (req: Request, res: Response, next: NextFunction) => {
 	const { clientIp } = req;
@@ -26,10 +26,14 @@ const isGuestWiFi = (ip: string) => {
 	return ips.includes(ip);
 };
 
-export const GuestWiFiIpFilter = catchAsync((req: Request, res: Response, next: NextFunction) => {
-	const rules: Function[] = [];
-	if (env.node_env === 'production') {
-		rules.push(checkIsAdmin, isGuestWiFi);
-	}
-	return ipFilter(rules)(req, res, next);
-});
+export const GuestWiFiIpFilter = (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const rules: Function[] = [];
+        if (env.node_env === 'production') {
+            rules.push(checkIsAdmin, isGuestWiFi);
+        }
+        return ipFilter(rules)(req, res, next);
+    } catch (e) {
+        errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack}), req, res, next);
+    }
+};

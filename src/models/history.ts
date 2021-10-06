@@ -91,4 +91,8 @@ export class History extends Model<HistoryAttributes, historyCreationAttributes>
         });
         return History;
     }
+
+    public static associations: {
+        projects: Association<History, Users>;
+    }
 }

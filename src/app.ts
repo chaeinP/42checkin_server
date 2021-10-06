@@ -11,7 +11,6 @@ import * as requestIp from 'request-ip';
 import * as Api from '@routes/routes';
 
 import {errorConverter, errorHandler} from '@modules/error';
-import {Sequelize} from './models';
 
 const port = env.port || 3000;
 export const app = express();
@@ -23,20 +22,6 @@ function getOrigin() {
 	}
 	return origin;
 }
-
-Sequelize().sync({force: false})
-    .then((v) => {
-        try {
-            app.emit('dbconnected')
-            console.log('🚀 db connected');
-        } catch (error) {
-            logger.error(error);
-        }
-    })
-    .catch(err => {
-        console.log(err);
-        throw err
-    });
 
 app.use(cookieParser());
 app.use(express.json());

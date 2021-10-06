@@ -75,7 +75,10 @@ export const getCluster = async (clusterType: CLUSTER_CODE, page: number, listSi
 	if (!CLUSTER_CODE[clusterType]) {
         throw new ApiError(httpStatus.NOT_FOUND, `존재하지 않는 클러스터 코드입니다. ${clusterType}, ${page}, ${listSize}`);
     }
-    logger.log('clusterType:', clusterType, 'cluster:', CLUSTER_CODE[clusterType], 'page:', page);
+    logger.log('clusterType:', clusterType, 'cluster:', CLUSTER_CODE[clusterType], 'page:', page, 'listSize:', listSize);
+
+    page = isNaN(page) ? 1: page;
+    listSize = isNaN(listSize) ? 50: listSize;
 
     const { rows, count } = await History.findAndCountAll({
         include: [{
@@ -85,7 +88,7 @@ export const getCluster = async (clusterType: CLUSTER_CODE, page: number, listSi
         where: {
             card_no: clusterCondition[clusterType],
             [Op.and]: [
-                Sequelize.literal('`User`.`userLogin` = `History`.`userLogin`'),
+                Sequelize.literal('`User`.`login` = `History`.`login`'),
             ],
         },
         order: [ [ '_id', 'DESC' ] ],
@@ -93,6 +96,7 @@ export const getCluster = async (clusterType: CLUSTER_CODE, page: number, listSi
         limit: listSize
     });
 
+    logger.log(JSON.stringify(rows), count, listSize);
 	return { list: rows, lastPage: Math.ceil(count / listSize) };
 };
 
@@ -103,7 +107,10 @@ export const getCheckIn = async (clusterType: CLUSTER_CODE, page: number, listSi
     if (!CLUSTER_CODE[clusterType]) {
         throw new ApiError(httpStatus.NOT_FOUND, `존재하지 않는 클러스터 코드입니다. ${clusterType}, ${page}, ${listSize}`);
     }
-    logger.log('clusterType:', clusterType, 'cluster:', CLUSTER_CODE[clusterType], 'page:', page);
+    logger.log('clusterType:', clusterType, ',cluster:', CLUSTER_CODE[clusterType], ',page:', page, ',listSize:', listSize);
+
+    page = isNaN(page) ? 1: page;
+    listSize = isNaN(listSize) ? 50: listSize;
 
 	const { rows, count } = await History.findAndCountAll({
         include: [Users],
