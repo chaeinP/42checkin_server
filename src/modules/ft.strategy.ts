@@ -3,7 +3,7 @@ import ApiError from './api.error';
 import httpStatus from 'http-status';
 import passport from 'passport';
 import logger from '@modules/logger';
-import { Users } from '../models';
+import { Users } from '@models/database';
 import { now } from './util';
 
 let FortyTwoStrategy = require('passport-42').Strategy;

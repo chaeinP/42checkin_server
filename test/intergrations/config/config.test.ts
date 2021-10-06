@@ -2,7 +2,7 @@ import request from 'supertest';
 import { app } from '../../../src/app';
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
-import { sequelize } from '../../../src/models';
+import { sequelize } from '../../../src/models/database';
 import { getTimeFormat } from '../../../src/modules/util';
 import { getCookie } from '../env';
 

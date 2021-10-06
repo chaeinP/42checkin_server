@@ -4,7 +4,7 @@ import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import httpStatus from 'http-status';
 import { CLUSTER_CODE } from '../../../src/modules/cluster';
-import { sequelize } from '../../../src/models';
+import { sequelize } from '../../../src/models/database';
 import { Config as IConfig } from '../../../src/models/config';
 import { getTimeFormat } from '../../../src/modules/util';
 import { getCookie } from '../env';
