@@ -38,6 +38,7 @@ const strategeyCallback = (
 ) => {
 	validate(accessToken, refreshToken, profile)
 		.then(user => {
+            logger.log('user:', user)
 			callback(null, { ft: user });
 		})
 		.catch((err) => {

@@ -35,7 +35,6 @@ export class Usage extends Model<UsageAttributes, usageCreationAttributes> imple
     updated_at?: Date;
     created_at?: Date;
 
-
     static initModel(sequelize: Sequelize.Sequelize): typeof Usage {
         Usage.init({
             _id: {

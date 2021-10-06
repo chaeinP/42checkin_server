@@ -1,4 +1,4 @@
-import database from 'sequelize';
+import sequelize from 'sequelize';
 import type { ConfigAttributes, configCreationAttributes } from "./config";
 import type { HistoryAttributes, historyCreationAttributes } from "./history";
 import type { UsersAttributes, usersCreationAttributes } from "./users";
@@ -16,7 +16,7 @@ import logger from "../modules/logger";
 sequelize-auto -o "./models" -d checkin_dev -h localhost -u root -p  -x XXXX -e mysql -l ts
  */
 const {host, username, password, name, port} = env.database;
-const sequelize = new database.Sequelize(name, username, password, {
+const database = new sequelize.Sequelize(name, username, password, {
     host: host,
     dialect: 'mysql',
     port,
@@ -32,7 +32,7 @@ const sequelize = new database.Sequelize(name, username, password, {
     }
 });
 
-sequelize
+database
     .authenticate()
     .then(function SequelizeAuthCallback() {
         logger.log('Connection has been established successfully.');
@@ -60,13 +60,15 @@ export type {
 };
 
 export function Sequelize() {
-    Config.initModel(sequelize);
-    History.initModel(sequelize);
-    Users.initModel(sequelize);
-    Usage.initModel(sequelize);
+    Config.initModel(database);
+    History.initModel(database);
+    Users.initModel(database);
+    Usage.initModel(database);
 
     History.belongsTo(Users, { foreignKey: 'login', targetKey: 'login' });
     Users.hasMany(History, { foreignKey: 'login', sourceKey: 'login' });
 
-    return sequelize;
+    return database;
 }
+
+Sequelize();

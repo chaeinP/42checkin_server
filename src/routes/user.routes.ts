@@ -7,7 +7,6 @@ import * as Check from '@controllers/user.check';
 import { GuestWiFiIpFilter } from '@modules/ipFilter';
 import { JwtStrategy } from '@modules/jwt.strategy';
 import Strategy42 from '@modules/ft.strategy';
-import logger from "@modules/logger";
 
 export const path = '/user';
 export const router = Router();

@@ -35,6 +35,6 @@ export const callback = async (req: Request, res: Response, next: NextFunction) 
             res.status(httpStatus.FOUND).redirect(env.url.client + '/checkin');
         }
     } catch (e) {
-        errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'INTERNAL_SERVER_ERROR', {stack:new Error().stack}), req, res, next);
+        errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack}), req, res, next);
     }
 };

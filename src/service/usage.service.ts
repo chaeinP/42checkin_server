@@ -11,7 +11,7 @@ const DIVIDER_FOR_DURATION = 60;
  * 사용 시간 정보를 생성한다.
  */
 export const create = async (user: Users, actor: string): Promise<void> => {
-    logger.log('user:', user);
+    logger.log('user:', JSON.stringify(user));
 
     let duration: number = now().toDate().getTime() - getLocalDate(new Date(user.checkin_at)).toDate().getTime();
 
@@ -30,6 +30,8 @@ export const create = async (user: Users, actor: string): Promise<void> => {
  * 사용 시간 정보를 생성한다.
  */
 export const getUsagesDaily = async (userInfo: IJwtUser, from: string, to: string): Promise<any> => {
+    // noinspection DuplicatedCode
+    logger.log('userInfo:', JSON.stringify(userInfo), ', from:', from, ', to:', to);
     const user = await Users.findOne({ where: { _id: userInfo._id } });
     logger.log('user:', JSON.stringify(user), 'from:', from, 'to:', to);
 
@@ -52,16 +54,16 @@ export const getUsagesDaily = async (userInfo: IJwtUser, from: string, to: strin
         order: [ [Sequelize.literal('date'), 'ASC'] ]
     });
 
+    logger.debug(usages);
+
     return usages;
 };
 
 export const getUsagesList = async (userInfo: IJwtUser, from: string, to: string): Promise<any> => {
+    // noinspection DuplicatedCode
+    logger.log('userInfo:', JSON.stringify(userInfo), ', from:', from, ', to:', to);
     const user = await Users.findOne({ where: { _id: userInfo._id } });
-    logger.debug({
-        type: 'get',
-        message: 'getUsages',
-        data: { user: user.login, _id: user._id, from: from, to: to },
-    });
+    logger.log('user:', JSON.stringify(user), 'from:', from, 'to:', to);
 
     const conditions = {
         login: user.login,

@@ -47,6 +47,7 @@ export const userUsageDaily = async (req: Request, res: Response, next: NextFunc
  */
 export const userUsageList = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        logger.debug(req.user.jwt, req.query.from, req.query.to);
         const body = await usageService.getUsagesList(req.user.jwt, req.query.from, req.query.to);
         logger.res({ body: JSON.stringify(body, null, 2), statusCode: httpStatus.OK });
         res.json(body).status(200);
