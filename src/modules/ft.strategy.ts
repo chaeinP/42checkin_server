@@ -11,12 +11,8 @@ let FortyTwoStrategy = require('passport-42').Strategy;
 const validate = async (token: string, rt: string, profile: any) => {
 	try {
         if (profile._json.cursus_users.length < 2) {
-            logger.info({
-                type: 'get',
-                message: 'user profile',
-                data: profile,
-            });
-            throw new ApiError(httpStatus.NOT_ACCEPTABLE, '접근할 수 없는 유저입니다.');
+            logger.error('profile:', profile);
+            throw new ApiError(httpStatus.NOT_ACCEPTABLE, `접근할 수 없는 유저입니다. ${profile}`);
 		} else {
             const user = new Users({
                 login: profile.username,
@@ -24,6 +20,8 @@ const validate = async (token: string, rt: string, profile: any) => {
                 created_at: now().toDate(),
                 type: 'cadet'
             });
+
+            logger.log('user:', JSON.stringify(user));
 			return user;
 		}
 	} catch (e) {

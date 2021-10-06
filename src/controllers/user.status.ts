@@ -21,11 +21,19 @@ export const usingStatus = catchAsync(async (req: Request, res: Response, next: 
 });
 
 /**
- * 유저 상태조회
+ * 유저 체크인 사용시간 (일별통계)
  */
-export const userUsage = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    logger.debug(req.query);
-    const body = await usageService.getUsages(req.user.jwt, req.query.from, req.query.to);
+export const userUsageDaily = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const body = await usageService.getUsagesDaily(req.user.jwt, req.query.from, req.query.to);
+    logger.res({ body: JSON.stringify(body, null, 2), statusCode: httpStatus.OK });
+    res.json(body).status(200);
+});
+
+/**
+ * 유저 체크인 사용시간 전체 목록
+ */
+export const userUsageList = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const body = await usageService.getUsagesList(req.user.jwt, req.query.from, req.query.to);
     logger.res({ body: JSON.stringify(body, null, 2), statusCode: httpStatus.OK });
     res.json(body).status(200);
 });

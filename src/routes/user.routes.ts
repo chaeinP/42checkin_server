@@ -7,6 +7,7 @@ import * as Check from '@controllers/user.check';
 import { GuestWiFiIpFilter } from '@modules/ipFilter';
 import { JwtStrategy } from '@modules/jwt.strategy';
 import Strategy42 from '@modules/ft.strategy';
+import logger from "@modules/logger";
 
 export const path = '/user';
 export const router = Router();
@@ -14,12 +15,12 @@ const passportOptions = { failureRedirect: env.url.client + '/' };
 passport.use(JwtStrategy());
 passport.use(Strategy42());
 
-
 router.get('/login/', Login.login, passport.authenticate('42', passportOptions));
 router.get('/login/callback', passport.authenticate('42', passportOptions), Login.callback);
 router.post('/checkIn/:cardid', GuestWiFiIpFilter, passport.authenticate('jwt'), Check.checkIn);
 router.post('/checkOut', passport.authenticate('jwt'), Check.checkOut);
 router.get('/status', passport.authenticate('jwt'), Status.userStatus);
 router.get('/using', Status.usingStatus);
-router.get('/usage', passport.authenticate('jwt'), Status.userUsage);
+router.get('/usage', passport.authenticate('jwt'), Status.userUsageList);
+router.get('/usage/daily', passport.authenticate('jwt'), Status.userUsageDaily);
 router.post('/forceCheckout/:userId', passport.authenticate('jwt'), Status.forceCheckout);

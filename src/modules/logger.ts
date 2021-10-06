@@ -1,11 +1,12 @@
 import {dailyfile} from 'tracer';
-import rTracer from 'cls-rtracer';
+import tracer from 'cls-rtracer';
+import context from 'express-http-context';
 
 const rootFolder = './logs';
 const pmId = process.env.pm_id ? process.env.pm_id : 0;
 const splitFormat = `yyyymmdd`;
-const logFormat = '{{timestamp}} {{title}} {{file}}:{{line}} ({{method}}) {{tid}} {{message}}';
-const jsonFormat = '{ timestamp:{{timestamp}}, level:{{title}}, file:{{file}}, line:{{line}}, method:{{method}}, tid:{{tid}}, payload:{{message}} }';
+const logFormat = '{{timestamp}} {{title}} {{file}}:{{line}} ({{method}}) {{tid}} [{{login}}] {{message}}';
+const jsonFormat = '{ timestamp:{{timestamp}}, level:{{title}}, file:{{file}}, line:{{line}}, method:{{method}}, tid:{{tid}}, user:{{login}} payload:{{message}} }';
 const dateformat = 'yyyy-mm-dd"T"HH:MM:ss.lo';
 /**
  * root: 파일위치
@@ -16,6 +17,36 @@ const dateformat = 'yyyy-mm-dd"T"HH:MM:ss.lo';
  * preprocess: 로그 오브젝트를 불러와서 커스텀할 필터를 적용한다.
  * */
 
+const convTitle = (title: string) => {
+    let result: string;
+
+    switch (title) {
+        case 'error':
+            result = 'ERR'
+            break;
+        case 'warn':
+            result = 'WRN'
+            break;
+        case 'info':
+            result = 'INF'
+            break;
+        case 'debug':
+            result = 'DBG'
+            break;
+        case 'fatal':
+            result = 'FTL'
+            break;
+        case 'trace':
+            result = 'TRC'
+            break;
+        default:
+            result = 'LOG'
+            break;
+    }
+
+    return result;
+}
+
 let logConfig = {
     root: rootFolder,
     allLogsFileName: 'inf',
@@ -25,32 +56,36 @@ let logConfig = {
     stackIndex: 1,
     level: 'info',
     preprocess: function(data: any) {
-        let title = data.title;
-        switch (title) {
-            case 'error':
-                title = 'ERR'
-                break;
-            case 'warn':
-                title = 'WRN'
-                break;
-            case 'info':
-                title = 'INF'
-                break;
-            case 'debug':
-                title = 'DBG'
-                break;
-            case 'fatal':
-                title = 'FTL'
-                break;
-            case 'trace':
-                title = 'TRC'
-                break;
-            default:
-                title = 'LOG'
-                break;
+        data.title = convTitle(data.title)?.toUpperCase();
+        data.tid = `${tracer.id() ? tracer.id() : '00000000-0000-0000-0000-000000000000'}`;
+
+        const login = context.get('login');
+        data.login = login ? login : '';
+    },
+    transport: function(data: any) {
+        const isProd = process.env.NODE_ENV?.toLowerCase()?.includes('prod')
+            || process.env.ENV_TYPE?.toLowerCase()?.includes('prod');
+        if (isProd) {
+            return;
         }
-        data.title = title.toUpperCase();
-        data.tid = `${rTracer.id() ? rTracer.id() : '00000000-0000-0000-0000-000000000000'}`;
+        console.log(data.output);
+    }
+}
+
+let jsonConfig = {
+    root: rootFolder,
+    allLogsFileName: 'inf',
+    format: logFormat,
+    dateformat: dateformat,
+    splitFormat: splitFormat,
+    stackIndex: 1,
+    level: 'info',
+    preprocess: function(data: any) {
+        data.title = convTitle(data.title)?.toUpperCase();
+        data.tid = `${tracer.id() ? tracer.id() : '00000000-0000-0000-0000-000000000000'}`;
+
+        const login = context.get('login');
+        data.login = login ? login : '';
     },
     transport: function(data: any) {
         const isProd = process.env.NODE_ENV?.toLowerCase()?.includes('prod')
@@ -120,7 +155,7 @@ const sql = dailyfile({
 });
 
 const http = dailyfile({
-    ...logConfig,
+    ...jsonConfig,
     ...{
         allLogsFileName: 'htp',
         level: 'log',

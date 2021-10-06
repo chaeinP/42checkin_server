@@ -35,7 +35,7 @@ const sequelize = new database.Sequelize(name, username, password, {
 sequelize
     .authenticate()
     .then(() => {
-        logger.info('Connection has been established successfully.');
+        logger.log('Connection has been established successfully.');
     })
     .catch(err => {
         logger.error('Unable to connect to the database:', err);

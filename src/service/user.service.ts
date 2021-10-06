@@ -20,21 +20,13 @@ export const login = async (user: Users): Promise<string> => {
     //처음 사용하는 유저의 경우 db에 등록
     if (!existingUser) {
         await user.save();
-        logger.info({
-            type: 'action',
-            message: 'user created',
-            data: { user: user.toJSON() },
-        });
+        logger.log('User created:', user);
     } else if (existingUser.email !== user.email) {
         existingUser.email = user.email;
         await existingUser.save();
     }
     const u = existingUser ? existingUser : user;
-    logger.info({
-        type: 'action',
-        message: 'user login',
-        data: { user: u.toJSON() },
-    });
+    logger.log('User login:', u);
     return generateToken(u);
 };
 
@@ -43,13 +35,9 @@ export const login = async (user: Users): Promise<string> => {
  */
 export const checkIsAdmin = async (id: number) => {
     const user = await Users.findOne({ where: { _id: id } })
-    logger.info({
-        type: 'get',
-        message: 'check user is admin',
-        data: { user: user.toJSON() },
-    });
+    logger.log('IsAdmin:', user);
     if (user.type !== 'admin') {
-        throw new ApiError(httpStatus.FORBIDDEN, '관리자 권한이 없는 사용자입니다.');
+        throw new ApiError(httpStatus.FORBIDDEN, `관리자 권한이 없는 사용자입니다. ${user}`);
     }
     return true;
 };
@@ -123,7 +111,7 @@ export const checkOut = async (userInfo: IJwtUser) => {
     if (enterCnt >= maxCnt - 5) {
         await noticer(CLUSTER_CODE[clusterType], maxCnt - enterCnt - 1);
     }
-    logger.info({ action: 'checkOut', userId: id });
+    logger.info('checkOut', JSON.stringify(user));
     return true;
 };
 

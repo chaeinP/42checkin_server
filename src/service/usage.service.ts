@@ -11,16 +11,9 @@ const DIVIDER_FOR_DURATION = 60;
  * 사용 시간 정보를 생성한다.
  */
 export const create = async (user: Users, actor: string): Promise<void> => {
-    logger.info({
-        type: 'get',
-        message: 'create log',
-        data: { card_no: user.card_no, _id: user._id },
-    });
+    logger.log('user:', user);
 
     let duration: number = now().toDate().getTime() - getLocalDate(new Date(user.checkin_at)).toDate().getTime();
-    logger.log(`now: ${now().toDate().getTime()}`)
-    logger.log(`checkin: ${getLocalDate(new Date(user.checkin_at)).toDate().getTime()}`)
-    logger.log(`duration: ${duration / DIVIDER_FOR_DURATION}`)
 
 	const usage = await Usage.create({
         login: user.login,
@@ -36,7 +29,33 @@ export const create = async (user: Users, actor: string): Promise<void> => {
 /**
  * 사용 시간 정보를 생성한다.
  */
-export const getUsages = async (userInfo: IJwtUser, from: string, to: string): Promise<any> => {
+export const getUsagesDaily = async (userInfo: IJwtUser, from: string, to: string): Promise<any> => {
+    const user = await Users.findOne({ where: { _id: userInfo._id } });
+    logger.log('user:', JSON.stringify(user), 'from:', from, 'to:', to);
+
+    const conditions = {
+        login: user.login,
+        checkin_at: {
+            [Op.gte]: from
+        },
+        checkout_at: {
+            [Op.lt]: to
+        },
+    };
+
+    const usages = await Usage.findAll({
+        attributes: ['login',
+            [Sequelize.fn('date_format', Sequelize.col('checkin_at'), '%Y-%m-%d'), 'date'],
+            [Sequelize.fn('sum', Sequelize.col('duration')), 'seconds']],
+        where: conditions,
+        group : [Sequelize.fn('date_format', Sequelize.col('checkin_at'), '%Y-%m-%d'), 'date'],
+        order: [ [Sequelize.literal('date'), 'ASC'] ]
+    });
+
+    return usages;
+};
+
+export const getUsagesList = async (userInfo: IJwtUser, from: string, to: string): Promise<any> => {
     const user = await Users.findOne({ where: { _id: userInfo._id } });
     logger.debug({
         type: 'get',
@@ -55,11 +74,8 @@ export const getUsages = async (userInfo: IJwtUser, from: string, to: string): P
     };
 
     const usages = await Usage.findAll({
-        attributes: ['login',
-            [Sequelize.fn('date_format', Sequelize.col('checkin_at'), '%Y-%m-%d'), 'day'],
-            [Sequelize.fn('sum', Sequelize.col('duration')), 'amount_seconds']],
         where: conditions,
-        group : [Sequelize.fn('date_format', Sequelize.col('checkin_at'), '%Y-%m-%d'), 'day'],
+        order: [ ['checkin_at', 'ASC'] ]
     });
 
     logger.debug(usages);

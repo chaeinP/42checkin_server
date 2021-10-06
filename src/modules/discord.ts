@@ -19,11 +19,7 @@ export const noticer = async (type: number, leftover: number) => {
         axios
             .post(`https://discord.com/api/webhooks/${id}/${pw}`, form, { ...form.getHeaders() })
             .then((res) => {
-                logger.info({
-                    type: 'action',
-                    message: 'discord alram',
-                    data: res.data,
-                });
+                logger.log('Discord:', JSON.stringify(res.data));
             })
             .catch((e) => logger.error(e));
     }
