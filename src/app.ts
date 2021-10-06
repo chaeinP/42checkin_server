@@ -34,16 +34,18 @@ app.use(cors({ origin: getOrigin(), credentials: true }));
 app.use((req, res, next) => {
 	const { method, path, url, query, headers, body, params, cookies } = req;
 	const request = { method, path, url, query, headers, body, params, cookies };
-    logger.log(method, url, query, cookies);
-	logger.req(request);
+    if (path !== '/healthCheck') {
+        logger.log(method, url, query, cookies);
+        logger.req(request);
+    }
 	next();
 });
 app.use(Api.path, Api.router);
 app.use(errorConverter);
 app.use(errorHandler);
 const server = app.listen(port, () => {
-	console.log(`=================================`);
-	console.log(`======= ENV: ${env.node_env} =============`);
-	console.log(`🚀 App listening on the port ${port}`);
-	console.log(`=================================`);
+	logger.log(`=================================`);
+    logger.log(`======= ENV: ${env.node_env} =============`);
+    logger.log(`🚀 App listening on the port ${port}`);
+    logger.log(`=================================`);
 });
