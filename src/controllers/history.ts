@@ -11,7 +11,7 @@ export const getUserHistory = catchAsync(async (req: Request<{ login: string }, 
 	const page = req.query.page ? parseInt(req.query.page) : 1;
 	const listSize = parseInt(req.query.listSize);
 	const body = await historyService.getUserHistory(login, page, listSize);
-	logger.logginResponse({ body, statusCode: STATUS_OK })
+	logger.res({ body, statusCode: STATUS_OK })
 	res.json(body).status(STATUS_OK);
 });
 
@@ -20,7 +20,7 @@ export const getCardHistory = catchAsync(async (req: Request<{ id: string }, {},
 	const page = parseInt(req.query.page);
 	const listSize = parseInt(req.query.listSize);
 	const body = await historyService.getCardHistory(id, page, listSize);
-	logger.logginResponse({ body, statusCode: STATUS_OK })
+	logger.res({ body, statusCode: STATUS_OK })
 	res.json(body).status(STATUS_OK);
 });
 
@@ -28,7 +28,7 @@ export const getGaepoHistory = catchAsync(async (req: Request<{ type: string }, 
 	const page = parseInt(req.query.page);
 	const listSize = parseInt(req.query.listSize);
 	const body = await historyService.getCluster(CLUSTER_CODE.gaepo, page, listSize);
-	logger.logginResponse({ body, statusCode: STATUS_OK })
+	logger.res({ body, statusCode: STATUS_OK })
 	res.json(body).status(STATUS_OK);
 });
 
@@ -36,7 +36,7 @@ export const getSeochoHistory = catchAsync(async (req: Request<{ type: string },
 	const page = parseInt(req.query.page);
 	const listSize = parseInt(req.query.listSize);
 	const body = await historyService.getCluster(CLUSTER_CODE.seocho, page, listSize);
-	logger.logginResponse({ body, statusCode: STATUS_OK })
+	logger.res({ body, statusCode: STATUS_OK })
 	res.json(body).status(STATUS_OK);
 });
 
@@ -45,6 +45,6 @@ export const getCheckInUsers = catchAsync(async (req: Request<{ type: string }, 
 	const page = parseInt(req.query.page);
 	const listSize = parseInt(req.query.listSize);
 	const body = await historyService.getCheckIn(type, page, listSize);
-	logger.logginResponse({ body, statusCode: STATUS_OK })
+	logger.res({ body, statusCode: STATUS_OK })
 	res.json(body).status(STATUS_OK);
 });

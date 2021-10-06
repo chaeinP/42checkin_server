@@ -14,3 +14,7 @@ export const getTimeFormat = (timestamp: moment.MomentInput, format: string) => 
 export const now = () => {
     return moment().tz(TZ);
 }
+
+export const getLocalDate = (date: Date) => {
+    return moment(date).tz(TZ);
+}

@@ -3,13 +3,13 @@ import { Op } from 'sequelize';
 import { generateToken, IJwtUser } from '@modules/jwt.strategy';
 import logger from '@modules/logger';
 import ApiError from '@modules/api.error';
-import { CLUSTER_CODE, CLUSTER_TYPE } from '@modules/cluster';
+import { CHECK_STATE, CLUSTER_CODE, CLUSTER_TYPE } from '@modules/cluster';
 import { Users } from '@models/users';
 import { noticer } from '@modules/discord';
-import { getTimeFormat } from '@modules/util';
-import * as logService from '@service/history.service';
+import { getLocalDate } from '@modules/util';
+import * as historyService from '@service/history.service';
 import * as configService from '@service/config.service';
-import { CHECK_STATE } from '../modules/cluster';
+import * as usageService from '@service/usage.service';
 
 /**
  * 미들웨어에서 넘어온 user정보로 JWT token 생성
@@ -20,22 +20,14 @@ export const login = async (user: Users): Promise<string> => {
     //처음 사용하는 유저의 경우 db에 등록
     if (!existingUser) {
         await user.save();
-        logger.info({
-            type: 'action',
-            message: 'user created',
-            data: { user: user.toJSON() },
-        });
+        logger.log('User created:', user);
     } else if (existingUser.email !== user.email) {
         existingUser.email = user.email;
         await existingUser.save();
     }
     const u = existingUser ? existingUser : user;
-    logger.info({
-        type: 'action',
-        message: 'user login',
-        data: { user: u.toJSON() },
-    });
-    return await generateToken(u);
+    logger.log('User login:', u);
+    return generateToken(u);
 };
 
 /**
@@ -43,13 +35,9 @@ export const login = async (user: Users): Promise<string> => {
  */
 export const checkIsAdmin = async (id: number) => {
     const user = await Users.findOne({ where: { _id: id } })
-    logger.info({
-        type: 'get',
-        message: 'check user is admin',
-        data: { user: user.toJSON() },
-    });
+    logger.log('IsAdmin:', user);
     if (user.type !== 'admin') {
-        throw new ApiError(httpStatus.FORBIDDEN, '관리자 권한이 없는 사용자입니다.');
+        throw new ApiError(httpStatus.FORBIDDEN, `관리자 권한이 없는 사용자입니다. ${user}`);
     }
     return true;
 };
@@ -87,7 +75,7 @@ export const checkIn = async (userInfo: IJwtUser, cardId: string) => {
         await user.setState('checkIn', user.login, _cardId);
         // 남은 인원이 5명이하인 경우, 몇 명 남았는지 디스코드로 노티
         if (enterCnt + 1 >= maxCnt - 5) {
-            noticer(CLUSTER_CODE[clusterType], maxCnt - enterCnt + 1);
+            await noticer(CLUSTER_CODE[clusterType], maxCnt - enterCnt + 1);
             notice = true;
         }
         logger.error({
@@ -95,7 +83,7 @@ export const checkIn = async (userInfo: IJwtUser, cardId: string) => {
             message: 'checkin',
             data: { login: userInfo.name, userId, cardId },
         });
-        await logService.createHistory(user, 'checkIn');
+        await historyService.create(user, 'checkIn');
         return {
             result: true,
             notice
@@ -113,16 +101,17 @@ export const checkOut = async (userInfo: IJwtUser) => {
     }
     const id = userInfo._id;
     const user = await Users.findOne({ where: { _id: id } });
-    logService.createHistory(user, 'checkOut');
+    await usageService.create(user, user.login);
+    await historyService.create(user, 'checkOut');
     const clusterType = user.getClusterType(user.card_no)
     await user.setState('checkOut', user.login);
 
     const { enterCnt, maxCnt } = await checkCanEnter(clusterType); //현재 이용자 수 확인
     // 남은 인원이 5명이하인 경우, 몇 명 남았는지 디스코드로 노티
     if (enterCnt >= maxCnt - 5) {
-        noticer(CLUSTER_CODE[clusterType], maxCnt - enterCnt - 1);
+        await noticer(CLUSTER_CODE[clusterType], maxCnt - enterCnt - 1);
     }
-    logger.info({ action: 'checkOut', userId: id });
+    logger.info('checkOut', JSON.stringify(user));
     return true;
 };
 
@@ -143,7 +132,8 @@ export const status = async (userInfo: IJwtUser) => {
         });
         throw new ApiError(httpStatus.UNAUTHORIZED, '유저 정보 없음');
     }
-    let returnVal: any = {
+
+    return {
         user: {
             login: user.login,
             card: user.card_no
@@ -151,7 +141,6 @@ export const status = async (userInfo: IJwtUser) => {
         cluster: await getUsingInfo(),
         isAdmin: user.type === 'admin'
     };
-    return returnVal;
 };
 
 /**
@@ -170,7 +159,8 @@ export const forceCheckOut = async (adminInfo: IJwtUser, userId: string) => {
     if (user.card_no === null) {
         throw new ApiError(httpStatus.BAD_REQUEST, '이미 체크아웃된 유저입니다.');
     }
-    await logService.createHistory(user, 'forceCheckOut');
+    await usageService.create(user, adminInfo.name);
+    await historyService.create(user, 'forceCheckOut');
     logger.error({
         type: 'action',
         message: 'return card',
@@ -181,7 +171,7 @@ export const forceCheckOut = async (adminInfo: IJwtUser, userId: string) => {
     const { enterCnt, maxCnt } = await checkCanEnter(clusterType); //현재 이용자 수 확인
     // 남은 인원이 5명이하인 경우, 몇 명 남았는지 디스코드로 노티
     if (enterCnt >= maxCnt - 5) {
-        noticer(CLUSTER_CODE[clusterType], maxCnt - enterCnt - 1);
+        await noticer(CLUSTER_CODE[clusterType], maxCnt - enterCnt - 1);
     }
     return user;
 };
@@ -204,6 +194,7 @@ export const getUsingInfo = async () => {
             }
         }
     })
+    // noinspection JSPotentiallyInvalidTargetOfIndexedPropertyAccess
     return {
         [CLUSTER_CODE[0]]: gaepo,
         [CLUSTER_CODE[1]]: seocho
@@ -213,12 +204,13 @@ export const getUsingInfo = async () => {
 /**
  * 입장가능여부 판별 및 최대입장인원수 반환
  * @param clusterType 클러스터 타입
+ * @param checkType
  * @returns
  */
 const checkCanEnter = async (clusterType: CLUSTER_TYPE, checkType?: CHECK_STATE) => {
     const enterCnt = (await getUsingInfo())[clusterType];
     // 최대인원을 넘었으면 다 찼으면 체크인 불가
-    const config = await configService.getConfig(getTimeFormat(new Date(), 'YYYY-MM-DD'));
+    const config = await configService.getConfig(getLocalDate(new Date()).toISOString());
     const maxCnt = config[clusterType];
     return {
         enterCnt,

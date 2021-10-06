@@ -1,7 +1,8 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import rTracer from 'cls-rtracer';
+import tracer from 'cls-rtracer';
+import context from 'express-http-context';
 import env from '@modules/env';
 import passport from 'passport';
 import logger from './modules/logger';
@@ -42,12 +43,14 @@ app.use(express.json());
 app.use(requestIp.mw());
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(rTracer.expressMiddleware());
+app.use(tracer.expressMiddleware());
+app.use(context.middleware);
 app.use(cors({ origin: getOrigin(), credentials: true }));
 app.use((req, res, next) => {
-	const { method, path, url, query, headers: { cookie }, body } = req;
-	const request = { method, path, cookie, body, url, query };
-	logger.info({ request });
+	const { method, path, url, query, headers, body, params, cookies } = req;
+	const request = { method, path, url, query, headers, body, params, cookies };
+    logger.log(method, url, query, cookies);
+	logger.req(request);
 	next();
 });
 app.use(Api.path, Api.router);

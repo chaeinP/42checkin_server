@@ -1,17 +1,19 @@
 import database from 'sequelize';
-import type {configAttributes, configCreationAttributes} from "./config";
-import type {historyAttributes, historyCreationAttributes} from "./history";
-import type {usersAttributes, usersCreationAttributes} from "./users";
+import type { ConfigAttributes, configCreationAttributes } from "./config";
+import type { HistoryAttributes, historyCreationAttributes } from "./history";
+import type { UsersAttributes, usersCreationAttributes } from "./users";
+import type { UsageAttributes, usageCreationAttributes } from "./usage";
 
-import {Config} from "./config";
+import { Config } from "./config";
 import { History } from './history';
-import {Users} from "./users";
+import { Users } from "./users";
+import { Usage } from "./usage";
 
 import env from '@modules/env';
 import logger from "../modules/logger";
 
 /*
-sequelize-auto -o "./models" -d checkin_dev -h localhost -u root -p  -x Daiso523! -e mysql -l ts
+sequelize-auto -o "./models" -d checkin_dev -h localhost -u root -p  -x XXXX -e mysql -l ts
  */
 const {host, username, password, name, port} = env.database;
 const sequelize = new database.Sequelize(name, username, password, {
@@ -33,7 +35,7 @@ const sequelize = new database.Sequelize(name, username, password, {
 sequelize
     .authenticate()
     .then(() => {
-        logger.info('Connection has been established successfully.');
+        logger.log('Connection has been established successfully.');
     })
     .catch(err => {
         logger.error('Unable to connect to the database:', err);
@@ -47,19 +49,20 @@ export {
 };
 
 export type {
-    configAttributes,
+    ConfigAttributes,
     configCreationAttributes,
-    historyAttributes,
+    HistoryAttributes,
     historyCreationAttributes,
-    usersAttributes,
+    UsersAttributes,
     usersCreationAttributes,
+    UsageAttributes,
+    usageCreationAttributes,
 };
 
 export function Sequelize() {
     Config.initModel(sequelize);
     History.initModel(sequelize);
     Users.initModel(sequelize);
-    History.belongsTo(Users, { foreignKey: 'login', targetKey: 'login' });
-    Users.hasMany(History, { foreignKey: 'login', sourceKey: 'login' });
+    Usage.initModel(sequelize);
     return sequelize;
 }

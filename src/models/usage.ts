@@ -1,41 +1,43 @@
-import * as Sequelize from 'sequelize';
-import {Association, DataTypes, Model, Optional} from 'sequelize';
-import { Users } from './users';
+import Sequelize from 'sequelize';
+import { DataTypes, Model, Optional } from 'sequelize';
 
-export interface HistoryAttributes {
+export interface UsageAttributes {
     _id: number;
     login?: string;
-    type?: string;
-    card_no?: number;
+    checkin_at?: Date;
+    checkout_at?: Date;
+    duration?: number;
+    actor?: string;
     deleted_at?: Date;
     updated_at?: Date;
     created_at?: Date;
 }
 
-export type historyPk = "_id";
-export type historyId = History[historyPk];
-export type historyOptionalAttributes =
+export type usagePk = "_id";
+export type usageId = Usage[usagePk];
+export type usageOptionalAttributes =
     "_id"
     | "login"
-    | "type"
-    | "card_no"
+    | "checkin_at"
+    | "checkout_at"
+    | "duration"
+    | "actor"
     | "deleted_at"
     | "updated_at"
     | "created_at";
-export type historyCreationAttributes = Optional<HistoryAttributes, historyOptionalAttributes>;
+export type usageCreationAttributes = Optional<UsageAttributes, usageOptionalAttributes>;
 
-export class History extends Model<HistoryAttributes, historyCreationAttributes> implements HistoryAttributes {
+export class Usage extends Model<UsageAttributes, usageCreationAttributes> implements UsageAttributes {
     _id!: number;
     login?: string;
-    type?: string;
-    card_no?: number;
+    actor?: string;
     deleted_at?: Date;
     updated_at?: Date;
     created_at?: Date;
 
 
-    static initModel(sequelize: Sequelize.Sequelize): typeof History {
-        History.init({
+    static initModel(sequelize: Sequelize.Sequelize): typeof Usage {
+        Usage.init({
             _id: {
                 autoIncrement: true,
                 type: DataTypes.BIGINT,
@@ -46,12 +48,20 @@ export class History extends Model<HistoryAttributes, historyCreationAttributes>
                 type: DataTypes.STRING(50),
                 allowNull: true
             },
-            type: {
-                type: DataTypes.STRING(20),
+            checkin_at: {
+                type: DataTypes.DATE,
                 allowNull: true
             },
-            card_no: {
+            checkout_at: {
+                type: DataTypes.DATE,
+                allowNull: true
+            },
+            duration: {
                 type: DataTypes.INTEGER,
+                allowNull: true,
+            },
+            actor: {
+                type: DataTypes.STRING(50),
                 allowNull: true
             },
             deleted_at: {
@@ -68,7 +78,7 @@ export class History extends Model<HistoryAttributes, historyCreationAttributes>
             }
         }, {
             sequelize,
-            tableName: 'history',
+            tableName: 'usage',
             timestamps: false,
             indexes: [
                 {
@@ -80,7 +90,7 @@ export class History extends Model<HistoryAttributes, historyCreationAttributes>
                     ]
                 },
                 {
-                    name: "history__id_uindex",
+                    name: "usage__id_uindex",
                     unique: true,
                     using: "BTREE",
                     fields: [
@@ -89,6 +99,6 @@ export class History extends Model<HistoryAttributes, historyCreationAttributes>
                 },
             ]
         });
-        return History;
+        return Usage;
     }
 }

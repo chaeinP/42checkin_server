@@ -11,12 +11,8 @@ const ipFilter = (rules: Function[]) => async (req: Request, res: Response, next
 	if (rules.length === 0 || rules.some((rule) => rule(clientIp))) {
 		next();
 	} else {
-        logger.info({
-            type: 'get',
-            message: 'unauthorized ip',
-            data: { clientIp },
-        });
-		throw new ApiError(httpStatus.UNAUTHORIZED, '42seoul Guest WiFi를 사용해주세요.');
+        logger.log('Unauthorized IP', clientIp)
+		throw new ApiError(httpStatus.UNAUTHORIZED, `42seoul Guest WiFi를 사용해주세요. ${clientIp}`);
 	}
 };
 
