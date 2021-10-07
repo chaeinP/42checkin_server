@@ -16,6 +16,7 @@ import {errorHandler} from "@modules/error";
  * 미들웨어에서 넘어온 user정보로 JWT token 생성
  * */
 export const login = async (user: Users): Promise<string> => {
+    logger.log('login:', user);
     const found = await Users.findOne({ where: { login: user.login } });
 
     //처음 사용하는 유저의 경우 db에 등록
