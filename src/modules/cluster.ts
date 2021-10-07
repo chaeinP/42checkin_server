@@ -7,8 +7,8 @@ export enum CLUSTER_CODE {
 export type CLUSTER_TYPE = 'gaepo' | 'seocho';
 
 export const clusterCondition =  {
-    [CLUSTER_CODE.gaepo]: { [Op.lt]: 999 },
-    [CLUSTER_CODE.seocho]: { [Op.gt]: 1000 },
+    [CLUSTER_CODE.gaepo]: { [Op.lt]: 1000 },
+    [CLUSTER_CODE.seocho]: { [Op.gte]: 1000 },
 }
 
 export type USER_TYPE = 'cadet' | 'admin';
