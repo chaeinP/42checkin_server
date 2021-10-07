@@ -24,26 +24,26 @@ router.get('/healthCheck', (req, res, next) => {
             res.send({ statusCode: 5000, message: err.message })
         });
 })
-router.get('/info',
+router.get('/authCheck',
     function routerInfoCallback(req, res, next) {
-        passport.authenticate('jwt', function (error, user, info) {
+        passport.authenticate('jwt', function passportAuthCallback (error, user, info) {
             // this will execute in any case, even if a passport strategy will find an error
             // log everything to console
-            logger.log(error);
-            logger.log(user);
-            logger.log(info);
+            let payload = { };
+            if (error != undefined) payload = {...payload, error: JSON.stringify(error)};
+            if (user != undefined) payload = {...payload, error: JSON.stringify(user)};
+            if (info != undefined) payload = {...payload, error: JSON.stringify(info)};
 
             if (error) {
-                res.status(401).send(error);
+                res.status(401).send(payload);
             } else if (!user) {
-                res.status(401).send(info);
+                res.status(401).send(payload);
             } else {
-                next();
+                res.status(401).send(payload);
             }
         })(req, res);
     },
     // function to call once successfully authenticated
     function onAuthSuccess(req, res) {
-        const version = require(app_root + '/package.json').version
-        res.status(200).send({ statusCode: 2000, version:  version});
+        res.status(200).send({ statusCode: 2000 });
     });
