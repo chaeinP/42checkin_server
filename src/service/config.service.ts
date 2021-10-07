@@ -32,7 +32,10 @@ export const getConfig = async (date: string) => {
             end_at: {
                 [Op.gte]: date
             },
-        } });
+        },
+        raw: true,
+        nest: true,
+    });
 	if (setting) {
 		return setting;
 	} else {

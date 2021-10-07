@@ -17,7 +17,7 @@ import {errorHandler} from "@modules/error";
  * */
 export const login = async (user: Users): Promise<string> => {
     logger.log('login:', user);
-    const found = await Users.findOne({ where: { login: user.login } });
+    const found = await Users.findOne({ where: { login: user.login }, raw: true, nest: true });
 
     //처음 사용하는 유저의 경우 db에 등록
     if (!found) {
@@ -37,7 +37,7 @@ export const login = async (user: Users): Promise<string> => {
  * 어드민 여부 확인
  */
 export const checkIsAdmin = async (id: number) => {
-    const user = await Users.findOne({ where: { _id: id } })
+    const user = await Users.findOne({ where: { _id: id }, raw: true, nest: true, })
     logger.log('IsAdmin:', user);
     if (user.type !== 'admin') {
         throw new ApiError(httpStatus.FORBIDDEN, `관리자 권한이 없는 사용자입니다. ${user}`);
@@ -55,7 +55,7 @@ export const checkIn = async (userInfo: IJwtUser, cardId: string) => {
     const userId = userInfo._id;
     const _cardId = parseInt(cardId);
     let notice = false;
-    const cardOwner = await Users.findOne({ where: { card_no: cardId } });
+    const cardOwner = await Users.findOne({ where: { card_no: cardId }, raw: true, nest: true, });
     if (cardOwner) {
         logger.error({
             type: 'get',
@@ -64,7 +64,7 @@ export const checkIn = async (userInfo: IJwtUser, cardId: string) => {
         });
         throw new ApiError(httpStatus.CONFLICT, '이미 사용중인 카드입니다.');
     }
-    const user = await Users.findOne({ where: { _id: userId } });
+    const user = await Users.findOne({ where: { _id: userId }, raw: true, nest: true, });
     const clusterType = user.getClusterType(_cardId)
     const { enterCnt, maxCnt, result } = await checkCanEnter(clusterType, 'checkIn'); //현재 이용자 수 확인
     if (!result) {
@@ -103,7 +103,7 @@ export const checkOut = async (userInfo: IJwtUser) => {
         throw new ApiError(httpStatus.UNAUTHORIZED, '유저 정보 없음');
     }
     const id = userInfo._id;
-    const user = await Users.findOne({ where: { _id: id } });
+    const user = await Users.findOne({ where: { _id: id }, raw: true, nest: true, });
     await usageService.create(user, user.login);
     await historyService.create(user, 'checkOut');
     const clusterType = user.getClusterType(user.card_no)
@@ -126,7 +126,7 @@ export const status = async (userInfo: IJwtUser) => {
         throw new ApiError(httpStatus.UNAUTHORIZED, '유저 정보 없음');
     }
     const id = userInfo._id;
-    const user = await Users.findOne({ where: { '_id': id } });
+    const user = await Users.findOne({ where: { '_id': id }, raw: true, nest: true, });
     if (!user) {
         throw new ApiError(httpStatus.UNAUTHORIZED, `유저 정보 없음-${user}`, {stack:new Error().stack});
     }
@@ -138,7 +138,6 @@ export const status = async (userInfo: IJwtUser) => {
         logger.error(e);
     }
 
-    logger.debug(user);
     return {
         user: {
             login: user.login,
@@ -159,7 +158,7 @@ export const forceCheckOut = async (adminInfo: IJwtUser, userId: string) => {
     }
     await checkIsAdmin(adminInfo._id);
     const _userId = parseInt(userId);
-    const user = await Users.findOne({ where: { _id: _userId } });
+    const user = await Users.findOne({ where: { _id: _userId }, raw: true, nest: true, });
     if (!user) {
         throw new ApiError(httpStatus.UNAUTHORIZED, '유저 정보 없음');
     }

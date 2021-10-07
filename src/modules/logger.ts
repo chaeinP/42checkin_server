@@ -199,15 +199,33 @@ const logger = {
         return log.log(...args);
     },
     req (request: any) {
-        if (request?.body?.dataValues) {
-            request.body = request?.body?.dataValues;
+        /*
+        Usages {
+            dataValues: { login: 'ohjongin', date: '2021-10-06', seconds: '1167417' },
+            _previousDataValues: { login: 'ohjongin', date: '2021-10-06', seconds: '1167417' },
+            _changed: Set(0) {},
+            _options: {
+              isNewRecord: false,
+              _schema: null,
+              _schemaDelimiter: '',
+              raw: true,
+              attributes: [Array]
+            },
+            isNewRecord: false
+          }
+         */
+        logger.debug(request);
+        if (request?.res?.dataValues) {
+            request.res = request?.res?.dataValues;
         }
         return http.log(request);
     },
     res (response: any) {
-        if (response?.body?.dataValues) {
-            response.body = response?.body?.dataValues;
+        logger.debug(response);
+        if (response?.res?.dataValues) {
+            response.res = response?.res?.dataValues;
         }
+
         return http.log(response);
     }
 };

@@ -32,7 +32,7 @@ export const create = async (user: Users, actor: string): Promise<void> => {
 export const getUsagesDaily = async (userInfo: IJwtUser, from: string, to: string): Promise<any> => {
     // noinspection DuplicatedCode
     logger.log('userInfo:', JSON.stringify(userInfo), ', from:', from, ', to:', to);
-    const user = await Users.findOne({ where: { _id: userInfo._id } });
+    const user = await Users.findOne({ where: { _id: userInfo._id }, raw: true, nest: true, });
     logger.log('user:', JSON.stringify(user), 'from:', from, 'to:', to);
 
     const conditions = {
@@ -51,10 +51,10 @@ export const getUsagesDaily = async (userInfo: IJwtUser, from: string, to: strin
             [Sequelize.fn('sum', Sequelize.col('duration')), 'seconds']],
         where: conditions,
         group : [Sequelize.fn('date_format', Sequelize.col('checkin_at'), '%Y-%m-%d'), 'date'],
-        order: [ [Sequelize.literal('date'), 'ASC'] ]
+        order: [ [Sequelize.literal('date'), 'ASC'] ],
+        raw: true,
+        nest: true,
     });
-
-    logger.debug(usages);
 
     return usages;
 };
@@ -62,7 +62,7 @@ export const getUsagesDaily = async (userInfo: IJwtUser, from: string, to: strin
 export const getUsagesList = async (userInfo: IJwtUser, from: string, to: string): Promise<any> => {
     // noinspection DuplicatedCode
     logger.log('userInfo:', JSON.stringify(userInfo), ', from:', from, ', to:', to);
-    const user = await Users.findOne({ where: { _id: userInfo._id } });
+    const user = await Users.findOne({ where: { _id: userInfo._id }, raw: true, nest: true, });
     logger.log('user:', JSON.stringify(user), 'from:', from, 'to:', to);
 
     const conditions = {
@@ -77,10 +77,10 @@ export const getUsagesList = async (userInfo: IJwtUser, from: string, to: string
 
     const usages = await Usages.findAll({
         where: conditions,
-        order: [ ['checkin_at', 'ASC'] ]
+        order: [ ['checkin_at', 'ASC'] ],
+        raw: true,
+        nest: true,
     });
-
-    logger.debug(usages);
 
     return usages;
 };

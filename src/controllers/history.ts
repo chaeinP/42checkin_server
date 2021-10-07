@@ -13,7 +13,7 @@ export const getUserHistory = async (req: Request<{ login: string }, {}, {}, { p
         const page = req.query.page ? parseInt(req.query.page) : 1;
         const listSize = parseInt(req.query.listSize);
         const body = await historyService.getUserHistory(login, page, listSize);
-        logger.res({ body, statusCode: STATUS_OK })
+        logger.res({ res: body, statusCode: STATUS_OK })
         res.json(body).status(STATUS_OK);
     } catch (e) {
         errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack}), req, res, () => {});
@@ -26,7 +26,7 @@ export const getCardHistory = async (req: Request<{ id: string }, {}, {}, { page
         const page = parseInt(req.query.page);
         const listSize = parseInt(req.query.listSize);
         const body = await historyService.getCardHistory(id, page, listSize);
-        logger.res({ body, statusCode: STATUS_OK })
+        logger.res({ res: body, statusCode: STATUS_OK })
         res.json(body).status(STATUS_OK);
     } catch (e) {
         errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack}), req, res, () => {});
@@ -38,7 +38,7 @@ const getClusterHistory = async (req: Request<{ type: string }, {}, {}, { page: 
         const page = parseInt(req.query.page);
         const listSize = parseInt(req.query.listSize);
         const body = await historyService.getCluster(clusterType, page, listSize);
-        logger.res({ body, statusCode: STATUS_OK })
+        logger.res({ res: body, statusCode: STATUS_OK })
         res.json(body).status(STATUS_OK);
     } catch (e) {
         errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack}), req, res, () => {});
@@ -64,7 +64,7 @@ export const getCheckInUsers = async (req: Request<{ type: string }, {}, {}, { p
         }
 
         const body = await historyService.getCheckIn(type, page, listSize);
-        logger.res({ body, statusCode: STATUS_OK })
+        logger.res({ res: body, statusCode: STATUS_OK })
         res.json(body).status(STATUS_OK);
     } catch (e) {
         errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack}), req, res, () => {});

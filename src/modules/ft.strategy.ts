@@ -46,7 +46,7 @@ const strategeyCallback = (
             logger.log('profile:', profile)
             logger.log('user:', user)
 
-            const found = await Users.findOne({ where: { login: user.login } })
+            const found = await Users.findOne({ where: { login: user.login }, raw: true, nest: true, })
             if (found) {
                 found.email = user.email;
                 found.access_token = user.access_token;

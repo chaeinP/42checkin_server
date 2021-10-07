@@ -11,7 +11,7 @@ import ApiError from "@modules/api.error";
 export const checkIn = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const body = await userService.checkIn(req.user.jwt, req.params.cardid);
-        logger.res({ body, statusCode: httpStatus.OK });
+        logger.res({ res: body, statusCode: httpStatus.OK });
         res.status(httpStatus.OK).json(body);
     } catch (e) {
         errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack}), req, res, next);
@@ -24,9 +24,9 @@ export const checkIn = async (req: Request, res: Response, next: NextFunction) =
  */
 export const checkOut = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const result = await userService.checkOut(req.user.jwt);
-        logger.res({body: result, statusCode: httpStatus.OK});
-        res.status(httpStatus.OK).json({result});
+        const body = await userService.checkOut(req.user.jwt);
+        logger.res({ res: body, statusCode: httpStatus.OK});
+        res.status(httpStatus.OK).json(body);
     } catch (e) {
         errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack}), req, res, next);
     }

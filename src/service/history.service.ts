@@ -25,7 +25,9 @@ export const getUserHistory = async (login: string, page: number, listSize: numb
         },
 		order: [ [ '_id', 'DESC' ] ],
 		offset: listSize * (page - 1),
-		limit: listSize
+		limit: listSize,
+        raw: true,
+        nest: true,
 	});
 	return { list: rows, lastPage: Math.ceil(count / listSize) };
 };
@@ -48,7 +50,9 @@ export const getCardHistory = async (id: number, page: number, listSize: number)
         },
 		order: [ [ '_id', 'DESC' ] ],
 		offset: listSize * (page - 1),
-		limit: listSize
+		limit: listSize,
+        raw: true,
+        nest: true,
 	});
 	return { list: rows, lastPage: Math.ceil(count / listSize) };
 };
@@ -93,7 +97,9 @@ export const getCluster = async (clusterType: CLUSTER_CODE, page: number, listSi
         },
         order: [ [ '_id', 'DESC' ] ],
         offset: listSize * (page - 1),
-        limit: listSize
+        limit: listSize,
+        raw: true,
+        nest: true,
     });
 
     logger.log(JSON.stringify(rows), count, listSize);
@@ -123,7 +129,9 @@ export const getCheckIn = async (clusterType: CLUSTER_CODE, page: number, listSi
 		},
 		order: [ [ '_id', 'DESC' ] ],
 		offset: listSize * (page - 1),
-		limit: listSize
+		limit: listSize,
+        raw: true,
+        nest: true,
 	});
 
 	return { list: rows, lastPage: Math.ceil(count / listSize) };

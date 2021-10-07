@@ -26,7 +26,7 @@ router.get('/healthCheck', (req, res, next) => {
 })
 router.get('/authCheck',
     function routerInfoCallback(req, res, next) {
-        passport.authenticate('jwt', function passportAuthCallback (error, user, info) {
+        passport.authenticate('jwt', function onAuthFail (error, user, info) {
             // this will execute in any case, even if a passport strategy will find an error
             // log everything to console
             let payload = { };
