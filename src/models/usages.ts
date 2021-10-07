@@ -14,7 +14,7 @@ export interface UsageAttributes {
 }
 
 export type usagePk = "_id";
-export type usageId = Usage[usagePk];
+export type usageId = Usages[usagePk];
 export type usageOptionalAttributes =
     "_id"
     | "login"
@@ -27,7 +27,7 @@ export type usageOptionalAttributes =
     | "created_at";
 export type usageCreationAttributes = Optional<UsageAttributes, usageOptionalAttributes>;
 
-export class Usage extends Model<UsageAttributes, usageCreationAttributes> implements UsageAttributes {
+export class Usages extends Model<UsageAttributes, usageCreationAttributes> implements UsageAttributes {
     _id!: number;
     login?: string;
     actor?: string;
@@ -35,8 +35,8 @@ export class Usage extends Model<UsageAttributes, usageCreationAttributes> imple
     updated_at?: Date;
     created_at?: Date;
 
-    static initModel(sequelize: Sequelize.Sequelize): typeof Usage {
-        Usage.init({
+    static initModel(sequelize: Sequelize.Sequelize): typeof Usages {
+        Usages.init({
             _id: {
                 autoIncrement: true,
                 type: DataTypes.BIGINT,
@@ -77,7 +77,7 @@ export class Usage extends Model<UsageAttributes, usageCreationAttributes> imple
             }
         }, {
             sequelize,
-            tableName: 'usage',
+            tableName: 'usages',
             timestamps: false,
             indexes: [
                 {
@@ -98,6 +98,6 @@ export class Usage extends Model<UsageAttributes, usageCreationAttributes> imple
                 },
             ]
         });
-        return Usage;
+        return Usages;
     }
 }

@@ -18,3 +18,13 @@ export const now = () => {
 export const getLocalDate = (date: Date) => {
     return moment(date).tz(TZ);
 }
+
+export const getTimezoneDateString = (dt : Date) => {
+    const offset = dt.getTimezoneOffset()
+    const localDate = new Date(dt.getTime() - (offset*60*1000));
+    return getDateString(localDate);
+}
+
+export const getDateString = (dt : Date) => {
+    return dt.toISOString().replace('T', ' ').split('.')[0];
+}

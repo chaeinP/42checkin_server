@@ -7,6 +7,7 @@ export interface HistoryAttributes {
     login?: string;
     type?: string;
     card_no?: number;
+    actor?: string;
     deleted_at?: Date;
     updated_at?: Date;
     created_at?: Date;
@@ -19,6 +20,7 @@ export type historyOptionalAttributes =
     | "login"
     | "type"
     | "card_no"
+    | "actor"
     | "deleted_at"
     | "updated_at"
     | "created_at";
@@ -29,10 +31,10 @@ export class History extends Model<HistoryAttributes, historyCreationAttributes>
     login?: string;
     type?: string;
     card_no?: number;
+    actor?: string;
     deleted_at?: Date;
     updated_at?: Date;
     created_at?: Date;
-
 
     static initModel(sequelize: Sequelize.Sequelize): typeof History {
         History.init({
@@ -52,6 +54,10 @@ export class History extends Model<HistoryAttributes, historyCreationAttributes>
             },
             card_no: {
                 type: DataTypes.INTEGER,
+                allowNull: true
+            },
+            actor: {
+                type: DataTypes.STRING(50),
                 allowNull: true
             },
             deleted_at: {

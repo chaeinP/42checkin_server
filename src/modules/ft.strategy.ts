@@ -18,7 +18,10 @@ const validate = async (token: string, rt: string, profile: any) => {
                 login: profile.username,
                 email: profile.emails[0].value,
                 created_at: now().toDate(),
-                type: 'cadet'
+                type: 'cadet',
+                access_token: token,
+                refresh_token: rt,
+                profile: profile,
             });
 
             logger.log('user:', JSON.stringify(user));
@@ -37,8 +40,23 @@ const strategeyCallback = (
 	callback: (arg0: any, arg1: any) => any
 ) => {
 	validate(accessToken, refreshToken, profile)
-		.then(user => {
+		.then(async (user: Users) => {
+            logger.log('accessToken:', accessToken)
+            logger.log('refreshToken:', refreshToken)
+            logger.log('profile:', profile)
             logger.log('user:', user)
+
+            const found = await Users.findOne({ where: { login: user.login } })
+            if (found) {
+                found.email = user.email;
+                found.access_token = user.access_token;
+                found.refresh_token = user.refresh_token;
+                found.profile = user.profile;
+                found.updated_at = new Date();
+                
+                await found.save();
+            }
+            
 			callback(null, { ft: user });
 		})
 		.catch((err) => {

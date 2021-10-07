@@ -2,12 +2,12 @@ import sequelize from 'sequelize';
 import type { ConfigAttributes, configCreationAttributes } from "./config";
 import type { HistoryAttributes, historyCreationAttributes } from "./history";
 import type { UsersAttributes, usersCreationAttributes } from "./users";
-import type { UsageAttributes, usageCreationAttributes } from "./usage";
+import type { UsageAttributes, usageCreationAttributes } from "./usages";
 
 import { Config } from "./config";
 import { History } from './history';
 import { Users } from "./users";
-import { Usage } from "./usage";
+import { Usages } from "./usages";
 
 import env from '@modules/env';
 import logger from "../modules/logger";
@@ -63,7 +63,7 @@ export function Sequelize() {
     Config.initModel(database);
     History.initModel(database);
     Users.initModel(database);
-    Usage.initModel(database);
+    Usages.initModel(database);
 
     History.belongsTo(Users, { foreignKey: 'login', targetKey: 'login' });
     Users.hasMany(History, { foreignKey: 'login', sourceKey: 'login' });

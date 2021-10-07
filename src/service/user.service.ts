@@ -10,22 +10,24 @@ import { getLocalDate } from '@modules/util';
 import * as historyService from '@service/history.service';
 import * as configService from '@service/config.service';
 import * as usageService from '@service/usage.service';
+import {errorHandler} from "@modules/error";
 
 /**
  * 미들웨어에서 넘어온 user정보로 JWT token 생성
  * */
 export const login = async (user: Users): Promise<string> => {
-    const existingUser = await Users.findOne({ where: { login: user.login } });
+    const found = await Users.findOne({ where: { login: user.login } });
 
     //처음 사용하는 유저의 경우 db에 등록
-    if (!existingUser) {
+    if (!found) {
         await user.save();
         logger.log('User created:', user);
-    } else if (existingUser.email !== user.email) {
-        existingUser.email = user.email;
-        await existingUser.save();
+    } else if (found.email !== user.email) {
+        found.email = user.email;
+        await found.save();
     }
-    const u = existingUser ? existingUser : user;
+
+    const u = found ? found : user;
     logger.log('User login:', u);
     return generateToken(u);
 };
@@ -125,18 +127,15 @@ export const status = async (userInfo: IJwtUser) => {
     const id = userInfo._id;
     const user = await Users.findOne({ where: { '_id': id } });
     if (!user) {
-        logger.error({
-            type: 'get',
-            message: 'checkin',
-            data: userInfo,
-        });
-        throw new ApiError(httpStatus.UNAUTHORIZED, '유저 정보 없음');
+        throw new ApiError(httpStatus.UNAUTHORIZED, `유저 정보 없음-${user}`, {stack:new Error().stack});
     }
 
+    logger.debug(user);
     return {
         user: {
             login: user.login,
-            card: user.card_no
+            card: user.card_no,
+            profileUrl: user.profile.profileUrl
         },
         cluster: await getUsingInfo(),
         isAdmin: user.type === 'admin'

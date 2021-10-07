@@ -1,7 +1,7 @@
 import {Sequelize, Op} from "sequelize";
 import logger from '../modules/logger';
 import { Users } from 'src/models/users';
-import { Usage } from '@models/usage';
+import { Usages } from '@models/usages';
 import { now, getLocalDate } from '@modules/util';
 import {IJwtUser} from "@modules/jwt.strategy";
 
@@ -15,7 +15,7 @@ export const create = async (user: Users, actor: string): Promise<void> => {
 
     let duration: number = now().toDate().getTime() - getLocalDate(new Date(user.checkin_at)).toDate().getTime();
 
-	const usage = await Usage.create({
+	const usage = await Usages.create({
         login: user.login,
         checkin_at: user.checkin_at,
         checkout_at: now().toDate(),
@@ -45,7 +45,7 @@ export const getUsagesDaily = async (userInfo: IJwtUser, from: string, to: strin
         },
     };
 
-    const usages = await Usage.findAll({
+    const usages = await Usages.findAll({
         attributes: ['login',
             [Sequelize.fn('date_format', Sequelize.col('checkin_at'), '%Y-%m-%d'), 'date'],
             [Sequelize.fn('sum', Sequelize.col('duration')), 'seconds']],
@@ -75,7 +75,7 @@ export const getUsagesList = async (userInfo: IJwtUser, from: string, to: string
         },
     };
 
-    const usages = await Usage.findAll({
+    const usages = await Usages.findAll({
         where: conditions,
         order: [ ['checkin_at', 'ASC'] ]
     });

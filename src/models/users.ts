@@ -12,8 +12,11 @@ export interface UsersAttributes {
     state?: string;
     checkin_at?: Date;
     checkout_at?: Date;
-    checkout_by?: string;
+    actor?: string;
     email?: string;
+    access_token?: string;
+    refresh_token?: string;
+    profile?: any
     deleted_at?: Date;
     updated_at?: Date;
     created_at?: Date;
@@ -28,8 +31,11 @@ export type usersOptionalAttributes =
     | "state"
     | "checkin_at"
     | "checkout_at"
-    | "checkout_by"
+    | "actor"
     | "email"
+    | "access_token"
+    | "refresh_token"
+    | "profile"
     | "deleted_at"
     | "updated_at"
     | "created_at";
@@ -43,8 +49,11 @@ export class Users extends Model<UsersAttributes, usersCreationAttributes> imple
     state?: string;
     checkin_at?: Date;
     checkout_at?: Date;
-    checkout_by?: string;
+    actor?: string;
     email?: string;
+    access_token?: string;
+    refresh_token?: string;
+    profile?: any
     deleted_at?: Date;
     updated_at?: Date;
     created_at?: Date;
@@ -82,12 +91,24 @@ export class Users extends Model<UsersAttributes, usersCreationAttributes> imple
                 type: DataTypes.DATE,
                 allowNull: true
             },
-            checkout_by: {
+            actor: {
                 type: DataTypes.STRING(50),
                 allowNull: true
             },
             email: {
                 type: DataTypes.STRING(100),
+                allowNull: true
+            },
+            access_token: {
+                type: DataTypes.STRING(100),
+                allowNull: true
+            },
+            refresh_token: {
+                type: DataTypes.STRING(100),
+                allowNull: true
+            },
+            profile: {
+                type: DataTypes.JSON,
                 allowNull: true
             },
             deleted_at: {
@@ -144,14 +165,14 @@ export class Users extends Model<UsersAttributes, usersCreationAttributes> imple
         return this.getClusterType(this.card_no);
     }
 
-    async setState(state: CHECK_STATE, checkout_by: string, cardId?: number) {
+    async setState(state: CHECK_STATE, actor: string, cardId?: number) {
         const at = now().toDate();
         if (state === 'checkIn') {
             this.card_no = cardId
             this.checkin_at = at;
-            this.checkout_by = null;
+            this.actor = null;
         } else {
-            this.checkout_by = checkout_by;
+            this.actor = actor;
             this.card_no = null;
             this.checkout_at = at;
         }
