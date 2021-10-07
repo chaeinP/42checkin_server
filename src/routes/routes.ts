@@ -1,4 +1,4 @@
-import {Router} from "express";
+import { Router } from "express";
 
 import * as userRouter from '@routes/user.routes'
 import * as configRouter from '@routes/config.routes'
