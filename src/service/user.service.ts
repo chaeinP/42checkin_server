@@ -130,12 +130,19 @@ export const status = async (userInfo: IJwtUser) => {
         throw new ApiError(httpStatus.UNAUTHORIZED, `유저 정보 없음-${user}`, {stack:new Error().stack});
     }
 
+    let rawProfile: any;
+    try {
+        rawProfile = JSON.parse(user.profile._raw);
+    } catch (e) {
+        logger.error(e);
+    }
+
     logger.debug(user);
     return {
         user: {
             login: user.login,
             card: user.card_no,
-            profileUrl: user.profile.profileUrl
+            profile_image_url: rawProfile?.image_url
         },
         cluster: await getUsingInfo(),
         isAdmin: user.type === 'admin'
