@@ -1,5 +1,5 @@
-import { IJwtUser } from '../modules/jwt.strategy'
-import { Users } from '../models/users';
+import { IJwtUser } from '@modules/jwt.strategy'
+import { Users } from '@models/users';
 
 declare module "express" {
   export interface Request {

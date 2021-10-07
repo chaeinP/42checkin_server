@@ -9,6 +9,7 @@ import context from 'express-http-context';
 const opts: StrategyOptions = {
 	jwtFromRequest: ExtractJwt.fromExtractors([
 		(req: Request) => {
+            logger.log('auth:', env.cookie.auth, 'cookie:', JSON.stringify(req.cookies));
 			return req.cookies[env.cookie.auth];
 		}
 	]),
