@@ -190,14 +190,14 @@ export const getUsingInfo = async () => {
     const gaepo = await Users.count({
         where: {
             card_no: {
-                [Op.lt]: 999
+                [Op.lt]: 1000
             }
         }
     })
     const seocho = await Users.count({
         where: {
             card_no: {
-                [Op.gt]: 1000
+                [Op.gte]: 1000
             }
         }
     })
