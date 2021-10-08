@@ -26,24 +26,30 @@ router.get('/healthCheck', (req, res, next) => {
 })
 router.get('/authCheck',
     function routerInfoCallback(req, res, next) {
-        passport.authenticate('jwt', function onAuthFail (error, user, info) {
+        passport.authenticate('jwt', function onPassportAuthCallback (error, user, info) {
             // this will execute in any case, even if a passport strategy will find an error
             // log everything to console
-            let payload = { };
-            if (error != undefined) payload = {...payload, error: JSON.stringify(error)};
-            if (user != undefined) payload = {...payload, error: JSON.stringify(user)};
-            if (info != undefined) payload = {...payload, error: JSON.stringify(info)};
+            logger.log('error:', error === undefined ? 'undefined' : JSON.stringify(error));
+            logger.log('user:', user === undefined ? 'undefined' : JSON.stringify(user));
+            logger.log('info:', info === undefined ? 'undefined' : JSON.stringify(info));
 
+            let payload = { };
+            if (error != undefined) payload = {...payload, error: error};
+            if (user != undefined) payload = {...payload, user: user};
+            if (info != undefined) payload = {...payload, info: info};
+
+            logger.res(payload);
             if (error) {
                 res.status(401).send(payload);
             } else if (!user) {
                 res.status(401).send(payload);
             } else {
-                res.status(401).send(payload);
+                res.status(200).send(payload);
             }
         })(req, res);
     },
     // function to call once successfully authenticated
     function onAuthSuccess(req, res) {
+        logger.res({ statusCode: 2000 });
         res.status(200).send({ statusCode: 2000 });
     });

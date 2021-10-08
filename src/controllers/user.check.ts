@@ -16,7 +16,7 @@ export const checkIn = async (req: Request, res: Response, next: NextFunction) =
         logger.res({ res: body, statusCode: httpStatus.OK });
         res.status(httpStatus.OK).json(body);
     } catch (e) {
-        errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack}), req, res, next);
+        errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack, isFatal: true}), req, res, next);
     }
 
 };
@@ -32,6 +32,6 @@ export const checkOut = async (req: Request, res: Response, next: NextFunction) 
         logger.res({ res: body, statusCode: httpStatus.OK});
         res.status(httpStatus.OK).json(body);
     } catch (e) {
-        errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack}), req, res, next);
+        errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack, isFatal: true}), req, res, next);
     }
 };

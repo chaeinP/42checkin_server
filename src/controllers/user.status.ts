@@ -17,7 +17,7 @@ export const userStatus = async (req: Request, res: Response, next: NextFunction
         logger.res({ res: body, statusCode: httpStatus.OK });
         res.json(body).status(httpStatus.OK);
     } catch (e) {
-        errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack}), req, res, next);
+        errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack, isFatal: true}), req, res, next);
     }
 };
 
@@ -29,7 +29,7 @@ export const usingStatus = async (req: Request, res: Response, next: NextFunctio
         logger.res({  res: body, statusCode: httpStatus.OK });
         res.status(httpStatus.OK).json(body);
     } catch (e) {
-        errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack}), req, res, next);
+        errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack, isFatal: true}), req, res, next);
     }
 };
 
@@ -44,7 +44,7 @@ export const userUsageDaily = async (req: Request, res: Response, next: NextFunc
         logger.res({ res: body, statusCode: httpStatus.OK });
         res.json(body).status(httpStatus.OK);
     } catch (e) {
-        errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack}), req, res, next);
+        errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack, isFatal: true}), req, res, next);
     }
 };
 
@@ -59,7 +59,7 @@ export const userUsageList = async (req: Request, res: Response, next: NextFunct
         logger.res({ res: body, statusCode: httpStatus.OK });
         res.json(body).status(httpStatus.OK);
     } catch (e) {
-        errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack}), req, res, next);
+        errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack, isFatal: true}), req, res, next);
     }
 };
 
@@ -75,6 +75,6 @@ export const forceCheckout = async (req: Request, res: Response, next: NextFunct
         logger.res({ res: body, statusCode: httpStatus.OK });
         res.json(body).status(httpStatus.OK);
     } catch (e) {
-        errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack}), req, res, next);
+        errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack, isFatal: true}), req, res, next);
     }
 };

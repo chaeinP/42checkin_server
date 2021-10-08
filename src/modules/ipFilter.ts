@@ -34,6 +34,6 @@ export const GuestWiFiIpFilter = (req: Request, res: Response, next: NextFunctio
         }
         return ipFilter(rules)(req, res, next);
     } catch (e) {
-        errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack}), req, res, next);
+        errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack, isFatal: true}), req, res, next);
     }
 };

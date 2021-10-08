@@ -64,7 +64,7 @@ const getErrorFormat = ({ stack, file, line, uid, statusCode, args, message }: I
 
 export const sendErrorMessage = (error: IError) => {
 	const body = getErrorFormat(error);
-    axios.post(`${SLACK_API}${env.webHook.alarm}`, body).catch(err => logger.error(err));
+    axios.post(`${SLACK_API}${env.slack.alarm}`, body).catch(err => logger.error(err));
 };
 
 

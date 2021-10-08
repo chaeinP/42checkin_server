@@ -13,7 +13,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 		res.cookie('redirect', decodeURIComponent(redirect));
 		next();
 	} else {
-        errorHandler(new ApiError(httpStatus.BAD_REQUEST, '리다이렉트할 url이 지정되지 않았습니다.', {stack:new Error().stack}), req, res, next);
+        errorHandler(new ApiError(httpStatus.BAD_REQUEST, '리다이렉트할 url이 지정되지 않았습니다.', {stack:new Error().stack, isFatal: true}), req, res, next);
     }
 };
 
@@ -38,6 +38,6 @@ export const callback = async (req: Request, res: Response, next: NextFunction) 
             res.status(httpStatus.FOUND).redirect(env.url.client + '/checkin');
         }
     } catch (e) {
-        errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack}), req, res, next);
+        errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack, isFatal: true}), req, res, next);
     }
 };

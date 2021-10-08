@@ -34,10 +34,10 @@ const database = new sequelize.Sequelize(name, username, password, {
 
 database
     .authenticate()
-    .then(function SequelizeAuthCallback() {
+    .then(function onSequelizeAuthSuccess() {
         logger.log('Connection has been established successfully.');
     })
-    .catch(function SequelizeAuthCallback (err) {
+    .catch(function onSequelizeAuthError (err) {
         logger.error('Unable to connect to the database:', err);
     });
 
