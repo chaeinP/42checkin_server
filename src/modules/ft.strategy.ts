@@ -24,7 +24,6 @@ const validate = async (token: string, rt: string, profile: any) => {
                 profile: profile,
             });
 
-            logger.log('user:', JSON.stringify(user));
 			return user;
 		}
 	} catch (e) {
@@ -43,8 +42,6 @@ const strategeyCallback = (
 		.then(async (user: Users) => {
             logger.log('accessToken:', accessToken)
             logger.log('refreshToken:', refreshToken)
-            logger.log('profile:', profile)
-            logger.log('user:', user)
 
             const found = await Users.findOne({ where: { login: user.login } })
             if (found) {

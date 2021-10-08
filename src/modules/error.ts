@@ -23,7 +23,6 @@ export const errorConverter = (err: any, req: Request, res: Response, next: Next
  * 에러내용을 응답함
  */
 export const errorHandler = (err: ApiError, req: Request, res: Response, next: NextFunction) => {
-    logger.error(err);
     let { statusCode, message } = err;
     let msg = message;
 
@@ -41,12 +40,16 @@ export const errorHandler = (err: ApiError, req: Request, res: Response, next: N
         response.stack = err.stack;
     }
 
-    if (err.isFatal || !err.isNormal) {
-        sendErrorMessage({
-            ...logger.fatal(err),
-            statusCode: err.statusCode || req.statusCode,
-            uid: tracer.id()
-        })
+    try {
+        if (err.isFatal || !err.isNormal) {
+            sendErrorMessage({
+                ...logger.fatal(err),
+                statusCode: err.statusCode || req.statusCode,
+                uid: tracer.id()
+            })
+        }
+    } catch (e) {
+        logger.error(e);
     }
     logger.log(response);
     logger.res(response);

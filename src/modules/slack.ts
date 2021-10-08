@@ -1,9 +1,9 @@
 import env from '@modules/env';
 import axios from 'axios';
-import { Tracer } from 'tracer';
+import {Tracer} from 'tracer';
 import ApiError from './api.error';
 import logger from '@modules/logger';
-
+import context from 'express-http-context';
 
 const SLACK_API = 'https://hooks.slack.com/services/';
 
@@ -11,8 +11,8 @@ const getLine = (str: string, from: number, to: number) => str.split('\n').slice
 
 const getErrorFormat = ({ stack, file, line, uid, statusCode, args, message }: IError) => {
 	let errorTitle = '';
-	if (args[1][0] instanceof ApiError) {
-		errorTitle = args[1][0].message;
+	if (args[0] instanceof ApiError) {
+		errorTitle = args[0].message;
 	} else {
 		errorTitle = getLine(message, 0, 3);
 	}
@@ -33,12 +33,17 @@ const getErrorFormat = ({ stack, file, line, uid, statusCode, args, message }: I
 		.addField({
 			title: 'STATUS_CODE',
 			value: statusCode
-		})
-		.addField({
-			title: 'ERR_STACK',
-			value: statusCode
-		})
-		.addField({
+		});
+
+    let login = context.get('login');
+    if (login) {
+        builder.addField({
+            title: 'LOGIN',
+            value: context.get('login')
+        })
+    }
+
+    builder.addField({
 			title: 'UUID',
 			value: uid,
 			short: false
@@ -55,14 +60,14 @@ const getErrorFormat = ({ stack, file, line, uid, statusCode, args, message }: I
 			type: 'section',
 			text: {
 				type: 'mrkdwn',
-				text: `\`\`\`${getLine(stack, 0, 5)}\`\`\``
+				text: `\`\`\`${getLine(stack, 0, 10)}\`\`\``
 			}
 		})
-	const json = builder.toJSON();
-	return json;
+    return builder.toJSON();
 };
 
 export const sendErrorMessage = (error: IError) => {
+    logger.debug(error);
 	const body = getErrorFormat(error);
     axios.post(`${SLACK_API}${env.slack.alarm}`, body).catch(err => logger.error(err));
 };
