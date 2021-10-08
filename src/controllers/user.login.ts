@@ -4,8 +4,10 @@ import * as authService from '@service/auth.service';
 import { errorHandler} from '@modules/error';
 import httpStatus from 'http-status';
 import ApiError from '@modules/api.error';
+import logger from "@modules/logger";
 
 export const login = async (req: Request, res: Response, next: NextFunction) => {
+    logger.log(req.user.jwt, req.query.from, req.query.to);
 	const redirect = req.query.redirect as string;
 	if (redirect) {
 		res.cookie('redirect', decodeURIComponent(redirect));
@@ -26,6 +28,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
  */
 export const callback = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        logger.log(req.user.jwt, req.query.from, req.query.to);
         const { token, cookieOption } = await authService.getAuth(req.user.ft);
         res.cookie(env.cookie.auth, token, cookieOption);
         res.clearCookie('redirect');

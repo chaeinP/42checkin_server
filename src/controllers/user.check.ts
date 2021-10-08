@@ -10,7 +10,9 @@ import ApiError from "@modules/api.error";
  */
 export const checkIn = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        logger.log(req.user.jwt, req.query.from, req.query.to);
         const body = await userService.checkIn(req.user.jwt, req.params.cardid);
+        logger.info(body);
         logger.res({ res: body, statusCode: httpStatus.OK });
         res.status(httpStatus.OK).json(body);
     } catch (e) {
@@ -24,7 +26,9 @@ export const checkIn = async (req: Request, res: Response, next: NextFunction) =
  */
 export const checkOut = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        logger.log(req.user.jwt, req.query.from, req.query.to);
         const body = await userService.checkOut(req.user.jwt);
+        logger.info(body);
         logger.res({ res: body, statusCode: httpStatus.OK});
         res.status(httpStatus.OK).json(body);
     } catch (e) {

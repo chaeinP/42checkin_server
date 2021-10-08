@@ -56,6 +56,11 @@ const env = {
 	webHook: {
 		alarm: process.env.SLACK_WH_MONITOR
 	},
+    slack: {
+        alarm: process.env.SLACK_ALARM,
+        test: process.env.SLACK_TEST,
+        cs: process.env.SLACK_CS,
+    },
 	ip: {
 		guest: process.env.FT_GUEST_IP,
 		developer01: process.env.DEVELOPER01_IP,
