@@ -33,13 +33,13 @@ export const getConfig = async (date: string) => {
                 [Op.gte]: date
             },
         },
-        raw: true,
-        nest: true,
     });
 	if (setting) {
 		return setting;
 	} else {
-		throw new ApiError(httpStatus.NOT_FOUND, `해당 환경에 대한 설정값이 존재하지 않습니다-${date},${setting}`);
+        let msg = `해당 날짜(${date})의 설정값이 서버에 존재하지 않습니다.`;
+        logger.error(msg, 'date:', date, 'setting:', setting);
+		throw new ApiError(httpStatus.NOT_FOUND, msg, {stack: new Error(msg).stack});
 	}
 };
 
@@ -53,6 +53,7 @@ export const setConfig = async (body: { env: Partial<IConfig>, date: string }) =
 	return setting.save()
 		.then(_ => setting)
 		.catch(_ => {
-			throw new ApiError(httpStatus.BAD_REQUEST, '설정값수정에 실패하였습니다.');
+            let msg = '설정값을 수정하는 중 오류가 발생했습니다.';
+			throw new ApiError(httpStatus.BAD_REQUEST, msg, {stack: new Error(msg).stack, isFatal: true});
 		})
 };

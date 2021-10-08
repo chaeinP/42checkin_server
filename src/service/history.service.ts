@@ -26,8 +26,6 @@ export const getUserHistory = async (login: string, page: number, listSize: numb
 		order: [ [ '_id', 'DESC' ] ],
 		offset: listSize * (page - 1),
 		limit: listSize,
-        raw: true,
-        nest: true,
 	});
 	return { list: rows, lastPage: Math.ceil(count / listSize) };
 };
@@ -51,8 +49,6 @@ export const getCardHistory = async (id: number, page: number, listSize: number)
 		order: [ [ '_id', 'DESC' ] ],
 		offset: listSize * (page - 1),
 		limit: listSize,
-        raw: true,
-        nest: true,
 	});
 	return { list: rows, lastPage: Math.ceil(count / listSize) };
 };
@@ -77,7 +73,8 @@ export const create = async (user: Users, type: string): Promise<void> => {
  */
 export const getCluster = async (clusterType: CLUSTER_CODE, page: number, listSize: number) => {
 	if (!CLUSTER_CODE[clusterType]) {
-        throw new ApiError(httpStatus.NOT_FOUND, `존재하지 않는 클러스터 코드입니다. ${clusterType}, ${page}, ${listSize}`);
+        let msg = `존재하지 않는 클러스터 코드(${clusterType})입니다.`;
+        throw new ApiError(httpStatus.NOT_FOUND, msg, {stack: new Error(msg).stack});
     }
     logger.log('clusterType:', clusterType, 'cluster:', CLUSTER_CODE[clusterType], 'page:', page, 'listSize:', listSize);
 
@@ -98,8 +95,6 @@ export const getCluster = async (clusterType: CLUSTER_CODE, page: number, listSi
         order: [ [ '_id', 'DESC' ] ],
         offset: listSize * (page - 1),
         limit: listSize,
-        raw: true,
-        nest: true,
     });
 
     logger.log(JSON.stringify(rows), count, listSize);
@@ -111,7 +106,8 @@ export const getCluster = async (clusterType: CLUSTER_CODE, page: number, listSi
  */
 export const getCheckIn = async (clusterType: CLUSTER_CODE, page: number, listSize: number) => {
     if (!CLUSTER_CODE[clusterType]) {
-        throw new ApiError(httpStatus.NOT_FOUND, `존재하지 않는 클러스터 코드입니다. ${clusterType}, ${page}, ${listSize}`);
+        let msg = `존재하지 않는 클러스터 코드(${clusterType})입니다.`;
+        throw new ApiError(httpStatus.NOT_FOUND, msg, {stack: new Error(msg).stack});
     }
     logger.log('clusterType:', clusterType, ',cluster:', CLUSTER_CODE[clusterType], ',page:', page, ',listSize:', listSize);
 
@@ -130,8 +126,6 @@ export const getCheckIn = async (clusterType: CLUSTER_CODE, page: number, listSi
 		order: [ [ '_id', 'DESC' ] ],
 		offset: listSize * (page - 1),
 		limit: listSize,
-        raw: true,
-        nest: true,
 	});
 
 	return { list: rows, lastPage: Math.ceil(count / listSize) };

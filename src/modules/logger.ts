@@ -126,9 +126,18 @@ const fatal = dailyfile({
     ...{
         allLogsFileName: 'ftl',
         level: 'fatal',
+        stackIndex: 1,
     }
 });
 
+const handler = dailyfile({
+    ...logConfig,
+    ...{
+        allLogsFileName: 'ftl',
+        level: 'fatal',
+        stackIndex: 2,
+    }
+});
 
 const log = dailyfile({
     ...logConfig,
@@ -167,6 +176,14 @@ const logger = {
     init () {
         log.log('initialized...');
         console.log('initialized...');
+    },
+    // errorHandle에서 slack으로 보내는 메시지용
+    handler (...args: any[]) {
+        const isProd = process.env.NODE_ENV?.toLowerCase()?.includes('prod')
+            || process.env.ENV_TYPE?.toLowerCase()?.includes('prod');
+        if (isProd) console.log(...args);
+        log.log(...args);
+        return handler.fatal(...args);
     },
     fatal (...args: any[]) {
         const isProd = process.env.NODE_ENV?.toLowerCase()?.includes('prod')
@@ -215,17 +232,10 @@ const logger = {
           }
          */
         logger.debug(request);
-        if (request?.res?.dataValues) {
-            request.res = request?.res?.dataValues;
-        }
         return http.log(request);
     },
     res (response: any) {
         logger.debug(response);
-        if (response?.res?.dataValues) {
-            response.res = response?.res?.dataValues;
-        }
-
         return http.log(response);
     }
 };

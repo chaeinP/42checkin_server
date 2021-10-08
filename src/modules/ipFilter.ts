@@ -12,11 +12,12 @@ const ipFilter = (rules: Function[]) => async (req: Request, res: Response, next
 		next();
 	} else {
         logger.log('Unauthorized IP', clientIp)
-		throw new ApiError(httpStatus.UNAUTHORIZED, `42seoul Guest WiFi를 사용해주세요. ${clientIp}`);
+        let msg = `42seoul Guest WiFi를 사용해주세요.\n현재 IP:${clientIp}`;
+        errorHandler(new ApiError(httpStatus.UNAUTHORIZED, msg, {stack: new Error(msg).stack}), req, res, next);
 	}
 };
 
-const checkIsAdmin = (ip: string) => {
+const requestAdminPrivilege = (ip: string) => {
 	const ips = [ env.ip.developer01, env.ip.developer02 ];
 	return ips.includes(ip);
 };
@@ -30,7 +31,7 @@ export const GuestWiFiIpFilter = (req: Request, res: Response, next: NextFunctio
     try {
         const rules: Function[] = [];
         if (env.node_env === 'production') {
-            rules.push(checkIsAdmin, isGuestWiFi);
+            rules.push(requestAdminPrivilege, isGuestWiFi);
         }
         return ipFilter(rules)(req, res, next);
     } catch (e) {

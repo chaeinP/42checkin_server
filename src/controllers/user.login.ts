@@ -7,13 +7,15 @@ import ApiError from '@modules/api.error';
 import logger from "@modules/logger";
 
 export const login = async (req: Request, res: Response, next: NextFunction) => {
-    logger.log(req.user?.jwt, req.query?.from, req.query?.to);
+    logger.log(req.user?.jwt, req.query?.redirect);
 	const redirect = req.query.redirect as string;
 	if (redirect) {
 		res.cookie('redirect', decodeURIComponent(redirect));
 		next();
 	} else {
-        errorHandler(new ApiError(httpStatus.BAD_REQUEST, '리다이렉트할 url이 지정되지 않았습니다.', {stack:new Error().stack, isFatal: true}), req, res, next);
+        let msg = 'Redirect URL is missing';
+        logger.error('Redirect URL is missing', req.query?.direct);
+        errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, msg, {stack:new Error(msg).stack, isFatal: true}), req, res, next);
     }
 };
 
@@ -28,7 +30,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
  */
 export const callback = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        logger.log(req.user?.jwt, req.query?.from, req.query?.to);
+        logger.log(req.user?.jwt, req.user?.ft);
         const { token, cookieOption } = await authService.getAuth(req.user.ft);
         res.cookie(env.cookie.auth, token, cookieOption);
         res.clearCookie('redirect');

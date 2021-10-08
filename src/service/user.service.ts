@@ -28,18 +28,19 @@ export const login = async (user: Users): Promise<string> => {
     }
 
     const u = found ? found : user;
-    logger.log('User login:', u);
+
     return generateToken(u);
 };
 
 /**
  * 어드민 여부 확인
  */
-export const checkIsAdmin = async (id: number) => {
-    const user = await Users.findOne({ where: { _id: id }, raw: true, nest: true, })
-    logger.log('IsAdmin:', user);
+export const requestAdminPrivilege = async (id: number) => {
+    const user = await Users.findOne({ where: { _id: id } })
+    logger.log('IsAdmin:', user.type);
     if (user.type !== 'admin') {
-        throw new ApiError(httpStatus.FORBIDDEN, `관리자 권한이 없는 사용자입니다. ${user}`);
+        let msg = '관리자 권한이 필요한 접근입니다.'
+        throw new ApiError(httpStatus.FORBIDDEN, msg, {stack: new Error(msg).stack});
     }
     return true;
 };
@@ -49,7 +50,7 @@ export const checkIsAdmin = async (id: number) => {
  */
 export const checkIn = async (userInfo: IJwtUser, cardId: string) => {
     if (!userInfo) {
-        throw new ApiError(httpStatus.UNAUTHORIZED, '유저 정보 없음');
+        throw new ApiError(httpStatus.UNAUTHORIZED, '유저 정보 없음', {stack: new Error().stack});
     }
     const userId = userInfo._id;
     const _cardId = parseInt(cardId);
@@ -57,14 +58,14 @@ export const checkIn = async (userInfo: IJwtUser, cardId: string) => {
     const cardOwner = await Users.findOne({ where: { card_no: cardId } });
     if (cardOwner) {
         logger.error(`이미 사용중인 카드입니다, cardOwner: ${cardOwner.toJSON()}`);
-        throw new ApiError(httpStatus.CONFLICT, '이미 사용중인 카드입니다.');
+        throw new ApiError(httpStatus.CONFLICT, '이미 사용중인 카드입니다.', {stack: new Error().stack});
     }
     const user = await Users.findOne({ where: { _id: userId } });
     const clusterType = user.getClusterType(_cardId)
     const { enterCnt, maxCnt, result } = await checkCanEnter(clusterType, 'checkIn'); //현재 이용자 수 확인
     if (!result) {
         logger.error( { use: enterCnt, max: maxCnt } );
-        throw new ApiError(httpStatus.CONFLICT, '수용할 수 있는 최대 인원을 초과했습니다.');
+        throw new ApiError(httpStatus.CONFLICT, '수용할 수 있는 최대 인원을 초과했습니다.', {stack: new Error().stack});
     } else {
         await user.setState('checkIn', user.login, _cardId);
         // 남은 인원이 5명이하인 경우, 몇 명 남았는지 디스코드로 노티
@@ -91,7 +92,7 @@ export const checkIn = async (userInfo: IJwtUser, cardId: string) => {
  */
 export const checkOut = async (userInfo: IJwtUser) => {
     if (!userInfo) {
-        throw new ApiError(httpStatus.UNAUTHORIZED, '유저 정보 없음');
+        throw new ApiError(httpStatus.UNAUTHORIZED, '유저 정보 없음', {stack: new Error().stack});
     }
     const id = userInfo._id;
     const user = await Users.findOne({ where: { _id: id } });
@@ -114,12 +115,14 @@ export const checkOut = async (userInfo: IJwtUser) => {
  */
 export const status = async (userInfo: IJwtUser) => {
     if (!userInfo) {
-        throw new ApiError(httpStatus.UNAUTHORIZED, '유저 정보 없음');
+        let msg = '유저 정보 없음';
+        throw new ApiError(httpStatus.UNAUTHORIZED, msg, {stack: new Error(msg).stack});
     }
     const id = userInfo._id;
-    const user = await Users.findOne({ where: { '_id': id }, raw: true, nest: true, });
+    const user = await Users.findOne({ where: { '_id': id } });
     if (!user) {
-        throw new ApiError(httpStatus.UNAUTHORIZED, `유저 정보 없음-${user}`, {stack:new Error().stack});
+        let msg = '유저 정보 없음';
+        throw new ApiError(httpStatus.UNAUTHORIZED, msg, {stack:new Error(msg).stack});
     }
 
     let rawProfile: any;
@@ -145,16 +148,19 @@ export const status = async (userInfo: IJwtUser) => {
  */
 export const forceCheckOut = async (adminInfo: IJwtUser, userId: string) => {
     if (!adminInfo) {
-        throw new ApiError(httpStatus.UNAUTHORIZED, '관리자 정보 없음');
+        let msg = '관리자 권한이 필요한 접근입니다.'
+        throw new ApiError(httpStatus.UNAUTHORIZED, msg, {stack: new Error(msg).stack, isNormal: true});
     }
-    await checkIsAdmin(adminInfo._id);
+    await requestAdminPrivilege(adminInfo._id);
     const _userId = parseInt(userId);
     const user = await Users.findOne({ where: { _id: _userId } });
     if (!user) {
-        throw new ApiError(httpStatus.UNAUTHORIZED, '유저 정보 없음');
+        let msg = `사용자 정보(${_userId})가 없습니다.`;
+        throw new ApiError(httpStatus.UNAUTHORIZED, msg, {stack: new Error(msg).stack, isNormal: true});
     }
     if (user.card_no === null) {
-        throw new ApiError(httpStatus.BAD_REQUEST, '이미 체크아웃된 유저입니다.');
+        let msg = `이미 체크아웃한 사용자입니다.`;
+        throw new ApiError(httpStatus.BAD_REQUEST, msg, {stack: new Error(msg).stack, isNormal: true});
     }
     await usageService.create(user, adminInfo.name);
     await historyService.create(user, 'forceCheckOut');

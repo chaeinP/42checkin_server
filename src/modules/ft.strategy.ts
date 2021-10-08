@@ -12,7 +12,8 @@ const validate = async (token: string, rt: string, profile: any) => {
 	try {
         if (profile._json.cursus_users.length < 2) {
             logger.error('profile:', profile);
-            throw new ApiError(httpStatus.NOT_ACCEPTABLE, `접근할 수 없는 유저입니다. ${profile}`);
+            let msg = `접근할 수 없는 유저입니다. ${profile}`;
+            throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, msg, {stack: new Error(msg).stack});
 		} else {
             const user = new Users({
                 login: profile.username,

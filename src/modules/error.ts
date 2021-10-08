@@ -43,7 +43,7 @@ export const errorHandler = (err: ApiError, req: Request, res: Response, next: N
     try {
         if (err.isFatal || !err.isNormal) {
             sendErrorMessage({
-                ...logger.fatal(err),
+                ...logger.handler(err),
                 statusCode: err.statusCode || req.statusCode,
                 uid: tracer.id()
             })
