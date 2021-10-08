@@ -10,14 +10,13 @@ import { getLocalDate } from '@modules/util';
 import * as historyService from '@service/history.service';
 import * as configService from '@service/config.service';
 import * as usageService from '@service/usage.service';
-import {errorHandler} from "@modules/error";
 
 /**
  * 미들웨어에서 넘어온 user정보로 JWT token 생성
  * */
 export const login = async (user: Users): Promise<string> => {
     logger.log('login:', user);
-    const found = await Users.findOne({ where: { login: user.login }, raw: true, nest: true });
+    const found = await Users.findOne({ where: { login: user.login } });
 
     //처음 사용하는 유저의 경우 db에 등록
     if (!found) {
@@ -55,24 +54,16 @@ export const checkIn = async (userInfo: IJwtUser, cardId: string) => {
     const userId = userInfo._id;
     const _cardId = parseInt(cardId);
     let notice = false;
-    const cardOwner = await Users.findOne({ where: { card_no: cardId }, raw: true, nest: true, });
+    const cardOwner = await Users.findOne({ where: { card_no: cardId } });
     if (cardOwner) {
-        logger.error({
-            type: 'get',
-            message: 'using card',
-            data: { cardOwner: cardOwner.toJSON() },
-        });
+        logger.error(`이미 사용중인 카드입니다, cardOwner: ${cardOwner.toJSON()}`);
         throw new ApiError(httpStatus.CONFLICT, '이미 사용중인 카드입니다.');
     }
-    const user = await Users.findOne({ where: { _id: userId }, raw: true, nest: true, });
+    const user = await Users.findOne({ where: { _id: userId } });
     const clusterType = user.getClusterType(_cardId)
     const { enterCnt, maxCnt, result } = await checkCanEnter(clusterType, 'checkIn'); //현재 이용자 수 확인
     if (!result) {
-        logger.error({
-            type: 'get',
-            message: 'too many card',
-            data: { enterCnt, max: maxCnt },
-        });
+        logger.error( { use: enterCnt, max: maxCnt } );
         throw new ApiError(httpStatus.CONFLICT, '수용할 수 있는 최대 인원을 초과했습니다.');
     } else {
         await user.setState('checkIn', user.login, _cardId);
@@ -103,7 +94,7 @@ export const checkOut = async (userInfo: IJwtUser) => {
         throw new ApiError(httpStatus.UNAUTHORIZED, '유저 정보 없음');
     }
     const id = userInfo._id;
-    const user = await Users.findOne({ where: { _id: id }, raw: true, nest: true, });
+    const user = await Users.findOne({ where: { _id: id } });
     await usageService.create(user, user.login);
     await historyService.create(user, 'checkOut');
     const clusterType = user.getClusterType(user.card_no)
@@ -158,7 +149,7 @@ export const forceCheckOut = async (adminInfo: IJwtUser, userId: string) => {
     }
     await checkIsAdmin(adminInfo._id);
     const _userId = parseInt(userId);
-    const user = await Users.findOne({ where: { _id: _userId }, raw: true, nest: true, });
+    const user = await Users.findOne({ where: { _id: _userId } });
     if (!user) {
         throw new ApiError(httpStatus.UNAUTHORIZED, '유저 정보 없음');
     }
