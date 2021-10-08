@@ -59,7 +59,7 @@ export const getCheckInUsers = async (req: Request<{ type: string }, {}, {}, { p
         const page = parseInt(req.query?.page);
         const listSize = parseInt(req.query?.listSize);
         logger.log('type:', type, ', page:', page, ', listSize:', listSize);
-        if (!type || !page || !listSize) {
+        if (!page || !listSize) {
             throw new Error(`Invalid Parameters !! type:${type}, page:${page}, listSize:${listSize}`);
         }
 
