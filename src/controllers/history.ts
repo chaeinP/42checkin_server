@@ -24,7 +24,7 @@ export const getUserHistory = async (req: Request<{ login: string }, {}, {}, { p
 
 export const getCardHistory = async (req: Request<{ id: string }, {}, {}, { page: string, listSize: string }>, res: Response) => {
     try {
-        logger.log(req.user.jwt, req.query.from, req.query.to);
+        logger.log(req.user?.jwt, req.query?.from, req.query?.to);
         const id = parseInt(req.params.id);
         const page = parseInt(req.query.page);
         const listSize = parseInt(req.query.listSize);
@@ -39,7 +39,7 @@ export const getCardHistory = async (req: Request<{ id: string }, {}, {}, { page
 
 const getClusterHistory = async (req: Request<{ type: string }, {}, {}, { page: string, listSize: string }>, res: Response, clusterType: CLUSTER_CODE) => {
     try {
-        logger.log(req.user.jwt, req.query.from, req.query.to);
+        logger.log(req.user?.jwt, req.query?.from, req.query?.to);
         const page = parseInt(req.query.page);
         const listSize = parseInt(req.query.listSize);
         const body = await historyService.getCluster(clusterType, page, listSize);
@@ -61,7 +61,7 @@ export const getSeochoHistory = async (req: Request<{ type: string }, {}, {}, { 
 
 export const getCheckInUsers = async (req: Request<{ type: string }, {}, {}, { page: string, listSize: string }>, res: Response) => {
     try {
-        logger.log(req.user.jwt, req.query.from, req.query.to);
+        logger.log(req.user?.jwt, req.query?.from, req.query?.to);
         const type = parseInt(req.params?.type);
         const page = parseInt(req.query?.page);
         const listSize = parseInt(req.query?.listSize);

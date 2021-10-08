@@ -24,7 +24,7 @@ export const errorConverter = (err: any, req: Request, res: Response, next: Next
  */
 export const errorHandler = (err: ApiError, req: Request, res: Response, next: NextFunction) => {
     logger.error(err);
-	let { statusCode, message } = err;
+    let { statusCode, message } = err;
     let msg = message;
 
     if (statusCode == httpStatus.INTERNAL_SERVER_ERROR) {

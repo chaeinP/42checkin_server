@@ -7,7 +7,7 @@ import ApiError from "@modules/api.error";
 
 export const getConfig = async (req: Request<{}, {}, {}, { date: string }>, res: Response, next: NextFunction) => {
     try {
-        logger.log(req.user.jwt, req.query.from, req.query.to);
+        logger.log(req.user?.jwt, req.query?.from, req.query?.to);
         const body = await configService.getConfig(req.query.date);
         logger.info(body);
         logger.res({ res: body, statusCode: httpStatus.OK });
@@ -19,7 +19,7 @@ export const getConfig = async (req: Request<{}, {}, {}, { date: string }>, res:
 
 export const setConfig = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        logger.log(req.user.jwt, req.query.from, req.query.to);
+        logger.log(req.user?.jwt, req.query?.from, req.query?.to);
         const body = await configService.setConfig(req.body);
         logger.info(body);
         logger.res({res: body, statusCode: httpStatus.OK});

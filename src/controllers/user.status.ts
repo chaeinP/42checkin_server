@@ -11,7 +11,7 @@ import ApiError from "@modules/api.error";
  */
 export const userStatus = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        logger.log(req.user.jwt, req.query.from, req.query.to);
+        logger.log(req.user?.jwt, req.query?.from, req.query?.to);
         const body = await userService.status(req.user.jwt);
         logger.info(body);
         logger.res({ res: body, statusCode: httpStatus.OK });
@@ -23,7 +23,7 @@ export const userStatus = async (req: Request, res: Response, next: NextFunction
 
 export const usingStatus = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        logger.log(req.user.jwt, req.query.from, req.query.to);
+        logger.log(req.user?.jwt, req.query?.from, req.query?.to);
         const body = await userService.getUsingInfo();
         logger.info(body);
         logger.res({  res: body, statusCode: httpStatus.OK });
@@ -38,7 +38,7 @@ export const usingStatus = async (req: Request, res: Response, next: NextFunctio
  */
 export const userUsageDaily = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        logger.log(req.user.jwt, req.query.from, req.query.to);
+        logger.log(req.user?.jwt, req.query?.from, req.query?.to);
         const body = await usageService.getUsagesDaily(req.user.jwt, req.query.from, req.query.to);
         logger.info(body);
         logger.res({ res: body, statusCode: httpStatus.OK });
@@ -53,7 +53,7 @@ export const userUsageDaily = async (req: Request, res: Response, next: NextFunc
  */
 export const userUsageList = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        logger.log(req.user.jwt, req.query.from, req.query.to);
+        logger.log(req.user?.jwt, req.query?.from, req.query?.to);
         const body = await usageService.getUsagesList(req.user.jwt, req.query.from, req.query.to);
         logger.info(body);
         logger.res({ res: body, statusCode: httpStatus.OK });
@@ -68,7 +68,7 @@ export const userUsageList = async (req: Request, res: Response, next: NextFunct
  */
 export const forceCheckout = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        logger.log(req.user.jwt, req.query.from, req.query.to);
+        logger.log(req.user?.jwt, req.query?.from, req.query?.to);
         const { userId } = req.params;
         const body = await userService.forceCheckOut(req.user.jwt, userId);
         logger.info(body);
