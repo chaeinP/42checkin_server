@@ -1,12 +1,12 @@
 {
-    "name": "express-typescript-starter",
-    "version": "0.1.0",
-    "description": "A starting point for Node.js express apps with TypeScript",
+    "name": "42checkin",
+    "version": "2.1.0",
+    "description": "Cluster checkin service for 42 Seoul cadets.",
     "repository": {
         "type": "git",
         "url": "https://github.com/Microsoft/TypeScript-Node-Starter"
     },
-    "author": "Bowden Kelly",
+    "author": "@ryukim, @yurlee, @ohjongin",
     "license": "MIT",
     "scripts": {
         "build-ts": "cross-env NODE_ENV=production webpack --config webpack.config.js",
@@ -85,6 +85,7 @@
         "@typescript-eslint/eslint-plugin": "4.14.2",
         "@typescript-eslint/parser": "4.14.2",
         "awesome-typescript-loader": "^5.2.1",
+        "build-number-generator": "^1.0.0",
         "chai": "^4.3.4",
         "concurrently": "6.0.2",
         "cross-env": "^7.0.3",

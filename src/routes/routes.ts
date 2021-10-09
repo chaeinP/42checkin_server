@@ -6,7 +6,7 @@ import * as historyRouter from '@routes/history.routes';
 import {Sequelize} from "@models/database";
 import logger from "@modules/logger";
 import passport from "passport";
-import app_root from "app-root-path";
+import httpStatus from 'http-status';
 
 export const router = Router();
 export const path = '';
@@ -17,16 +17,18 @@ router.use(configRouter.path, configRouter.router);
 router.get('/healthCheck', (req, res, next) => {
     Sequelize().authenticate()
         .then(function SequelizeAuthCallback() {
-            res.send({ statusCode: 2000 })
+            res.json({ status: 'ok' }).status(httpStatus.OK);
         })
         .catch(function SequelizeAuthCallback (err) {
             logger.error('Unable to connect to the database:', err);
-            res.send({ statusCode: 5000, message: err.message })
+            res.json({ status: 'fail', message: err.message }).status(httpStatus.INTERNAL_SERVER_ERROR);
         });
 })
 router.get('/authCheck',
     function routerInfoCallback(req, res, next) {
         passport.authenticate('jwt', function onPassportAuthCallback (error, user, info) {
+            const pkg = require('../../package.json');
+
             // this will execute in any case, even if a passport strategy will find an error
             // log everything to console
             logger.log('error:', error === undefined ? 'undefined' : JSON.stringify(error));
@@ -37,6 +39,7 @@ router.get('/authCheck',
             if (error != undefined) payload = {...payload, error: error};
             if (user != undefined) payload = {...payload, user: user};
             if (info != undefined) payload = {...payload, info: info};
+            if (pkg) payload = {...payload, version: pkg?.version};
 
             logger.res(payload);
             if (error) {
