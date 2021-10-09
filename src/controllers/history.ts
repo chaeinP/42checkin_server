@@ -39,9 +39,14 @@ export const getCardHistory = async (req: Request<{ id: string }, {}, {}, { page
 
 const getClusterHistory = async (req: Request<{ type: string }, {}, {}, { page: string, listSize: string }>, res: Response, clusterType: CLUSTER_CODE) => {
     try {
-        logger.log(req.user?.jwt, req.query?.id, req.query?.type, req.query?.listSize);
-        const page = parseInt(req.query.page);
-        const listSize = parseInt(req.query.listSize);
+        logger.log('jwt:', req.user?.jwt, ' clusterType:', clusterType, ', req.query:', JSON.stringify(req.query));
+        const page = parseInt(req.query?.page);
+        const listSize = parseInt(req.query?.listSize);
+        if (isNaN(page) || isNaN(listSize)) {
+            res.status(httpStatus.BAD_REQUEST).send({clusterType: clusterType, page: page, listSize: listSize});
+            return;
+        }
+
         const body = await historyService.getCluster(clusterType, page, listSize);
         logger.info(body);
         logger.res({ res: body, statusCode: STATUS_OK })
@@ -61,13 +66,14 @@ export const getSeochoHistory = async (req: Request<{ type: string }, {}, {}, { 
 
 export const getCheckInUsers = async (req: Request<{ type: string }, {}, {}, { page: string, listSize: string }>, res: Response) => {
     try {
-        logger.log(req.user?.jwt, req.query?.id, req.query?.type, req.query?.listSize);
+        logger.log('jwt:', req.user?.jwt, ', req.query:', JSON.stringify(req.query));
         const type = parseInt(req.params?.type);
         const page = parseInt(req.query?.page);
         const listSize = parseInt(req.query?.listSize);
         logger.log('type:', type, ', page:', page, ', listSize:', listSize);
-        if (!page || !listSize) {
-            throw new Error(`Invalid Parameters !! type:${type}, page:${page}, listSize:${listSize}`);
+        if (isNaN(type) || isNaN(page) || isNaN(listSize)) {
+            res.status(httpStatus.BAD_REQUEST).send({type: type, page: page, listSize: listSize});
+            return;
         }
 
         const body = await historyService.getCheckIn(type, page, listSize);
