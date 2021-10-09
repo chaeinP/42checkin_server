@@ -53,7 +53,7 @@ export const getUsagesDaily = async (userInfo: IJwtUser, from: string, to: strin
         order: [ [Sequelize.literal('date'), 'ASC'] ],
     });
 
-    return usages;
+    return { list: usages };
 };
 
 export const getUsagesList = async (userInfo: IJwtUser, from: string, to: string): Promise<any> => {
@@ -77,5 +77,5 @@ export const getUsagesList = async (userInfo: IJwtUser, from: string, to: string
         order: [ ['checkin_at', 'ASC'] ],
     });
 
-    return usages;
+    return { list: usages };
 };
