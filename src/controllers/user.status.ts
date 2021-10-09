@@ -5,6 +5,7 @@ import { Request, Response, NextFunction } from 'express';
 import { errorHandler } from '@modules/error';
 import httpStatus from 'http-status';
 import ApiError from "@modules/api.error";
+import {getPlanObject} from "@modules/util";
 
 /**
  * 유저 상태조회
@@ -40,7 +41,7 @@ export const userUsageDaily = async (req: Request, res: Response, next: NextFunc
     try {
         logger.log(req.user?.jwt, req.query?.from, req.query?.to);
         const body = await usageService.getUsagesDaily(req.user.jwt, req.query.from, req.query.to);
-        logger.info(body);
+        logger.info(getPlanObject(body));
         logger.res(httpStatus.OK, body);
         res.json(body).status(httpStatus.OK);
     } catch (e) {
@@ -55,7 +56,7 @@ export const userUsageList = async (req: Request, res: Response, next: NextFunct
     try {
         logger.log(req.user?.jwt, req.query?.from, req.query?.to);
         const body = await usageService.getUsagesList(req.user.jwt, req.query.from, req.query.to);
-        logger.info(body);
+        logger.info(getPlanObject(body));
         logger.res(httpStatus.OK, body);
         res.json(body).status(httpStatus.OK);
     } catch (e) {
@@ -71,7 +72,7 @@ export const forceCheckout = async (req: Request, res: Response, next: NextFunct
         logger.log(req.user?.jwt, req.params?.userId);
         const { userId } = req.params;
         const body = await userService.forceCheckOut(req.user.jwt, userId);
-        logger.info(body);
+        logger.info(getPlanObject(body));
         logger.res(httpStatus.OK, body);
         res.json(body).status(httpStatus.OK);
     } catch (e) {

@@ -1,6 +1,7 @@
 import {dailyfile} from 'tracer';
 import tracer from 'cls-rtracer';
 import context from 'express-http-context';
+import {getPlanObject} from "@modules/util";
 
 const rootFolder = './logs';
 const pmId = process.env.pm_id ? process.env.pm_id : 0;
@@ -238,25 +239,7 @@ const logger = {
     },
     res(httpStatus: number, response: any) {
         context.set('httpStatus', httpStatus);
-
-        let result = { ...response};
-        try {
-            if (Array.isArray(response?.list)) {
-                result.list = [];
-                for (let item of response?.list) {
-                    if (item.get) {
-                        result.list.push(item.get({plain: true}))
-                    } else {
-                        result.list.push(item);
-                    }
-                }
-            }
-        } catch (e) {
-            logger.error(e);
-            result = { ...response};
-        }
-
-        return http.log(result);
+        return http.log(getPlanObject(response));
     }
 };
 

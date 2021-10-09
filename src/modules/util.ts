@@ -28,3 +28,23 @@ export const getTimezoneDateString = (dt : Date) => {
 export const getDateString = (dt : Date) => {
     return dt.toISOString().replace('T', ' ').split('.')[0];
 }
+
+export const getPlanObject = (data: any) => {
+    let result = { ...data};
+    try {
+        if (Array.isArray(data?.list)) {
+            result.list = [];
+            for (let item of data?.list) {
+                if (item.get) {
+                    result.list.push(item.get({plain: true}))
+                } else {
+                    result.list.push(item);
+                }
+            }
+        }
+    } catch (e) {
+        result = data;
+    }
+
+    return result;
+}
