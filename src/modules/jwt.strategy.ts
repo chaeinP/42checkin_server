@@ -9,7 +9,8 @@ import context from 'express-http-context';
 const opts: StrategyOptions = {
 	jwtFromRequest: ExtractJwt.fromExtractors([
 		function JwtExtractor(req: Request) {
-            logger.log('env.cookie.auth:', env.cookie.auth, ', req.cookies:', JSON.stringify(req.cookies), ', ret:', req.cookies[env.cookie.auth]);
+            logger.log('env.cookie.auth:', env.cookie?.auth, ', req.cookies:', JSON.stringify(req.cookies),
+                ', ret:', req.cookies[env.cookie?.auth]);
 			return req.cookies[env.cookie.auth];
 		}
 	]),
@@ -18,8 +19,8 @@ const opts: StrategyOptions = {
 };
 
 const validate = (payload: any) => {
-    logger.log('payload:', payload);
     context.set('login', payload?.username ? payload?.username : '');
+    logger.log('payload:', payload);
 
 	return { _id: payload.sub, name: payload.username };
 };
