@@ -4,6 +4,7 @@ import {Tracer} from 'tracer';
 import ApiError from './api.error';
 import logger from '@modules/logger';
 import context from 'express-http-context';
+import * as os from "os";
 
 const SLACK_API = 'https://hooks.slack.com/services/';
 
@@ -33,7 +34,11 @@ const getErrorFormat = ({ stack, file, line, uid, statusCode, args, message }: I
 		.addField({
 			title: 'STATUS_CODE',
 			value: statusCode
-		});
+		})
+        .addField({
+                title: 'host',
+                value: os.hostname()
+            });
 
     let login = context.get('login');
     if (login) {
