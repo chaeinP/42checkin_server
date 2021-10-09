@@ -9,13 +9,18 @@ import {errorHandler} from "@modules/error";
 const STATUS_OK = httpStatus.OK;
 export const getUserHistory = async (req: Request<{ login: string }, {}, {}, { page: string, listSize: string }>, res: Response) => {
     try {
-        logger.log(req.user?.jwt, req.query?.login);
+        logger.log('jwt:', req.user?.jwt, ', req.query:', JSON.stringify(req.query));
         const login = req.params.login;
         const page = req.query.page ? parseInt(req.query.page) : 1;
         const listSize = parseInt(req.query.listSize);
+        if (isNaN(page) || isNaN(listSize)) {
+            res.status(httpStatus.BAD_REQUEST).send({login: login, page: page, listSize: listSize});
+            return;
+        }
+
         const body = await historyService.getUserHistory(login, page, listSize);
         logger.info(body);
-        logger.res({ res: body, statusCode: STATUS_OK })
+        logger.res(STATUS_OK, body)
         res.json(body).status(STATUS_OK);
     } catch (e) {
         errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack, isFatal: true}), req, res, () => {});
@@ -24,13 +29,18 @@ export const getUserHistory = async (req: Request<{ login: string }, {}, {}, { p
 
 export const getCardHistory = async (req: Request<{ id: string }, {}, {}, { page: string, listSize: string }>, res: Response) => {
     try {
-        logger.log(req.user?.jwt, req.query?.id, req.query?.page, req.query?.listSize);
+        logger.log('jwt:', req.user?.jwt, ', req.query:', JSON.stringify(req.query));
         const id = parseInt(req.params.id);
         const page = parseInt(req.query.page);
         const listSize = parseInt(req.query.listSize);
+        if (isNaN(page) || isNaN(listSize)) {
+            res.status(httpStatus.BAD_REQUEST).send({id: id, page: page, listSize: listSize});
+            return;
+        }
+
         const body = await historyService.getCardHistory(id, page, listSize);
         logger.info(body);
-        logger.res({ res: body, statusCode: STATUS_OK })
+        logger.res(STATUS_OK, body)
         res.json(body).status(STATUS_OK);
     } catch (e) {
         errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack, isFatal: true}), req, res, () => {});
@@ -48,8 +58,8 @@ const getClusterHistory = async (req: Request<{ type: string }, {}, {}, { page: 
         }
 
         const body = await historyService.getCluster(clusterType, page, listSize);
-        logger.info(body);
-        logger.res({ res: body, statusCode: STATUS_OK })
+        logger.info(JSON.stringify(body));
+        logger.res(STATUS_OK, body)
         res.json(body).status(STATUS_OK);
     } catch (e) {
         errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack, isFatal: true}), req, res, () => {});
@@ -78,7 +88,7 @@ export const getCheckInUsers = async (req: Request<{ type: string }, {}, {}, { p
 
         const body = await historyService.getCheckIn(type, page, listSize);
         logger.info(body);
-        logger.res({ res: body, statusCode: STATUS_OK })
+        logger.res(STATUS_OK, body)
         res.json(body).status(STATUS_OK);
     } catch (e) {
         errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack, isFatal: true}), req, res, () => {});

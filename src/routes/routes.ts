@@ -41,18 +41,20 @@ router.get('/authCheck',
             if (info != undefined) payload = {...payload, info: info};
             if (pkg) payload = {...payload, version: pkg?.version};
 
-            logger.res(payload);
             if (error) {
+                logger.res(401, payload);
                 res.status(401).send(payload);
             } else if (!user) {
+                logger.res(401, payload);
                 res.status(401).send(payload);
             } else {
+                logger.res(200, payload);
                 res.status(200).send(payload);
             }
         })(req, res);
     },
     // function to call once successfully authenticated
     function onAuthSuccess(req, res) {
-        logger.res({ statusCode: 2000 });
+        logger.res(200, { statusCode: 2000 });
         res.status(200).send({ statusCode: 2000 });
     });

@@ -52,6 +52,6 @@ export const errorHandler = (err: ApiError, req: Request, res: Response, next: N
         logger.error(e);
     }
     logger.log(response);
-    logger.res(response);
+    logger.res(err.statusCode || req.statusCode, response);
 	res.status(statusCode).send(response);
 };

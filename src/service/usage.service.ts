@@ -33,7 +33,6 @@ export const getUsagesDaily = async (userInfo: IJwtUser, from: string, to: strin
     // noinspection DuplicatedCode
     logger.log('userInfo:', JSON.stringify(userInfo), ', from:', from, ', to:', to);
     const user = await Users.findOne({ where: { _id: userInfo._id } });
-    logger.debug('user:', JSON.stringify(user), 'from:', from, 'to:', to);
 
     const conditions = {
         login: user.login,

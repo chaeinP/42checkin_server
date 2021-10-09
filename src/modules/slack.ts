@@ -67,7 +67,6 @@ const getErrorFormat = ({ stack, file, line, uid, statusCode, args, message }: I
 };
 
 export const sendErrorMessage = (error: IError) => {
-    logger.debug(error);
 	const body = getErrorFormat(error);
     axios.post(`${SLACK_API}${env.slack.alarm}`, body).catch(err => logger.error(err));
 };

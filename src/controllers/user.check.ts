@@ -13,7 +13,7 @@ export const checkIn = async (req: Request, res: Response, next: NextFunction) =
         logger.log(req.user?.jwt, req.params?.cardid);
         const body = await userService.checkIn(req.user.jwt, req.params.cardid);
         logger.info(body);
-        logger.res({ res: body, statusCode: httpStatus.OK });
+        logger.res(httpStatus.OK, body);
         res.status(httpStatus.OK).json(body);
     } catch (e) {
         errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack, isFatal: true}), req, res, next);
@@ -29,7 +29,7 @@ export const checkOut = async (req: Request, res: Response, next: NextFunction) 
         logger.log(req.user?.jwt);
         const body = await userService.checkOut(req.user.jwt);
         logger.info(body);
-        logger.res({ res: body, statusCode: httpStatus.OK});
+        logger.res(httpStatus.OK, body);
         res.status(httpStatus.OK).json(body);
     } catch (e) {
         errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack, isFatal: true}), req, res, next);

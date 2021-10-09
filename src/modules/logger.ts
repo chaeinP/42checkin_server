@@ -6,7 +6,7 @@ const rootFolder = './logs';
 const pmId = process.env.pm_id ? process.env.pm_id : 0;
 const splitFormat = `yyyymmdd`;
 const logFormat = '{{timestamp}} {{title}} {{file}}:{{line}} ({{method}}) {{tid}} [{{login}}] {{message}}';
-const jsonFormat = '{ timestamp:{{timestamp}}, level:{{title}}, file:{{file}}, line:{{line}}, method:{{method}}, tid:{{tid}}, user:{{login}} payload:{{message}} }';
+const jsonFormat = '{ timestamp:{{timestamp}}, level:{{title}}, file:{{file}}, line:{{line}}, method:{{method}}, tid:{{tid}}, user:{{login}} httpStatus:{{httpStatus}} payload:{{message}} }';
 const dateformat = 'yyyy-mm-dd"T"HH:MM:ss.lo';
 /**
  * root: 파일위치
@@ -86,6 +86,9 @@ let jsonConfig = {
 
         const login = context.get('login');
         data.login = login ? login : '';
+
+        const httpStatus = context.get('httpStatus');
+        data.httpStatus = httpStatus ? httpStatus : '';
     },
     transport: function(data: any) {
         const isProd = process.env.NODE_ENV?.toLowerCase()?.includes('prod')
@@ -231,12 +234,29 @@ const logger = {
             isNewRecord: false
           }
          */
-        logger.debug(request);
         return http.log(request);
     },
-    res (response: any) {
-        logger.debug(response);
-        return http.log(response);
+    res(httpStatus: number, response: any) {
+        context.set('httpStatus', httpStatus);
+
+        let result = { ...response};
+        try {
+            if (Array.isArray(response?.list)) {
+                result.list = [];
+                for (let item of response?.list) {
+                    if (item.get) {
+                        result.list.push(item.get({plain: true}))
+                    } else {
+                        result.list.push(item);
+                    }
+                }
+            }
+        } catch (e) {
+            logger.error(e);
+            result = { ...response};
+        }
+
+        return http.log(result);
     }
 };
 

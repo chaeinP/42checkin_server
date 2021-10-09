@@ -14,7 +14,7 @@ export const userStatus = async (req: Request, res: Response, next: NextFunction
         logger.log(req.user?.jwt);
         const body = await userService.status(req.user.jwt);
         logger.info(body);
-        logger.res({ res: body, statusCode: httpStatus.OK });
+        logger.res(httpStatus.OK, body);
         res.json(body).status(httpStatus.OK);
     } catch (e) {
         errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack, isFatal: true}), req, res, next);
@@ -26,7 +26,7 @@ export const usingStatus = async (req: Request, res: Response, next: NextFunctio
         logger.log(req.user?.jwt);
         const body = await userService.getUsingInfo();
         logger.info(body);
-        logger.res({  res: body, statusCode: httpStatus.OK });
+        logger.res(httpStatus.OK, body);
         res.status(httpStatus.OK).json(body);
     } catch (e) {
         errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack, isFatal: true}), req, res, next);
@@ -41,7 +41,7 @@ export const userUsageDaily = async (req: Request, res: Response, next: NextFunc
         logger.log(req.user?.jwt, req.query?.from, req.query?.to);
         const body = await usageService.getUsagesDaily(req.user.jwt, req.query.from, req.query.to);
         logger.info(body);
-        logger.res({ res: body, statusCode: httpStatus.OK });
+        logger.res(httpStatus.OK, body);
         res.json(body).status(httpStatus.OK);
     } catch (e) {
         errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack, isFatal: true}), req, res, next);
@@ -56,7 +56,7 @@ export const userUsageList = async (req: Request, res: Response, next: NextFunct
         logger.log(req.user?.jwt, req.query?.from, req.query?.to);
         const body = await usageService.getUsagesList(req.user.jwt, req.query.from, req.query.to);
         logger.info(body);
-        logger.res({ res: body, statusCode: httpStatus.OK });
+        logger.res(httpStatus.OK, body);
         res.json(body).status(httpStatus.OK);
     } catch (e) {
         errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack, isFatal: true}), req, res, next);
@@ -72,7 +72,7 @@ export const forceCheckout = async (req: Request, res: Response, next: NextFunct
         const { userId } = req.params;
         const body = await userService.forceCheckOut(req.user.jwt, userId);
         logger.info(body);
-        logger.res({ res: body, statusCode: httpStatus.OK });
+        logger.res(httpStatus.OK, body);
         res.json(body).status(httpStatus.OK);
     } catch (e) {
         errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack, isFatal: true}), req, res, next);
