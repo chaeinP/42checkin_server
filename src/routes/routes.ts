@@ -3,10 +3,18 @@ import { Router } from "express";
 import * as userRouter from '@routes/user.routes'
 import * as configRouter from '@routes/config.routes'
 import * as historyRouter from '@routes/history.routes';
+import * as diskusage from 'diskusage'
 import {Sequelize} from "@models/database";
 import logger from "@modules/logger";
 import passport from "passport";
 import httpStatus from 'http-status';
+import {errorHandler} from "@modules/error";
+import ApiError from "@modules/api.error";
+import {sendErrorMessage} from "@modules/slack";
+import tracer from "cls-rtracer";
+
+const os = require('os');
+let diskPath = os.platform() === 'win32' ? 'c:' : '/';
 
 export const router = Router();
 export const path = '';
@@ -16,7 +24,7 @@ router.use(historyRouter.path, historyRouter.router);
 router.use(configRouter.path, configRouter.router);
 router.get('/healthCheck', (req, res, next) => {
     Sequelize().authenticate()
-        .then(function SequelizeAuthCallback() {
+        .then(async function SequelizeAuthCallback() {
             res.json({ status: 'ok' }).status(httpStatus.OK);
         })
         .catch(function SequelizeAuthCallback (err) {
@@ -24,6 +32,17 @@ router.get('/healthCheck', (req, res, next) => {
             res.json({ status: 'fail', message: err.message }).status(httpStatus.INTERNAL_SERVER_ERROR);
         });
 })
+
+router.get('/diskCheck', async (req, res, next) => {
+    /*available: Disk space available to the current user (i.e. Linux reserves 5% for root)
+    free: Disk space physically free
+    total: Total disk space (free + used)*/
+    const { free, available, total } = await diskusage.check(diskPath);
+    let usage = available * 100 / total;
+    let status = usage > 80 ? httpStatus.INSUFFICIENT_STORAGE : httpStatus.OK;
+    res.json({ usage: `${usage.toFixed(1)}%` }).status(status);
+})
+
 router.get('/authCheck',
     function routerInfoCallback(req, res, next) {
         passport.authenticate('jwt', function onPassportAuthCallback (error, user, info) {
