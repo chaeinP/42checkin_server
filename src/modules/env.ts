@@ -60,6 +60,10 @@ const env = {
         alarm: process.env.SLACK_ALARM,
         test: process.env.SLACK_TEST,
         cs: process.env.SLACK_CS,
+        client: {
+            id: process.env.SLACK_CLIENT_ID,
+            secret: process.env.SLACK_CLIENT_SECRET,
+        },
     },
 	ip: {
 		guest: process.env.FT_GUEST_IP,
