@@ -1,95 +1,65 @@
+import { ExtractJwt, Strategy, StrategyOptions } from 'passport-jwt';
+import { Request } from 'express';
 import env from '@modules/env';
-import ApiError from './api.error';
-import httpStatus from 'http-status';
-import passport from 'passport';
+import jwt from 'jsonwebtoken';
 import logger from '@modules/logger';
-import { Users } from '@models/database';
-import { now } from './util';
+import { Users } from '@models/users';
+import context from 'express-http-context';
 
-let FortyTwoStrategy = require('passport-42').Strategy;
-
-const validate = async (token: string, rt: string, profile: any) => {
-	try {
-        if (profile._json.cursus_users.length < 2) {
-            logger.error('profile:', profile);
-            let msg = `접근할 수 없는 유저입니다. ${profile}`;
-            throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, msg, {stack: new Error(msg).stack});
-		} else {
-            const user = new Users({
-                login: profile.username,
-                email: profile.emails[0].value,
-                created_at: now().toDate(),
-                type: 'cadet',
-                access_token: token,
-                refresh_token: rt,
-                profile: profile,
-            });
-
-			return user;
+const opts: StrategyOptions = {
+	jwtFromRequest: ExtractJwt.fromExtractors([
+		function JwtExtractor(req: Request) {
+            logger.log('env.cookie.auth:', env.cookie?.auth, ', req.cookies:', JSON.stringify(req.cookies),
+                ', ret:', req.cookies[env.cookie?.auth]);
+			return req.cookies[env.cookie.auth];
 		}
+	]),
+	ignoreExpiration: false,
+	secretOrKey: env.jwt.secret
+};
+
+const validate = (payload: any) => {
+    context.set('login', payload?.username ? payload?.username : '');
+    logger.log('payload:', payload);
+
+	return { _id: payload.sub, name: payload.username };
+};
+
+const strategyCallback = (jwt_payload: { sub: any; username: any }, done: any) => {
+    try {
+        const user = validate(jwt_payload);
+        if (user._id) {
+            return done(null, { jwt: user });
+        } else {
+            return done(null, null);
+        }
+    } catch (e) {
+        logger.error(e);
+        return done(null, null);
+    }
+};
+
+const StrategyJwt = () => new Strategy(opts, strategyCallback);
+
+export const generateToken = (user: Users): string => {
+	try {
+		const payload = {
+			username: user.login,
+			sub: user._id
+		};
+        context.set('login', user?.login);
+		const token = jwt.sign(payload, env.jwt.secret, { expiresIn: '7d' });
+        logger.log('token:', token, 'payload:', payload);
+		return token;
 	} catch (e) {
 		logger.error(e);
-        return false;
+		throw e;
 	}
 };
 
-const strategeyCallback = (
-	accessToken: any,
-	refreshToken: any,
-	profile: { id: any },
-	callback: (arg0: any, arg1: any) => any
-) => {
-	validate(accessToken, refreshToken, profile)
-		.then(async (user: Users) => {
-            logger.log('accessToken:', accessToken)
-            logger.log('refreshToken:', refreshToken)
+export interface IJwtUser {
+	_id: number;
+	name: string;
+}
 
-            const found = await Users.findOne({ where: { login: user.login } })
-            if (found) {
-                found.email = user.email;
-                found.access_token = user.access_token;
-                found.refresh_token = user.refresh_token;
-                found.profile = user.profile;
-                found.updated_at = new Date();
-                
-                await found.save();
-            }
-            
-			callback(null, { ft: found });
-		})
-		.catch((err) => {
-			logger.error(err);
-			callback(null, null);
-		})
-};
-
-const Strategy42 = () =>
-	new FortyTwoStrategy(
-		{
-			clientID: env.client.id,
-			clientSecret: env.client.secret,
-			callbackURL: env.client.callback,
-			profileFields: {
-				id: (obj: any) => String(obj.id),
-				username: 'login',
-				displayName: 'displayname',
-				'name.familyName': 'last_name',
-				'name.givenName': 'first_name',
-				profileUrl: 'url',
-				'emails.0.value': 'email',
-				'phoneNumbers.0.value': 'phone',
-				'photos.0.value': 'image_url'
-			}
-		},
-		strategeyCallback
-	);
-
-passport.serializeUser(function(user, done) {
-	done(null, user);
-});
-
-passport.deserializeUser(function(obj, done) {
-	done(null, obj);
-});
-
-export default Strategy42;
+export default StrategyJwt;

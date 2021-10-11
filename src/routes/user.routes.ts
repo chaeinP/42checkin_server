@@ -5,15 +5,15 @@ import * as Login from '@controllers/user.login';
 import * as Status from '@controllers/user.status';
 import * as Check from '@controllers/user.check';
 import {GuestWiFiIpFilter} from '@modules/ipFilter';
-import {StrategyJwt} from '@modules/strategyJwt';
-import Strategy42 from '@modules/strategy.jwt';
+import StrategyJwt from '@modules/strategy.jwt';
+import Strategy42 from '@modules/strategy.42';
 import StrategySlack from "@modules/strategy.slack";
 
 export const path = '/user';
 export const router = Router();
 
 const passportOptions = { failureRedirect: env.url.client + '/' };
-const strategy = env.passport.strategy ? env.passport.strategy : '42';
+const strategy = env.passport?.strategy ? env.passport?.strategy : '42';
 
 passport.use(StrategyJwt());
 passport.use(Strategy42());

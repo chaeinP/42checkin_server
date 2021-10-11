@@ -1,6 +1,6 @@
 import httpStatus from 'http-status';
 import { Op } from 'sequelize';
-import { generateToken, IJwtUser } from '@modules/strategyJwt';
+import { generateToken, IJwtUser } from '@modules/strategy.jwt';
 import logger from '@modules/logger';
 import ApiError from '@modules/api.error';
 import { CHECK_STATE, CLUSTER_CODE, CLUSTER_TYPE } from '@modules/cluster';

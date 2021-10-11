@@ -55,7 +55,7 @@ router.get('/authCheck',
             let payload = { };
             if (error != undefined) payload = {...payload, error: error};
             if (user != undefined) payload = {...payload, user: user};
-            if (info != undefined) payload = {...payload, info: info};
+            if (info != undefined) payload = {...payload, info: JSON.stringify(info)};
             if (pkg) payload = {...payload, version: pkg?.version};
 
             if (error) {
