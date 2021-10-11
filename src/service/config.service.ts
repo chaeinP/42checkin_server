@@ -12,17 +12,13 @@ import logger from "@modules/logger";
  * @returns
  */
 export const getConfig = async (date: string) => {
-	const node_env = env.node_env === 'devtest' ? 'development' : env.node_env;
-    const start_at = moment(date).tz('Asia/Seoul');
-    const end_at = moment(date).tz('Asia/Seoul');
+	const node_env = env.node_env ? env.node_env : 'development';
 
     if (!date) {
         logger.error(`Invalid Date: ${date}`);
         date = new Date().toISOString();
     }
 
-    start_at.set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
-    end_at.set({ hour: 23, minute: 59, second: 59, millisecond: 0 })
 	const setting = await Config.findOne({
         where: {
             env: node_env,
@@ -30,7 +26,7 @@ export const getConfig = async (date: string) => {
                 [Op.lte]: date
             },
             end_at: {
-                [Op.gte]: date
+                [Op.gt]: date
             },
         },
     });
