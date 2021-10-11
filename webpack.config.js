@@ -14,15 +14,15 @@ const config = {
 	},
 	test: {
 		env: './.env.test',
-		output_path: 'test_dist'
+		output_path: 'dist_test'
 	},
 	alpha: {
 		env: './.env.alpha',
-		output_path: 'alpha_dist'
+		output_path: 'dist_alpha'
 	},
-	developlemt: {
+    development: {
 		env: './.env.development',
-		output_path: ''
+		output_path: 'dist_dev'
 	}
 }
 

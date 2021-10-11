@@ -1,8 +1,10 @@
 import path from 'path';
 import dotenv from 'dotenv';
+import appRootPath from "app-root-path";
 
-const config = dotenv.config({ path: path.join(__dirname, `../../.env.${process.env.NODE_ENV}`) });
+const config = dotenv.config({ path: path.join(appRootPath.path, `.env.${process.env.NODE_ENV}`) });
 if (config.error) {
+    console.log(config.error);
 	throw new Error('process.env.NODE_ENV를 설정하지 않았습니다!');
 }
 
