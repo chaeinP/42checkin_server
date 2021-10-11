@@ -1,4 +1,4 @@
-import { IJwtUser } from '@modules/jwt.strategy'
+import { IJwtUser } from '@modules/strategyJwt'
 import { Users } from '@models/users';
 
 declare module "express" {

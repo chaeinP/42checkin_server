@@ -6,7 +6,7 @@ import logger from '@modules/logger';
 import { Users } from '@models/database';
 import { now } from './util';
 
-let SlackStrategy = require('passport-slack-oauth2').Strategy;
+const PassortStrategySlack = require('passport-slack-oauth2').Strategy;
 
 // noinspection DuplicatedCode
 const validate = async (token: string, refreshToken: string, profile: any) => {
@@ -54,7 +54,7 @@ const strategeyCallback = async (
 };
 
 const StrategySlack = () =>
-	new SlackStrategy(
+	new PassortStrategySlack(
 		{
 			clientID: env.slack.client.id,
 			clientSecret: env.slack.client.secret,
