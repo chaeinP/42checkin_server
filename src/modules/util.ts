@@ -29,6 +29,15 @@ export const getDateString = (dt : Date) => {
     return dt.toISOString().replace('T', ' ').split('.')[0];
 }
 
+export const getTimeNumber = (t : string) => {
+    let data = t.split(':');
+    let hour = parseInt(data[0]);
+    let minute = parseInt(data[1])
+    let seconds = data.length > 2 ? parseInt(data[2]) : 0;
+
+    return (hour * 360) + (minute * 60) + seconds;
+}
+
 export const getPlanObject = (data: any) => {
     let result = { ...data};
     try {

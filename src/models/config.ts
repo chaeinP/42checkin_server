@@ -6,8 +6,15 @@ export interface ConfigAttributes {
     env?: string;
     begin_at?: Date;
     end_at?: Date;
+    open_at?: number;
+    close_at?: number;
+    checkin_at?: number;
+    checkout_at?: number;
     seocho?: number;
     gaepo?: number;
+    deleted_at?: Date;
+    updated_at?: Date;
+    created_at?: Date;
 }
 
 export type configPk = "_id";
@@ -20,9 +27,15 @@ export class Config extends Model<ConfigAttributes, configCreationAttributes> im
     env?: string;
     begin_at?: Date;
     end_at?: Date;
+    open_at?: number;
+    close_at?: number;
+    checkin_at?: number;
+    checkout_at?: number;
     seocho?: number;
     gaepo?: number;
-
+    deleted_at?: Date;
+    updated_at?: Date;
+    created_at?: Date;
 
     static initModel(sequelize: Sequelize.Sequelize): typeof Config {
         Config.init({
@@ -44,6 +57,22 @@ export class Config extends Model<ConfigAttributes, configCreationAttributes> im
                 type: DataTypes.DATE,
                 allowNull: true
             },
+            open_at: {
+                type: DataTypes.TIME,
+                allowNull: true
+            },
+            close_at: {
+                type: DataTypes.TIME,
+                allowNull: true
+            },
+            checkin_at: {
+                type: DataTypes.TIME,
+                allowNull: true
+            },
+            checkout_at: {
+                type: DataTypes.TIME,
+                allowNull: true
+            },
             seocho: {
                 type: DataTypes.INTEGER,
                 allowNull: true
@@ -51,7 +80,19 @@ export class Config extends Model<ConfigAttributes, configCreationAttributes> im
             gaepo: {
                 type: DataTypes.INTEGER,
                 allowNull: true
-            }
+            },
+            deleted_at: {
+                type: DataTypes.DATE,
+                allowNull: true
+            },
+            updated_at: {
+                type: DataTypes.DATE,
+                allowNull: true
+            },
+            created_at: {
+                type: DataTypes.DATE,
+                allowNull: true
+            },
         }, {
             sequelize,
             tableName: 'config',
