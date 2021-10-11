@@ -55,7 +55,7 @@ const strategeyCallback = (
                 await found.save();
             }
             
-			callback(null, { ft: user });
+			callback(null, { ft: found });
 		})
 		.catch((err) => {
 			logger.error(err);

@@ -31,7 +31,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 export const callback = async (req: Request, res: Response, next: NextFunction) => {
     try {
         logger.log(req.user?.jwt, req.user?.ft);
-        const { token, cookieOption } = await authService.getAuth(req.user.ft);
+        const { token, cookieOption } = await authService.getAuth(req.user?.ft);
         res.cookie(env.cookie.auth, token, cookieOption);
         res.clearCookie('redirect');
         if(req.cookies.redirect) {

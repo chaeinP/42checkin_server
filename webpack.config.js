@@ -14,15 +14,15 @@ const config = {
 	},
 	test: {
 		env: './.env.test',
-		output_path: 'test_dist'
+		output_path: 'dist_test'
 	},
 	alpha: {
 		env: './.env.alpha',
-		output_path: 'alpha_dist'
+		output_path: 'dist_alpha'
 	},
-	developlemt: {
+    development: {
 		env: './.env.development',
-		output_path: ''
+		output_path: 'dist_dev'
 	}
 }
 
@@ -95,6 +95,7 @@ module.exports = {
 			'process.env.SLACK_ALARM': JSON.stringify(process.env.SLACK_ALARM),
             'process.env.SLACK_TEST': JSON.stringify(process.env.SLACK_TEST),
             'process.env.SLACK_CS': JSON.stringify(process.env.SLACK_CS),
+            'process.env.PASSPORT_STRATEGY': JSON.stringify(process.env.PASSPORT_STRATEGY),
 			'process.env.FT_GUEST_IP': JSON.stringify(process.env.FT_GUEST_IP),
 			'process.env.DEVELOPER01_IP': JSON.stringify(process.env.DEVELOPER01_IP),
 			'process.env.DEVELOPER02_IP': JSON.stringify(process.env.DEVELOPER02_IP),
