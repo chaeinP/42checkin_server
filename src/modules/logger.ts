@@ -1,7 +1,7 @@
 import {dailyfile} from 'tracer';
 import tracer from 'cls-rtracer';
 import context from 'express-http-context';
-import {getPlanObject} from "@modules/util";
+import {getPlanObject} from './util';
 
 const rootFolder = './logs';
 const pmId = process.env.pm_id ? process.env.pm_id : 0;

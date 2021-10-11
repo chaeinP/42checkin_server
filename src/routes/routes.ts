@@ -8,9 +8,6 @@ import logger from "@modules/logger";
 import passport from "passport";
 import httpStatus from 'http-status';
 
-const os = require('os');
-let diskPath = os.platform() === 'win32' ? 'c:' : '/';
-
 export const router = Router();
 export const path = '';
 
@@ -32,9 +29,9 @@ router.get('/healthCheck', (req, res, next) => {
 // https://github.com/jduncanator/node-diskusage/issues/41
 // Broken for me on node 13.0.1.. need to search for some other package
 /*router.get('/diskCheck', async (req, res, next) => {
-    /!*available: Disk space available to the current user (i.e. Linux reserves 5% for root)
-    free: Disk space physically free
-    total: Total disk space (free + used)*!/
+    // available: Disk space available to the current user (i.e. Linux reserves 5% for root)
+    // free: Disk space physically free
+    // total: Total disk space (free + used)
     const { free, available, total } = await diskusage.check(diskPath);
     let usage = available * 100 / total;
     let status = usage > 80 ? httpStatus.INSUFFICIENT_STORAGE : httpStatus.OK;
