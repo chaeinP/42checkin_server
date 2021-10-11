@@ -3,7 +3,8 @@ import { app } from '../../../src/app';
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import httpStatus from 'http-status';
-import { sequelize } from '../../../src/models';
+import { Sequelize } from '../../../src/models/database';
+// @ts-ignore
 import { getCookie } from '../env';
 
 let cookie = '';
@@ -11,7 +12,7 @@ let cookie = '';
 describe('user api test', async () => {
     before(async () => {
         try {
-            await sequelize.authenticate();
+            await Sequelize().authenticate();
             cookie = await getCookie();
             await request(app).post(`/user/checkOut`).set('Cookie', [cookie]);
         } catch (e) {

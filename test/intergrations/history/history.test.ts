@@ -4,17 +4,17 @@ import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import httpStatus from 'http-status';
 import { CLUSTER_CODE } from '../../../src/modules/cluster';
-import { sessionCookie } from '../env';
-import { sequelize } from '../../../src/models';
+// @ts-ignore
 import { getCookie } from '../env';
+import {Sequelize} from "../../../src/models/database";
 
-let cookie = '';
+let sessionCookie = '';
 
 describe('log api test', async () => {
 	before(async () => {
         try {
-            await sequelize.authenticate();
-            cookie = await getCookie();
+            await Sequelize().authenticate();
+            sessionCookie = await getCookie();
         } catch(e) {
             console.log(e);
         }

@@ -2,8 +2,9 @@ import request from 'supertest';
 import { app } from '../../../src/app';
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
-import { sequelize } from '../../../src/models';
 import { getTimeFormat } from '../../../src/modules/util';
+import { Sequelize } from '../../../src/models/database';
+// @ts-ignore
 import { getCookie } from '../env';
 
 let cookie = '';
@@ -11,7 +12,7 @@ let cookie = '';
 describe('config api test', async () => {
 	before(async () => {
         try {
-            await sequelize.authenticate();
+            await Sequelize().authenticate();
             cookie = await getCookie();
         } catch(e) {
             console.log(e);

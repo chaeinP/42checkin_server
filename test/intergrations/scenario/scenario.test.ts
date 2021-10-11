@@ -4,10 +4,11 @@ import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import httpStatus from 'http-status';
 import { CLUSTER_CODE } from '../../../src/modules/cluster';
-import { sequelize } from '../../../src/models';
 import { Config as IConfig } from '../../../src/models/config';
 import { getTimeFormat } from '../../../src/modules/util';
+// @ts-ignore
 import { getCookie } from '../env';
+import {Sequelize} from "../../../src/models/database";
 
 let cookie = '';
 
@@ -28,7 +29,7 @@ describe('최대 수용인원수 가까이 입장했을때, 체크인 시스템 
 
     before(async () => {
         // 서버에서 디비가 연결될 경우 emit하는 값을 감지한 후 done()을 호출해, 테스트 케이스를 시작한다.
-        await sequelize.authenticate();
+        await Sequelize().authenticate();
         cookie = await getCookie();
         const forceCheckoutAll = (users: any) =>
             Promise.all(

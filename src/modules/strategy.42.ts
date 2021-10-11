@@ -3,7 +3,7 @@ import ApiError from './api.error';
 import httpStatus from 'http-status';
 import passport from 'passport';
 import logger from '@modules/logger';
-import { Users } from '../models';
+import { Users } from '@models/database';
 import { now } from './util';
 
 let FortyTwoStrategy = require('passport-42').Strategy;
@@ -11,19 +11,20 @@ let FortyTwoStrategy = require('passport-42').Strategy;
 const validate = async (token: string, rt: string, profile: any) => {
 	try {
         if (profile._json.cursus_users.length < 2) {
-            logger.info({
-                type: 'get',
-                message: 'user profile',
-                data: profile,
-            });
-            throw new ApiError(httpStatus.NOT_ACCEPTABLE, '접근할 수 없는 유저입니다.');
+            logger.error('profile:', profile);
+            let msg = `접근할 수 없는 유저입니다. ${profile}`;
+            throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, msg, {stack: new Error(msg).stack});
 		} else {
             const user = new Users({
                 login: profile.username,
                 email: profile.emails[0].value,
                 created_at: now().toDate(),
-                type: 'cadet'
+                type: 'cadet',
+                access_token: token,
+                refresh_token: rt,
+                profile: profile,
             });
+
 			return user;
 		}
 	} catch (e) {
@@ -39,8 +40,22 @@ const strategeyCallback = (
 	callback: (arg0: any, arg1: any) => any
 ) => {
 	validate(accessToken, refreshToken, profile)
-		.then(user => {
-			callback(null, { ft: user });
+		.then(async (user: Users) => {
+            logger.log('accessToken:', accessToken)
+            logger.log('refreshToken:', refreshToken)
+
+            const found = await Users.findOne({ where: { login: user.login } })
+            if (found) {
+                found.email = user.email;
+                found.access_token = user.access_token;
+                found.refresh_token = user.refresh_token;
+                found.profile = user.profile;
+                found.updated_at = new Date();
+                
+                await found.save();
+            }
+            
+			callback(null, { ft: found ? found : user });
 		})
 		.catch((err) => {
 			logger.error(err);
