@@ -3,7 +3,7 @@ import logger from '../modules/logger';
 import { Users } from 'src/models/users';
 import { Usages } from '@models/usages';
 import { now, getLocalDate } from '@modules/util';
-import {IJwtUser} from "@modules/jwt.strategy";
+import {IJwtUser} from "@modules/strategyJwt";
 
 const DIVIDER_FOR_DURATION = 60;
 

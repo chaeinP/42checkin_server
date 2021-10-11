@@ -39,7 +39,7 @@ const strategyCallback = (jwt_payload: { sub: any; username: any }, done: any) =
     }
 };
 
-export const JwtStrategy = () => new Strategy(opts, strategyCallback);
+export const StrategyJwt = () => new Strategy(opts, strategyCallback);
 
 export const generateToken = (user: Users): string => {
 	try {

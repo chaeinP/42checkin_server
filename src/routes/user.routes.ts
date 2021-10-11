@@ -1,21 +1,26 @@
-import { Router } from 'express';
+import {Router} from 'express';
 import passport from 'passport';
 import env from '@modules/env';
 import * as Login from '@controllers/user.login';
 import * as Status from '@controllers/user.status';
 import * as Check from '@controllers/user.check';
-import { GuestWiFiIpFilter } from '@modules/ipFilter';
-import { JwtStrategy } from '@modules/jwt.strategy';
-import Strategy42 from '@modules/ft.strategy';
+import {GuestWiFiIpFilter} from '@modules/ipFilter';
+import {StrategyJwt} from '@modules/strategyJwt';
+import Strategy42 from '@modules/strategy.jwt';
+import StrategySlack from "@modules/strategy.slack";
 
 export const path = '/user';
 export const router = Router();
-const passportOptions = { failureRedirect: env.url.client + '/' };
-passport.use(JwtStrategy());
-passport.use(Strategy42());
 
-router.get('/login/', Login.login, passport.authenticate('42', passportOptions));
-router.get('/login/callback', passport.authenticate('42', passportOptions), Login.callback);
+const passportOptions = { failureRedirect: env.url.client + '/' };
+const strategy = env.passport.strategy ? env.passport.strategy : '42';
+
+passport.use(StrategyJwt());
+passport.use(Strategy42());
+passport.use(StrategySlack());
+
+router.get('/login/', Login.login, passport.authenticate(strategy, passportOptions));
+router.get('/login/callback', passport.authenticate(strategy, passportOptions), Login.callback);
 router.post('/checkIn/:cardid', GuestWiFiIpFilter, passport.authenticate('jwt'), Check.checkIn);
 router.post('/checkOut', passport.authenticate('jwt'), Check.checkOut);
 router.get('/status', passport.authenticate('jwt'), Status.userStatus);
