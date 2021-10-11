@@ -6,6 +6,7 @@ import logger from '@modules/logger';
 import ApiError from "@modules/api.error";
 import {getConfig} from "@service/config.service";
 import {getTimeNumber, getTimezoneDateString} from "@modules/util";
+import {getUser} from "@service/user.service";
 
 const isBetween = (target: string, min: any, max: any) => {
     let now = getTimeNumber(target);
@@ -16,6 +17,11 @@ const isBetween = (target: string, min: any, max: any) => {
 }
 
 const checkAvailable = async (msg: string, req: Request, res: Response, next: NextFunction) => {
+    logger.log(req.user?.jwt, req.params?.cardid);
+
+    const user = await getUser(req.user?.jwt?._id);
+    if (['admin'].includes(user.type)) return;
+
     // noinspection DuplicatedCode
     const today = getTimezoneDateString(new Date()).slice(0, 10)
     const config = await getConfig(today);

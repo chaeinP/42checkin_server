@@ -30,6 +30,7 @@ export const getConfig = async (date: string) => {
             },
         },
     });
+    
 	if (setting) {
 		return setting;
 	} else {
