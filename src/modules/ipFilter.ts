@@ -11,9 +11,16 @@ const ipFilter = (rules: Function[]) => async (req: Request, res: Response, next
 	if (rules.length === 0 || rules.some((rule) => rule(clientIp))) {
 		next();
 	} else {
+        const response: { code: number, message: string, stack: string } = {
+            code: httpStatus.NETWORK_AUTHENTICATION_REQUIRED,
+            message: `42Guest WiFi 접속 중에만 체크인이 가능합니다.\n현재 IP: ${clientIp}\n42Guest WiFi: 121.135.181.61`,
+            stack: ''
+        };
+
         logger.log('Unauthorized IP', clientIp)
-        let msg = `42seoul Guest WiFi를 사용해주세요.\n현재 IP:${clientIp}`;
-        errorHandler(new ApiError(httpStatus.UNAUTHORIZED, msg, {stack: new Error(msg).stack}), req, res, next);
+        logger.info(response);
+        logger.res(httpStatus.OK, response);
+        res.json(response).status(httpStatus.OK);
 	}
 };
 
