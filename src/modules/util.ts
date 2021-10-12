@@ -19,14 +19,25 @@ export const getLocalDate = (date: Date) => {
     return moment(date).tz(TZ);
 }
 
-export const getTimezoneDateString = (dt : Date) => {
+export const getTimezoneDate = (dt : Date) => {
     const offset = dt.getTimezoneOffset()
-    const localDate = new Date(dt.getTime() - (offset*60*1000));
-    return getDateString(localDate);
+    return  new Date(dt.getTime() - (offset*60*1000));
+}
+export const getTimezoneDateString = (dt : Date) => {
+    return getDateString(getTimezoneDate(dt));
 }
 
 export const getDateString = (dt : Date) => {
     return dt.toISOString().replace('T', ' ').split('.')[0];
+}
+
+export const getTimeNumber = (t : string) => {
+    let data = t.split(':');
+    let hour = parseInt(data[0]);
+    let minute = parseInt(data[1])
+    let seconds = data.length > 2 ? parseInt(data[2]) : 0;
+
+    return (hour * 360) + (minute * 60) + seconds;
 }
 
 export const getPlanObject = (data: any) => {

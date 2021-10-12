@@ -3,8 +3,8 @@ import ApiError from '@modules/api.error';
 import httpStatus from 'http-status';
 import { Config, Config as IConfig } from '@models/config';
 import { Op } from 'sequelize';
-import moment from 'moment-timezone';
 import logger from "@modules/logger";
+import {getTimezoneDateString} from "@modules/util";
 
 /**
  *
@@ -16,7 +16,7 @@ export const getConfig = async (date: string) => {
 
     if (!date) {
         logger.error(`Invalid Date: ${date}`);
-        date = new Date().toISOString();
+        date = getTimezoneDateString(new Date()).slice(0,10);
     }
 
 	const setting = await Config.findOne({
@@ -30,6 +30,7 @@ export const getConfig = async (date: string) => {
             },
         },
     });
+    
 	if (setting) {
 		return setting;
 	} else {

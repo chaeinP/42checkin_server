@@ -1,6 +1,11 @@
 // noinspection DuplicatedCode
 import logger from '../modules/logger';
 import mysql from "promise-mysql";
+import dotenv from "dotenv";
+import path from "path";
+import appRootPath from "app-root-path";
+
+const config = dotenv.config({ path: path.join(appRootPath.path, `.env.${process.env.NODE_ENV}`) });
 
 const getLocalDateString = (dt : Date) => {
     const offset = dt.getTimezoneOffset()
@@ -16,10 +21,10 @@ const getDateString = (dt : Date) => {
 (async () => {
     logger.debug('[START] =========================================');
     const checkinParam = {
-        host : 'localhost',
-        user : 'root',
-        password : 'Daiso523!',
-        database : 'checkin_dev',
+        host : process.env.DATABASE_HOST,
+        user : process.env.DATABASE_USERNAME,
+        password : process.env.DATABASE_PASSWORD,
+        database : process.env.DATABASE_NAME,
         charset : 'utf8mb4'
     };
 

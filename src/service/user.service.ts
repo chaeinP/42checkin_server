@@ -46,6 +46,14 @@ export const requestAdminPrivilege = async (id: number) => {
 };
 
 /**
+ * 사용자 정보
+ */
+export const getUser = async (id: number) => {
+    const user = await Users.findOne({ where: { _id: id } })
+    return user;
+};
+
+/**
  * 유저 및 카드 체크인 처리
  */
 export const checkIn = async (userInfo: IJwtUser, cardId: string) => {
