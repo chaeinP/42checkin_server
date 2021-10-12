@@ -19,10 +19,12 @@ export const getLocalDate = (date: Date) => {
     return moment(date).tz(TZ);
 }
 
-export const getTimezoneDateString = (dt : Date) => {
+export const getTimezoneDate = (dt : Date) => {
     const offset = dt.getTimezoneOffset()
-    const localDate = new Date(dt.getTime() - (offset*60*1000));
-    return getDateString(localDate);
+    return  new Date(dt.getTime() - (offset*60*1000));
+}
+export const getTimezoneDateString = (dt : Date) => {
+    return getDateString(getTimezoneDate(dt));
 }
 
 export const getDateString = (dt : Date) => {

@@ -2,10 +2,10 @@ import {Sequelize, Op} from "sequelize";
 import logger from '../modules/logger';
 import { Users } from 'src/models/users';
 import { Usages } from '@models/usages';
-import { now, getLocalDate } from '@modules/util';
+import { now } from '@modules/util';
 import {IJwtUser} from "@modules/strategy.jwt";
 
-const DIVIDER_FOR_DURATION = 60;
+const DIVIDER_FOR_DURATION = 1000;
 
 /**
  * 사용 시간 정보를 생성한다.
@@ -13,13 +13,13 @@ const DIVIDER_FOR_DURATION = 60;
 export const create = async (user: Users, actor: string): Promise<void> => {
     logger.log('user:', JSON.stringify(user));
 
-    let duration: number = now().toDate().getTime() - getLocalDate(new Date(user.checkin_at)).toDate().getTime();
+    let duration: number = (new Date().getTime() - user.checkin_at.getTime()) / DIVIDER_FOR_DURATION;
 
 	const usage = await Usages.create({
         login: user.login,
         checkin_at: user.checkin_at,
         checkout_at: now().toDate(),
-        duration: duration / DIVIDER_FOR_DURATION,
+        duration: duration,
         actor: actor,
         created_at: now().toDate()
     });
