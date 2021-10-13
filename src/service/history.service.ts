@@ -23,7 +23,7 @@ export const getUserHistory = async (login: string, page: number, listSize: numb
                 Sequelize.literal('`User`.`login` = `History`.`login`'),
             ],
         },
-		order: [ [ '_id', 'DESC' ] ],
+		order: [ [ 'created_at', 'DESC' ] ],
 		offset: listSize * (page - 1),
 		limit: listSize,
 	});
@@ -46,7 +46,7 @@ export const getCardHistory = async (id: number, page: number, listSize: number)
                 Sequelize.literal('`User`.`login` = `History`.`login`'),
             ],
         },
-		order: [ [ '_id', 'DESC' ] ],
+		order: [ [ 'created_at', 'DESC' ] ],
 		offset: listSize * (page - 1),
 		limit: listSize,
 	});
@@ -92,7 +92,7 @@ export const getCluster = async (clusterType: CLUSTER_CODE, page: number, listSi
                 Sequelize.literal('`User`.`login` = `History`.`login`'),
             ],
         },
-        order: [ [ '_id', 'DESC' ] ],
+        order: [ [ 'created_at', 'DESC' ] ],
         offset: listSize * (page - 1),
         limit: listSize,
     });
@@ -123,7 +123,7 @@ export const getCheckIn = async (clusterType: CLUSTER_CODE, page: number, listSi
                 Sequelize.literal('`History`.`_id` in (SELECT MAX(`_id`) FROM `history` GROUP BY `login`)'),
 			],
 		},
-		order: [ [ '_id', 'DESC' ] ],
+		order: [ [ 'created_at', 'DESC' ] ],
 		offset: listSize * (page - 1),
 		limit: listSize,
 	});

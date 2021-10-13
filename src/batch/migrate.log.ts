@@ -17,7 +17,7 @@ const getDateString = (dt : Date) => {
     return dt.toISOString().replace('T', ' ').split('.')[0];
 }
 
-// node --require ts-node/register src/batch/make.usages.ts
+// // NODE_ENV=production node --require ts-node/register src/batch/migrate.log.ts
 (async () => {
     logger.debug('[START] =========================================');
     const checkinParam = {
