@@ -9,6 +9,16 @@ const splitFormat = `yyyymmdd`;
 const logFormat = '{{timestamp}} {{title}} {{file}}:{{line}} ({{method}}) {{tid}} [{{login}}] {{message}}';
 const jsonFormat = '{ timestamp:{{timestamp}}, level:{{title}}, file:{{file}}, line:{{line}}, method:{{method}}, tid:{{tid}}, user:{{login}}, httpStatus:{{httpStatus}}, payload:{{message}} }';
 const dateformat = 'yyyy-mm-dd"T"HH:MM:ss.lo';
+
+let config = {
+    console: true,
+    debug: true,
+    log: true,
+    error: true,
+    info: true,
+    fatal: true,
+    sql: true,
+}
 /**
  * root: 파일위치
  * allLogsFileName: 로그 파일명
@@ -176,8 +186,10 @@ const http = dailyfile({
     }
 });
 
+// noinspection DuplicatedCode
 const logger = {
-    init () {
+    init (options: any) {
+        config = {...config, ...options};
         log.log('initialized...');
         console.log('initialized...');
     },
@@ -185,39 +197,39 @@ const logger = {
     handler (...args: any[]) {
         const isProd = process.env.NODE_ENV?.toLowerCase()?.includes('prod')
             || process.env.ENV_TYPE?.toLowerCase()?.includes('prod');
-        if (isProd) console.log(...args);
+        if (isProd && config.console) console.log(...args);
         log.log(...args);
-        return handler.fatal(...args);
+        return config.fatal ? handler.fatal(...args) : null;
     },
     fatal (...args: any[]) {
         const isProd = process.env.NODE_ENV?.toLowerCase()?.includes('prod')
             || process.env.ENV_TYPE?.toLowerCase()?.includes('prod');
-        if (isProd) console.log(...args);
+        if (isProd && config.console) console.log(...args);
         log.log(...args);
-        return fatal.fatal(...args);
+        return config.fatal ? fatal.fatal(...args) : null;
     },
     error (...args: any[]) {
         const isProd = process.env.NODE_ENV?.toLowerCase()?.includes('prod')
             || process.env.ENV_TYPE?.toLowerCase()?.includes('prod');
         if (isProd) console.log(...args);
         log.log(...args);
-        return error.error(...args);
+        return config.error ? error.error(...args) : null;
     },
     info (...args: any[]) {
-        return info.info(...args);
+        return config.info ? info.info(...args) : null;
     },
     debug (...args: any[]) {
         const isProd = process.env.NODE_ENV?.toLowerCase()?.includes('prod')
             || process.env.ENV_TYPE?.toLowerCase()?.includes('prod');
         if (isProd) return;
 
-        return debug.debug(...args);
+        return config.debug ? debug.debug(...args) : null;
     },
     sql (...args: any[]) {
-        return sql.log(...args);
+        return config.log ? sql.log(...args) : null;
     },
     log (...args: any[]) {
-        return log.log(...args);
+        return config.log ? log.log(...args) : null;
     },
     req (request: any) {
         /*

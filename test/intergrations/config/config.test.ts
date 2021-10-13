@@ -6,12 +6,14 @@ import { getTimeFormat } from '../../../src/modules/util';
 import { Sequelize } from '../../../src/models/database';
 // @ts-ignore
 import { getCookie } from '../env';
+import logger from '../../../src/modules/logger';
 
 let cookie = '';
 
 describe('config api test', async () => {
 	before(async () => {
         try {
+            logger.init({console: false});
             await Sequelize().authenticate();
             cookie = await getCookie();
         } catch(e) {

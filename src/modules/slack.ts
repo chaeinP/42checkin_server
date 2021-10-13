@@ -128,4 +128,4 @@ interface Block {
 	text: any;
 }
 
-type IError = Tracer.LogOutput & { statusCode: number; uid: unknown };
+type IError = Tracer.LogOutput & { statusCode: number, uid: any };
