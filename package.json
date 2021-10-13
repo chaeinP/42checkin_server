@@ -1,6 +1,6 @@
 {
     "name": "42checkin",
-    "version": "2.1.2",
+    "version": "2.1.3",
     "description": "Cluster checkin service for 42 Seoul cadets.",
     "repository": {
         "type": "git",
