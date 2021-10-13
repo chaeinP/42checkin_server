@@ -57,6 +57,7 @@ export const getUser = async (id: number) => {
  * 유저 및 카드 체크인 처리
  */
 export const checkIn = async (userInfo: IJwtUser, cardId: string) => {
+    logger.log('userInfo: ', userInfo, ', cardId: ', cardId);
     if (!userInfo) {
         throw new ApiError(httpStatus.UNAUTHORIZED, '유저 정보 없음', {stack: new Error().stack});
     }
@@ -71,34 +72,36 @@ export const checkIn = async (userInfo: IJwtUser, cardId: string) => {
     const user = await Users.findOne({ where: { _id: userId } });
     const clusterType = user.getClusterType(_cardId)
     const { enterCnt, maxCnt, result } = await checkCanEnter(clusterType, 'checkIn'); //현재 이용자 수 확인
+
+    logger.log('login: ', user.login, 'card_no: ', _cardId, 'max: ', maxCnt, 'used: ', enterCnt);
     if (!result) {
-        logger.error( { use: enterCnt, max: maxCnt } );
+        logger.error({use: enterCnt, max: maxCnt});
         throw new ApiError(httpStatus.CONFLICT, '수용할 수 있는 최대 인원을 초과했습니다.', {stack: new Error().stack});
-    } else {
-        await user.setState('checkIn', user.login, _cardId);
-        // 남은 인원이 5명이하인 경우, 몇 명 남았는지 디스코드로 노티
-        if (enterCnt + 1 >= maxCnt - 5) {
-            await noticer(CLUSTER_CODE[clusterType], maxCnt - enterCnt + 1);
-            notice = true;
-        }
-        logger.error({
-            type: 'action',
-            message: 'checkin',
-            data: { login: userInfo.name, userId, cardId },
-        });
-        await historyService.create(user, 'checkIn');
-        return {
-            result: true,
-            notice
-        };
     }
 
+    await user.setState('checkIn', user.login, _cardId);
+    await historyService.create(user, 'checkIn');
+    // 남은 인원이 5명이하인 경우, 몇 명 남았는지 디스코드로 노티
+    if (enterCnt + 1 >= maxCnt - 5) {
+        try {
+            await noticer(CLUSTER_CODE[clusterType], maxCnt - enterCnt + 1);
+            notice = true;
+        } catch (e) {
+            logger.error(e);
+        }
+    }
+
+    return {
+        result: true,
+        notice
+    };
 };
 
 /**
  * 유저 및 카드 체크아웃 처리
  */
 export const checkOut = async (userInfo: IJwtUser) => {
+    logger.log('userInfo: ', userInfo);
     if (!userInfo) {
         throw new ApiError(httpStatus.UNAUTHORIZED, '유저 정보 없음', {stack: new Error().stack});
     }
@@ -112,7 +115,11 @@ export const checkOut = async (userInfo: IJwtUser) => {
     const { enterCnt, maxCnt } = await checkCanEnter(clusterType); //현재 이용자 수 확인
     // 남은 인원이 5명이하인 경우, 몇 명 남았는지 디스코드로 노티
     if (enterCnt >= maxCnt - 5) {
-        await noticer(CLUSTER_CODE[clusterType], maxCnt - enterCnt - 1);
+        try {
+            await noticer(CLUSTER_CODE[clusterType], maxCnt - enterCnt - 1);
+        } catch (e) {
+            logger.error(e);
+        }
     }
     logger.info('checkOut', JSON.stringify(user));
     return true;
@@ -144,7 +151,7 @@ export const status = async (userInfo: IJwtUser) => {
         user: {
             login: user.login,
             card: user.card_no,
-            profile_image_url: rawProfile?.image_url
+            profile_image_url: rawProfile?.image_url ? rawProfile.image_url : `https://cdn.intra.42.fr/users/${user.login}.jpg`
         },
         cluster: await getUsingInfo(),
         isAdmin: user.type === 'admin'
