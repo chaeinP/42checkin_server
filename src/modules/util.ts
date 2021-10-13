@@ -37,7 +37,7 @@ export const getTimeNumber = (t : string) => {
     let minute = parseInt(data[1])
     let seconds = data.length > 2 ? parseInt(data[2]) : 0;
 
-    return (hour * 360) + (minute * 60) + seconds;
+    return (hour * 3600) + (minute * 60) + seconds;
 }
 
 export const getPlanObject = (data: any) => {

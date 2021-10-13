@@ -13,7 +13,13 @@ const isBetween = (target: string, min: any, max: any) => {
     let checkin_at = (min !== null && min !== undefined) ? getTimeNumber(min) : -1;
     let checkout_at = (max !== null && max !== undefined) ? getTimeNumber(max) : 10000;
 
-    return (now >= checkin_at) && (now < checkout_at);
+    let result = (now >= checkin_at) && (now < checkout_at);
+    if (!result) {
+        logger.log('now: ', now, ', checkin_at: ', checkin_at, ', checkout_at: ', checkout_at);
+        logger.log('now: ', getTimeNumber(target), ', min: ', min, ', max: ', max);
+    }
+
+    return result;
 }
 
 const isCheckAvailable = async (msg: string, req: Request, res: Response, next: NextFunction) => {
@@ -34,7 +40,7 @@ const isCheckAvailable = async (msg: string, req: Request, res: Response, next: 
     let now = getTimezoneDate(new Date()).toISOString().slice(11, 19);
     if (!isBetween(now, config.checkin_at, config.checkout_at)) {
         logger.log('now: ', now, ', checkin_at: ', config.checkin_at, ', checkout_at: ', config.checkout_at);
-        let msg = '체크아웃 가능 시간이 아닙니다.';
+        let msg = `체크아웃 가능 시간이 아닙니다.\n(가능시간: ${config.checkin_at} ~ ${config.checkout_at})`;
         errorHandler(new ApiError(httpStatus.NOT_FOUND, msg, {
             stack: new Error(msg).stack,
             isFatal: false
