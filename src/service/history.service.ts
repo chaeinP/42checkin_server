@@ -114,15 +114,10 @@ export const getCheckIn = async (clusterType: CLUSTER_CODE, page: number, listSi
     page = isNaN(page) ? 1: page;
     listSize = isNaN(listSize) ? 50: listSize;
 
-	const { rows, count } = await History.findAndCountAll({
-        include: [Users],
-		where: {
-            card_no: clusterCondition[clusterType],
-            type: 'checkIn',
-			[Op.and]: [
-                Sequelize.literal('`History`.`_id` in (SELECT MAX(`_id`) FROM `history` GROUP BY `login`)'),
-			],
-		},
+	const { rows, count } = await Users.findAndCountAll({
+		where: Sequelize.and(
+            { card_no: clusterCondition[clusterType] },
+            { card_no: { [Op.ne]: null } }),
 		order: [ [ '_id', 'DESC' ] ],
 		offset: listSize * (page - 1),
 		limit: listSize,
