@@ -120,7 +120,7 @@ export const getCheckIn = async (clusterType: CLUSTER_CODE, page: number, listSi
             card_no: clusterCondition[clusterType],
             type: 'checkIn',
 			[Op.and]: [
-                Sequelize.literal('`History`.`_id` in (SELECT MAX(`_id`) FROM `history` GROUP BY `login`)'),
+                Sequelize.literal('`History`.`created_at` in (SELECT MAX(`created_at`) FROM `history` GROUP BY `login`)'),
 			],
 		},
 		order: [ [ 'created_at', 'DESC' ] ],
