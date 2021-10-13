@@ -3,6 +3,8 @@ import {Router} from "express";
 import * as userRouter from '@routes/user.routes'
 import * as configRouter from '@routes/config.routes'
 import * as historyRouter from '@routes/history.routes';
+import {exec} from 'child_process';
+
 import {Sequelize} from "@models/database";
 import logger from "@modules/logger";
 import passport from "passport";
@@ -28,15 +30,39 @@ router.get('/healthCheck', (req, res, next) => {
 
 // https://github.com/jduncanator/node-diskusage/issues/41
 // Broken for me on node 13.0.1.. need to search for some other package
-/*router.get('/diskCheck', async (req, res, next) => {
-    // available: Disk space available to the current user (i.e. Linux reserves 5% for root)
-    // free: Disk space physically free
-    // total: Total disk space (free + used)
-    const { free, available, total } = await diskusage.check(diskPath);
-    let usage = available * 100 / total;
-    let status = usage > 80 ? httpStatus.INSUFFICIENT_STORAGE : httpStatus.OK;
-    res.json({ usage: `${usage.toFixed(1)}%` }).status(status);
-})*/
+router.get('/diskCheck', async (req, res, next) => {
+    try {
+        exec("df -h", (error, stdout, stderr) => {
+            let diskInfo = {};
+            let status = httpStatus.OK;
+            if (error) {
+                diskInfo = {...diskInfo, error: error}
+                logger.error('error:', error);
+            } else if (stderr) {
+                diskInfo = {...diskInfo, stderr: stderr}
+                logger.error('stderr:', stderr);
+            } else {
+                let result = stdout.split('\n');
+                for (let item of result) {
+                    let trimed = item.replace(/\s\s+/g, ' ');
+                    let info = trimed.split(' ');
+                    if (info?.length < 1) continue;
+
+                    if (info[5] === '/') {
+                        diskInfo = {...diskInfo, path: info[5], filesystem: info[0], size: info[1], used: info[2], avail: info[3], percent: info[4]}
+                        let percent = parseInt(info[4].replace('%', ''));
+                        status = percent > 80 ? httpStatus.INSUFFICIENT_STORAGE : httpStatus.OK;
+                    }
+                }
+                logger.log('stdout:', result);
+            }
+
+            res.json({ disk_info: diskInfo }).status(httpStatus.OK);
+        });
+    } catch (e) {
+        res.json({ error: e }).status(httpStatus.INTERNAL_SERVER_ERROR);
+    }
+})
 
 router.get('/authCheck',
     function routerInfoCallback(req, res, next) {

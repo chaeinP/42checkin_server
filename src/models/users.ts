@@ -3,6 +3,7 @@ import { now } from '@modules/util';
 import * as Sequelize from 'sequelize';
 import {Association, DataTypes, Model, Optional} from 'sequelize';
 import { History } from './history';
+import logger from "@modules/logger";
 
 export interface UsersAttributes {
     _id: number;
@@ -166,6 +167,8 @@ export class Users extends Model<UsersAttributes, usersCreationAttributes> imple
     }
 
     async setState(state: CHECK_STATE, actor: string, cardId?: number) {
+        logger.log('state: ', state, ', actor: ', actor, ', card_no: ', cardId, ', at: ', now().toDate().toISOString());
+
         const at = now().toDate();
         if (state === 'checkIn') {
             this.card_no = cardId
