@@ -15,7 +15,7 @@ export const getUserHistory = async (login: string, page: number, listSize: numb
 	const { rows, count } = await History.findAndCountAll({
         include: [{
             model: Users,
-            attributes: ['state', '_id', 'login', 'card_no'],
+            attributes: ['state', '_id', 'login', 'card_no', 'created_at'],
         }],
         where: {
             login,
@@ -38,7 +38,7 @@ export const getCardHistory = async (id: number, page: number, listSize: number)
 	const { rows, count } = await History.findAndCountAll({
         include: [{
             model: Users,
-            attributes: ['state', '_id', 'login', 'card_no'],
+            attributes: ['state', '_id', 'login', 'card_no', 'created_at'],
         }],
         where: {
             card_no: id,
@@ -84,7 +84,7 @@ export const getCluster = async (clusterType: CLUSTER_CODE, page: number, listSi
     const { rows, count } = await History.findAndCountAll({
         include: [{
             model: Users,
-            attributes: ['state', '_id', 'login', 'card_no'],
+            attributes: ['state', '_id', 'login', 'card_no', 'created_at'],
         }],
         where: {
             card_no: clusterCondition[clusterType],
