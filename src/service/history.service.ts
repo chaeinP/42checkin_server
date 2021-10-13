@@ -15,7 +15,7 @@ export const getUserHistory = async (login: string, page: number, listSize: numb
 	const { rows, count } = await History.findAndCountAll({
         include: [{
             model: Users,
-            attributes: ['state', '_id', 'login', 'card_no', 'created_at'],
+            attributes: ['state', '_id', 'login', 'card_no'],
         }],
         where: {
             login,
@@ -23,7 +23,7 @@ export const getUserHistory = async (login: string, page: number, listSize: numb
                 Sequelize.literal('`User`.`login` = `History`.`login`'),
             ],
         },
-		order: [ [ 'created_at', 'DESC' ] ],
+		order: [ [ '_id', 'DESC' ] ],
 		offset: listSize * (page - 1),
 		limit: listSize,
 	});
@@ -38,7 +38,7 @@ export const getCardHistory = async (id: number, page: number, listSize: number)
 	const { rows, count } = await History.findAndCountAll({
         include: [{
             model: Users,
-            attributes: ['state', '_id', 'login', 'card_no', 'created_at'],
+            attributes: ['state', '_id', 'login', 'card_no'],
         }],
         where: {
             card_no: id,
@@ -46,7 +46,7 @@ export const getCardHistory = async (id: number, page: number, listSize: number)
                 Sequelize.literal('`User`.`login` = `History`.`login`'),
             ],
         },
-		order: [ [ 'created_at', 'DESC' ] ],
+		order: [ [ '_id', 'DESC' ] ],
 		offset: listSize * (page - 1),
 		limit: listSize,
 	});
@@ -84,7 +84,7 @@ export const getCluster = async (clusterType: CLUSTER_CODE, page: number, listSi
     const { rows, count } = await History.findAndCountAll({
         include: [{
             model: Users,
-            attributes: ['state', '_id', 'login', 'card_no', 'created_at'],
+            attributes: ['state', '_id', 'login', 'card_no'],
         }],
         where: {
             card_no: clusterCondition[clusterType],
@@ -92,7 +92,7 @@ export const getCluster = async (clusterType: CLUSTER_CODE, page: number, listSi
                 Sequelize.literal('`User`.`login` = `History`.`login`'),
             ],
         },
-        order: [ [ 'created_at', 'DESC' ] ],
+        order: [ [ '_id', 'DESC' ] ],
         offset: listSize * (page - 1),
         limit: listSize,
     });
@@ -120,10 +120,10 @@ export const getCheckIn = async (clusterType: CLUSTER_CODE, page: number, listSi
             card_no: clusterCondition[clusterType],
             type: 'checkIn',
 			[Op.and]: [
-                Sequelize.literal('`History`.`created_at` in (SELECT MAX(`created_at`) FROM `history` GROUP BY `login`)'),
+                Sequelize.literal('`History`.`_id` in (SELECT MAX(`_id`) FROM `history` GROUP BY `login`)'),
 			],
 		},
-		order: [ [ 'created_at', 'DESC' ] ],
+		order: [ [ '_id', 'DESC' ] ],
 		offset: listSize * (page - 1),
 		limit: listSize,
 	});
