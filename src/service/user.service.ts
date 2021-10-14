@@ -10,6 +10,7 @@ import { getLocalDate } from '@modules/util';
 import * as historyService from '@service/history.service';
 import * as configService from '@service/config.service';
 import * as usageService from '@service/usage.service';
+import axios from "axios";
 
 /**
  * 미들웨어에서 넘어온 user정보로 JWT token 생성
@@ -150,11 +151,18 @@ export const status = async (userInfo: IJwtUser) => {
         logger.error(e);
     }
 
+    let imageUrl = rawProfile?.image_url;
+    if (!imageUrl) {
+        let url = `https://cdn.intra.42.fr/users/${user.login}.jpg`;
+        let res = await axios.get(url);
+        imageUrl = (res.status === 200) ? url : `https://cdn.intra.42.fr/users/default.png`;
+    }
+
     return {
         user: {
             login: user.login,
             card: user.card_no,
-            profile_image_url: rawProfile?.image_url ? rawProfile.image_url : `https://cdn.intra.42.fr/users/${user.login}.jpg`
+            profile_image_url: imageUrl
         },
         cluster: await getUsingInfo(),
         isAdmin: user.type === 'admin'
