@@ -57,7 +57,7 @@ export const getCardHistory = async (id: number, page: number, listSize: number)
  * 로그정보를 생성한다.
  */
 export const create = async (user: Users, type: string): Promise<History> => {
-    logger.log('user:', JSON.stringify(user));
+    logger.log('user:', user.login, ', card_no: ', user.card_no, ', type: ', type);
     const log = await History.create({
         login: user.login,
         card_no: user.card_no,

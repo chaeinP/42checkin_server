@@ -79,6 +79,9 @@ export const checkIn = async (userInfo: IJwtUser, cardId: string) => {
         throw new ApiError(httpStatus.CONFLICT, '수용할 수 있는 최대 인원을 초과했습니다.', {stack: new Error().stack});
     }
 
+    // Users table에 log_id를 남기면서 순서가 뒤바뀌어서 card_no가 null이 되는 현상이 발생.
+    // card_no를 user에 미리 세팅하고 history 생성한다.
+    user.card_no = _cardId;
     let history = await historyService.create(user, 'checkIn');
     await user.setState('checkIn', user.login, _cardId, history._id);
     // 남은 인원이 5명이하인 경우, 몇 명 남았는지 디스코드로 노티
