@@ -66,7 +66,7 @@ export const checkIn = async (userInfo: IJwtUser, cardId: string) => {
     let notice = false;
     const cardOwner = await Users.findOne({ where: { card_no: cardId } });
     if (cardOwner) {
-        logger.error(`이미 사용중인 카드입니다, cardOwner: ${cardOwner.toJSON()}`);
+        logger.error(`이미 사용중인 카드입니다, cardOwner: ${JSON.stringify(cardOwner)}`);
         throw new ApiError(httpStatus.CONFLICT, '이미 사용중인 카드입니다.', {stack: new Error().stack});
     }
     const user = await Users.findOne({ where: { _id: userId } });
@@ -130,14 +130,16 @@ export const checkOut = async (userInfo: IJwtUser) => {
  */
 export const status = async (userInfo: IJwtUser) => {
     if (!userInfo) {
+        logger.error('IJwtUser is null !!');
         let msg = '유저 정보 없음';
         throw new ApiError(httpStatus.UNAUTHORIZED, msg, {stack: new Error(msg).stack});
     }
     const id = userInfo._id;
     const user = await Users.findOne({ where: { '_id': id } });
     if (!user) {
-        let msg = '유저 정보 없음';
-        throw new ApiError(httpStatus.UNAUTHORIZED, msg, {stack:new Error(msg).stack});
+        logger.error('userInfo:', userInfo);
+        let msg = 'DB에서 사용자를 찾지 못했습니다.';
+        throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, msg, {stack:new Error(msg).stack});
     }
 
     let rawProfile: any;

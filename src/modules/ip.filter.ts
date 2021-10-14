@@ -22,7 +22,7 @@ const ipFilter = (rules: Function[]) => async (req: Request, res: Response, next
     }
 };
 
-const requestAdminPrivilege = (ip: string) => {
+const checkIsWhitelist = (ip: string) => {
 	const ips = [ env.ip.developer01, env.ip.developer02 ];
 	return ips.includes(ip);
 };
@@ -36,7 +36,7 @@ export const GuestWiFiIpFilter = (req: Request, res: Response, next: NextFunctio
     try {
         const rules: Function[] = [];
         if (env.ip.filter) {
-            rules.push(requestAdminPrivilege, isGuestWiFi);
+            rules.push(checkIsWhitelist, isGuestWiFi);
         }
         return ipFilter(rules)(req, res, next);
     } catch (e) {
