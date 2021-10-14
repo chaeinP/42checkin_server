@@ -13,6 +13,7 @@ export interface UsersAttributes {
     state?: string;
     checkin_at?: Date;
     checkout_at?: Date;
+    log_id?: number;
     actor?: string;
     email?: string;
     access_token?: string;
@@ -32,6 +33,7 @@ export type usersOptionalAttributes =
     | "state"
     | "checkin_at"
     | "checkout_at"
+    | "log_id"
     | "actor"
     | "email"
     | "access_token"
@@ -50,6 +52,7 @@ export class Users extends Model<UsersAttributes, usersCreationAttributes> imple
     state?: string;
     checkin_at?: Date;
     checkout_at?: Date;
+    log_id?: number;
     actor?: string;
     email?: string;
     access_token?: string;
@@ -90,6 +93,10 @@ export class Users extends Model<UsersAttributes, usersCreationAttributes> imple
             },
             checkout_at: {
                 type: DataTypes.DATE,
+                allowNull: true
+            },
+            log_id: {
+                type: DataTypes.INTEGER,
                 allowNull: true
             },
             actor: {
@@ -166,19 +173,21 @@ export class Users extends Model<UsersAttributes, usersCreationAttributes> imple
         return this.getClusterType(this.card_no);
     }
 
-    async setState(state: CHECK_STATE, actor: string, cardId?: number) {
-        logger.log('state: ', state, ', actor: ', actor, ', card_no: ', cardId, ', at: ', now().toDate().toISOString());
+    async setState(state: CHECK_STATE, actor: string, cardId?: number, logId?: number) {
+        logger.log('state: ', state, ', actor: ', actor, ', card_no: ', cardId, ', log_id: ', logId, ', at: ', now().toDate().toISOString());
 
         const at = now().toDate();
         if (state === 'checkIn') {
             this.card_no = cardId
             this.checkin_at = at;
+            this.checkout_at = null;
             this.actor = null;
         } else {
             this.actor = actor;
             this.card_no = null;
             this.checkout_at = at;
         }
+        if (logId !== null && logId !== undefined) this.log_id = logId;
         this.state = state;
         this.updated_at = at;
         await this.save();

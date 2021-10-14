@@ -79,8 +79,8 @@ export const checkIn = async (userInfo: IJwtUser, cardId: string) => {
         throw new ApiError(httpStatus.CONFLICT, '수용할 수 있는 최대 인원을 초과했습니다.', {stack: new Error().stack});
     }
 
-    await user.setState('checkIn', user.login, _cardId);
-    await historyService.create(user, 'checkIn');
+    let history = await historyService.create(user, 'checkIn');
+    await user.setState('checkIn', user.login, _cardId, history._id);
     // 남은 인원이 5명이하인 경우, 몇 명 남았는지 디스코드로 노티
     if (enterCnt + 1 >= maxCnt - 5) {
         try {
@@ -108,9 +108,9 @@ export const checkOut = async (userInfo: IJwtUser) => {
     const id = userInfo._id;
     const user = await Users.findOne({ where: { _id: id } });
     await usageService.create(user, user.login);
-    await historyService.create(user, 'checkOut');
+    let history = await historyService.create(user, 'checkOut');
     const clusterType = user.getClusterType(user.card_no)
-    await user.setState('checkOut', user.login);
+    await user.setState('checkOut', user.login, null, history._id);
 
     const { enterCnt, maxCnt } = await checkCanEnter(clusterType); //현재 이용자 수 확인
     // 남은 인원이 5명이하인 경우, 몇 명 남았는지 디스코드로 노티

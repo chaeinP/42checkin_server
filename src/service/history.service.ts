@@ -56,7 +56,7 @@ export const getCardHistory = async (id: number, page: number, listSize: number)
 /**
  * 로그정보를 생성한다.
  */
-export const create = async (user: Users, type: string): Promise<void> => {
+export const create = async (user: Users, type: string): Promise<History> => {
     logger.log('user:', JSON.stringify(user));
     const log = await History.create({
         login: user.login,
@@ -65,7 +65,7 @@ export const create = async (user: Users, type: string): Promise<void> => {
         created_at: now().toDate()
     });
 
-    await log.save();
+    return await log.save();
 };
 
 /**
@@ -81,13 +81,38 @@ export const getCluster = async (clusterType: CLUSTER_CODE, page: number, listSi
     page = isNaN(page) ? 1 : page;
     listSize = isNaN(listSize) ? 50 : listSize;
 
-    const {rows, count} = await History.findAndCountAll({
+    /*
+        const { rows, count } = await History.findAndCountAll({
+        include: [{
+            model: Users,
+            attributes: ['state', '_id', 'login', 'card_no'],
+        }],
         where: {
             card_no: clusterCondition[clusterType],
+            [Op.and]: [
+                Sequelize.literal('`User`.`login` = `History`.`login`'),
+            ],
+        },
+        order: [ [ '_id', 'DESC' ] ],
+        offset: listSize * (page - 1),
+        limit: listSize
+    });
+     */
+    const {rows, count} = await History.findAndCountAll({
+        include: [{
+            model: Users,
+            attributes: ['state', '_id', 'login', 'card_no'],
+        }],
+        where: {
+            card_no: clusterCondition[clusterType],
+            [Op.and]: [
+                Sequelize.literal('`User`.`login` = `History`.`login`'),
+            ],
         },
         order: [['_id', 'DESC']],
         offset: listSize * (page - 1),
         limit: listSize,
+        raw: true
     });
 
     logger.log(JSON.stringify(rows), count, listSize);
