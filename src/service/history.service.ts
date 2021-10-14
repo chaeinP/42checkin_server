@@ -81,34 +81,11 @@ export const getCluster = async (clusterType: CLUSTER_CODE, page: number, listSi
     page = isNaN(page) ? 1 : page;
     listSize = isNaN(listSize) ? 50 : listSize;
 
-    /*
-        const { rows, count } = await History.findAndCountAll({
-        include: [{
-            model: Users,
-            attributes: ['state', '_id', 'login', 'card_no'],
-        }],
-        where: {
-            card_no: clusterCondition[clusterType],
-            [Op.and]: [
-                Sequelize.literal('`User`.`login` = `History`.`login`'),
-            ],
-        },
-        order: [ [ '_id', 'DESC' ] ],
-        offset: listSize * (page - 1),
-        limit: listSize
-    });
-     */
     const {rows, count} = await History.findAndCountAll({
-        include: [{
-            model: Users,
-            attributes: ['state', '_id', 'login', 'card_no'],
-        }],
-        where: {
-            card_no: clusterCondition[clusterType],
-            [Op.and]: [
-                Sequelize.literal('`User`.`login` = `History`.`login`'),
-            ],
-        },
+        attributes: ['_id', ['checkin_at', 'created_at'], 'state', 'login', 'card_no'],
+        where: Sequelize.and(
+            {card_no: clusterCondition[clusterType]},
+            {card_no: {[Op.ne]: null}}),
         order: [['_id', 'DESC']],
         offset: listSize * (page - 1),
         limit: listSize,
