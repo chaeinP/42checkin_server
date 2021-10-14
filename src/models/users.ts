@@ -13,6 +13,7 @@ export interface UsersAttributes {
     state?: string;
     checkin_at?: Date;
     checkout_at?: Date;
+    log_id?: number;
     actor?: string;
     email?: string;
     access_token?: string;
@@ -32,6 +33,7 @@ export type usersOptionalAttributes =
     | "state"
     | "checkin_at"
     | "checkout_at"
+    | "log_id"
     | "actor"
     | "email"
     | "access_token"
@@ -50,6 +52,7 @@ export class Users extends Model<UsersAttributes, usersCreationAttributes> imple
     state?: string;
     checkin_at?: Date;
     checkout_at?: Date;
+    log_id?: number;
     actor?: string;
     email?: string;
     access_token?: string;
@@ -166,7 +169,7 @@ export class Users extends Model<UsersAttributes, usersCreationAttributes> imple
         return this.getClusterType(this.card_no);
     }
 
-    async setState(state: CHECK_STATE, actor: string, cardId?: number) {
+    async setState(state: CHECK_STATE, actor: string, cardId?: number, logId?: number) {
         logger.log('state: ', state, ', actor: ', actor, ', card_no: ', cardId, ', at: ', now().toDate().toISOString());
 
         const at = now().toDate();
@@ -179,6 +182,7 @@ export class Users extends Model<UsersAttributes, usersCreationAttributes> imple
             this.card_no = null;
             this.checkout_at = at;
         }
+        if (logId !== null && logId !== undefined) this.log_id = logId;
         this.state = state;
         this.updated_at = at;
         await this.save();
