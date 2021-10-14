@@ -64,6 +64,7 @@ const env = {
         strategy:process.env.PASSPORT_STRATEGY,
     },
 	ip: {
+        filter: process.env.IP_FILTER,
 		guest: process.env.FT_GUEST_IP,
 		developer01: process.env.DEVELOPER01_IP,
 		developer02: process.env.DEVELOPER02_IP
