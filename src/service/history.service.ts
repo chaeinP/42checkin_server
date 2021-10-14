@@ -99,6 +99,10 @@ export const getCluster = async (clusterType: CLUSTER_CODE, page: number, listSi
     });
      */
     const {rows, count} = await History.findAndCountAll({
+        include: [{
+            model: Users,
+            attributes: ['state', '_id', 'login', 'card_no'],
+        }],
         where: {
             card_no: clusterCondition[clusterType],
             [Op.and]: [
@@ -108,7 +112,6 @@ export const getCluster = async (clusterType: CLUSTER_CODE, page: number, listSi
         order: [['_id', 'DESC']],
         offset: listSize * (page - 1),
         limit: listSize,
-        raw: true
     });
 
     logger.log(JSON.stringify(rows), count, listSize);
