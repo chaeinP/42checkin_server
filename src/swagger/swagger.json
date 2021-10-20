@@ -1,0 +1,70 @@
+{
+	"components": {
+		"examples": {},
+		"headers": {},
+		"parameters": {},
+		"requestBodies": {},
+		"responses": {},
+		"schemas": {
+			"IHealthStatus": {
+				"properties": {
+					"status": {
+						"type": "string"
+					},
+					"version": {
+						"type": "string"
+					},
+					"message": {
+						"type": "string"
+					}
+				},
+				"type": "object",
+				"additionalProperties": false
+			}
+		},
+		"securitySchemes": {}
+	},
+	"info": {
+		"title": "42checkin",
+		"version": "2.1.5",
+		"description": "Cluster checkin service for 42 Seoul cadets.",
+		"license": {
+			"name": "MIT"
+		},
+		"contact": {
+			"name": "@ryukim, @yurlee, @ohjongin"
+		}
+	},
+	"openapi": "3.0.0",
+	"paths": {
+		"/healthCheck": {
+			"get": {
+				"operationId": "CheckHealth",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IHealthStatus"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": []
+			}
+		}
+	},
+	"servers": [
+		{
+			"url": "http://localhost:3000",
+			"description": "localhost"
+		},
+		{
+			"url": "https://api.checkin.dev.42seoul.io",
+			"description": "development"
+		}
+	]
+}

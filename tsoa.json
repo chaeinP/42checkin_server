@@ -1,9 +1,9 @@
 {
     "entryFile": "src/app.ts",
     "noImplicitAdditionalProperties": "throw-on-extras",
-    "controllerPathGlobs": ["src/controllers/*.controller.ts"],
+    "controllerPathGlobs": ["src/controllers/check.controller.ts"],
     "spec": {
-        "outputDirectory": "public",
+        "outputDirectory": "src/swagger",
         "specVersion": 3,
         "spec": {
             "servers": [
@@ -19,6 +19,6 @@
         }
     },
     "routes": {
-        "routesDir": "dist"
+        "routesDir": "src/routes"
     }
 }

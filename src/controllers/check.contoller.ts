@@ -1,6 +1,4 @@
-import {Controller, Get, Route} from "tsoa";
-import {Sequelize} from "@models/database";
-import logger from "@modules/logger";
+import {Get, Route} from "tsoa";
 
 export interface IHealthStatus {
     status?: string;
@@ -9,7 +7,7 @@ export interface IHealthStatus {
 }
 
 @Route("healthCheck")
-export default class CheckController {
+export class CheckController {
     @Get("/")
     public async checkHealth() : Promise<IHealthStatus> {
         return {

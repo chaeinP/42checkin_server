@@ -9,7 +9,7 @@ import {Sequelize} from "@models/database";
 import logger from "@modules/logger";
 import passport from "passport";
 import httpStatus from 'http-status';
-import CheckController from "@controllers/check.contoller";
+import {CheckController} from "@controllers/check.contoller";
 
 export const router = Router();
 export const path = '';

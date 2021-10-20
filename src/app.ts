@@ -43,14 +43,7 @@ app.use((req, res, next) => {
     }
 	next();
 });
-app.use('/docs', swaggerUi.serve,
-    async (req: any, res: any, next: NextFunction) => {
-        const html = appRootPath.path + '/public/swagger.json';
-        return res.send(
-            swaggerUi.generateHTML(await import(html))
-        )
-    }
-);
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(require('./swagger/swagger.json')));
 app.use(Api.path, Api.router);
 app.use(errorConverter);
 app.use(errorHandler);
