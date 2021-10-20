@@ -5,9 +5,8 @@
         "allowSyntheticDefaultImports": true,
         "target": "ES2017",
         "noImplicitAny": true,
-        "emitDecoratorMetadata": true,
         "moduleResolution": "node",
-        "sourceMap": true,
+        "sourceMap": false,
         "outDir": "./dist",
         "rootDir": "src",
         "baseUrl": "./",
@@ -21,7 +20,16 @@
             "@routes/*": [ "./src/routes/*" ],
             "@types/*": [ "./src/@types/*" ]
         },
-        "experimentalDecorators": true
+
+        /* Experimental Options */
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+
+        /* Advanced Options */
+        "forceConsistentCasingInFileNames": true,
+
+
+        "resolveJsonModule": true
     },
     "include": [
         "src",

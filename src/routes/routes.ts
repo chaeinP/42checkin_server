@@ -9,6 +9,7 @@ import {Sequelize} from "@models/database";
 import logger from "@modules/logger";
 import passport from "passport";
 import httpStatus from 'http-status';
+import CheckController from "@controllers/check.contoller";
 
 export const router = Router();
 export const path = '';
@@ -16,16 +17,10 @@ export const path = '';
 router.use(userRouter.path, userRouter.router);
 router.use(historyRouter.path, historyRouter.router);
 router.use(configRouter.path, configRouter.router);
-router.get('/healthCheck', (req, res, next) => {
-    Sequelize().authenticate()
-        .then(async function SequelizeAuthCallback() {
-            const pkg = require('../../package.json');
-            res.json({ version: pkg?.version }).status(httpStatus.OK);
-        })
-        .catch(function SequelizeAuthCallback (err) {
-            logger.error('Unable to connect to the database:', err);
-            res.json({ status: 'fail', message: err.message }).status(httpStatus.INTERNAL_SERVER_ERROR);
-        });
+
+router.get('/healthCheck', async function healthCheck(req, res, next) {
+    const response = await new CheckController().checkHealth();
+    return res.send(response);
 })
 
 // https://github.com/jduncanator/node-diskusage/issues/41

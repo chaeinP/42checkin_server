@@ -1,10 +1,12 @@
-import express from 'express';
+import express, {NextFunction} from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import tracer from 'cls-rtracer';
 import context from 'express-http-context';
+import swaggerUi from 'swagger-ui-express';
 import env from '@modules/env';
 import passport from 'passport';
+import appRootPath from "app-root-path";
 import logger from './modules/logger';
 
 import * as requestIp from 'request-ip';
@@ -25,6 +27,7 @@ function getOrigin() {
 
 app.use(cookieParser());
 app.use(express.json());
+app.use(express.static("public"));
 app.use(requestIp.mw());
 app.use(passport.initialize());
 app.use(passport.session());
@@ -40,6 +43,14 @@ app.use((req, res, next) => {
     }
 	next();
 });
+app.use('/docs', swaggerUi.serve,
+    async (req: any, res: any, next: NextFunction) => {
+        const html = appRootPath.path + '/public/swagger.json';
+        return res.send(
+            swaggerUi.generateHTML(await import(html))
+        )
+    }
+);
 app.use(Api.path, Api.router);
 app.use(errorConverter);
 app.use(errorHandler);

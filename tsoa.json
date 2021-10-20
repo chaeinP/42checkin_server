@@ -1,0 +1,24 @@
+{
+    "entryFile": "src/app.ts",
+    "noImplicitAdditionalProperties": "throw-on-extras",
+    "controllerPathGlobs": ["src/controllers/*.controller.ts"],
+    "spec": {
+        "outputDirectory": "public",
+        "specVersion": 3,
+        "spec": {
+            "servers": [
+                {
+                    "url": "http://localhost:3000",
+                    "description": "localhost"
+                },
+                {
+                    "url": "https://api.checkin.dev.42seoul.io",
+                    "description": "development"
+                }
+            ]
+        }
+    },
+    "routes": {
+        "routesDir": "dist"
+    }
+}
