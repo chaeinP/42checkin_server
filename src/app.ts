@@ -9,7 +9,7 @@ import passport from 'passport';
 import logger from './modules/logger';
 
 import * as requestIp from 'request-ip';
-import * as routes from './routes/routes';
+import * as mainRouter from './routes/main.router';
 
 import {errorConverter, errorHandler} from './modules/error';
 
@@ -44,7 +44,7 @@ app.use((req, res, next) => {
 	next();
 });
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(require('./swagger/swagger.json')));
-app.use(routes.path, routes.router);
+app.use(mainRouter.path, mainRouter.router);
 app.use(errorConverter);
 app.use(errorHandler);
 app.listen(port, () => {

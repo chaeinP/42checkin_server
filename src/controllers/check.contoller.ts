@@ -3,6 +3,8 @@ import logger from "@modules/logger";
 import {Sequelize} from "@models/database";
 import {exec} from 'child_process';
 import httpStatus from "http-status";
+import passport from "passport";
+import {NextFunction} from "express";
 
 /**
  * User objects allow you to associate actions performed
@@ -33,6 +35,18 @@ export interface IDiskStatus {
     avail?: string;
     percent?: string;
     error?: string;
+}
+
+export interface IAuthStatus {
+    error?: any;
+    user: {
+        jwt?: {
+            _id: number,
+            name?: string
+        }
+    };
+    info?: any;
+    version?: string;
 }
 
 @Route("check")
@@ -112,4 +126,34 @@ export class CheckController extends Controller {
 
         return diskInfo;
     }
+
+    public async authCheck(req, res, next): Promise<IAuthStatus> {
+        const self = this;
+        return new Promise((resolve, reject) => {
+            passport.authenticate('jwt', function onPassportAuthCallback (error, user, info) {
+                const pkg = require('../../package.json');
+
+                // this will execute in any case, even if a passport strategy will find an error
+                // log everything to console
+                logger.log('error:', error === undefined ? 'undefined' : JSON.stringify(error));
+                logger.log('user:', user === undefined ? 'undefined' : JSON.stringify(user));
+                logger.log('info:', info === undefined ? 'undefined' : JSON.stringify(info));
+
+                let payload: IAuthStatus;
+                if (error != undefined) payload = {...payload, error: error};
+                if (user != undefined) payload = {...payload, user: user};
+                if (info != undefined) payload = {...payload, info: JSON.stringify(info)};
+                if (pkg) payload = {...payload, version: pkg?.version};
+
+                if (error || !user) {
+                    logger.res(httpStatus.UNAUTHORIZED, payload);
+                    self.setStatus(httpStatus.UNAUTHORIZED);
+                } else {
+                    logger.res(httpStatus.OK, payload);
+                    self.setStatus(httpStatus.OK);
+                }
+                resolve(payload);
+            })(req, res, next);
+        });
+    };
 }

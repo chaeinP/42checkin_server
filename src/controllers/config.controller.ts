@@ -4,7 +4,7 @@ import { errorHandler } from '@modules/error';
 import logger from '@modules/logger';
 import httpStatus from 'http-status';
 import ApiError from "@modules/api.error";
-import {getTimeNumber, getTimezoneDateString} from "@modules/util";
+import {Controller, Get, Route} from "tsoa";
 
 export const getConfig = async (req: Request<{}, {}, {}, { date: string }>, res: Response, next: NextFunction) => {
     try {
@@ -29,3 +29,12 @@ export const setConfig = async (req: Request, res: Response, next: NextFunction)
         errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack, isFatal: true}), req, res, next);
     }
 };
+
+
+@Route("config")
+export class ConfigController extends Controller {
+    @Get("/health")
+    public async getHealth(): Promise<void> {
+
+    }
+}
