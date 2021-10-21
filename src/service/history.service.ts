@@ -112,7 +112,6 @@ export const getCluster = async (clusterType: CLUSTER_CODE, page: number, listSi
         order: [['_id', 'DESC']],
         offset: listSize * (page - 1),
         limit: listSize,
-        raw: true
     });
 
     logger.log(JSON.stringify(rows), count, listSize);
