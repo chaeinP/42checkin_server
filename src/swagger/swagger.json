@@ -7,14 +7,45 @@
 		"responses": {},
 		"schemas": {
 			"IHealthStatus": {
+				"description": "User objects allow you to associate actions performed\nin the system with the user that performed them.\nThe User object contains common information across\nevery user in the system regardless of status and role.",
 				"properties": {
 					"status": {
 						"type": "string"
 					},
+					"message": {
+						"type": "string",
+						"description": "Error message"
+					},
 					"version": {
+						"type": "string",
+						"description": "The version number of server code"
+					}
+				},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"IDiskStatus": {
+				"properties": {
+					"path": {
+						"type": "string",
+						"description": "Partition path"
+					},
+					"filesystem": {
 						"type": "string"
 					},
-					"message": {
+					"size": {
+						"type": "string"
+					},
+					"used": {
+						"type": "string"
+					},
+					"avail": {
+						"type": "string"
+					},
+					"percent": {
+						"type": "string"
+					},
+					"error": {
 						"type": "string"
 					}
 				},
@@ -37,9 +68,9 @@
 	},
 	"openapi": "3.0.0",
 	"paths": {
-		"/healthCheck": {
+		"/check/health": {
 			"get": {
-				"operationId": "CheckHealth",
+				"operationId": "GetHealth",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -47,6 +78,35 @@
 							"application/json": {
 								"schema": {
 									"$ref": "#/components/schemas/IHealthStatus"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": "ok",
+											"message": "the server is healthy",
+											"version": "2.1.5"
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"description": "Check server status whether it is alive or not",
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/check/disk": {
+			"get": {
+				"operationId": "GetDisk",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IDiskStatus"
 								}
 							}
 						}

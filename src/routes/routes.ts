@@ -3,12 +3,8 @@ import {Router} from "express";
 import * as userRouter from '@routes/user.routes'
 import * as configRouter from '@routes/config.routes'
 import * as historyRouter from '@routes/history.routes';
-import {exec} from 'child_process';
-
-import {Sequelize} from "@models/database";
 import logger from "@modules/logger";
 import passport from "passport";
-import httpStatus from 'http-status';
 import {CheckController} from "@controllers/check.contoller";
 
 export const router = Router();
@@ -18,45 +14,16 @@ router.use(userRouter.path, userRouter.router);
 router.use(historyRouter.path, historyRouter.router);
 router.use(configRouter.path, configRouter.router);
 
-router.get('/healthCheck', async function healthCheck(req, res, next) {
-    const response = await new CheckController().checkHealth();
-    return res.send(response);
+router.get('/check/health', async function healthCheck(req, res, next) {
+    const controller = new CheckController();
+    const response = await controller.getHealth();
+    return res.status(<number>controller.getStatus()).send(response);
 })
 
-// https://github.com/jduncanator/node-diskusage/issues/41
-// Broken for me on node 13.0.1.. need to search for some other package
-router.get('/diskCheck', async (req, res, next) => {
-    try {
-        exec("df -h", (error, stdout, stderr) => {
-            let diskInfo = {};
-            let status = httpStatus.OK;
-            if (error) {
-                diskInfo = {...diskInfo, error: error}
-                logger.error('error:', error);
-            } else if (stderr) {
-                diskInfo = {...diskInfo, stderr: stderr}
-                logger.error('stderr:', stderr);
-            } else {
-                let result = stdout.split('\n');
-                for (let item of result) {
-                    let trimed = item.replace(/\s\s+/g, ' ');
-                    let info = trimed.split(' ');
-                    if (info?.length < 1) continue;
-
-                    if (info[5] === '/') {
-                        diskInfo = {...diskInfo, path: info[5], filesystem: info[0], size: info[1], used: info[2], avail: info[3], percent: info[4]}
-                        let percent = parseInt(info[4].replace('%', ''));
-                        status = percent > 80 ? httpStatus.INSUFFICIENT_STORAGE : httpStatus.OK;
-                    }
-                }
-                logger.log('stdout:', result);
-            }
-
-            res.json({ disk_info: diskInfo }).status(httpStatus.OK);
-        });
-    } catch (e) {
-        res.json({ error: e }).status(httpStatus.INTERNAL_SERVER_ERROR);
-    }
+router.get('/check/disk', async function diskCheck(req, res, next) {
+    const controller = new CheckController();
+    const response = await controller.getDisk();
+    return res.status(<number>controller.getStatus()).send(response);
 })
 
 router.get('/authCheck',

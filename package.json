@@ -9,17 +9,18 @@
     "author": "@ryukim, @yurlee, @ohjongin",
     "license": "MIT",
     "scripts": {
-        "build:ts": "cross-env NODE_ENV=production webpack --config webpack.config.js",
-        "build:dev-ts": "cross-env NODE_ENV=development webpack --config webpack.config.js",
-        "build:alpha-ts": "cross-env NODE_ENV=alpha webpack --config webpack.config.js",
+        "build:ts": "cross-env NODE_ENV=production webpack --config webpack.config.js && npm run swagger",
+        "build:ts:dev": "cross-env NODE_ENV=development webpack --config webpack.config.js && npm run swagger",
+        "build:ts:alpha": "cross-env NODE_ENV=alpha webpack --config webpack.config.js && npm run swagger",
         "build": "npm run build:ts",
-        "build:dev": "npm run build-dev-ts",
-        "build:alpha": "npm run build-alpha-ts",
-        "serve:dev": "cross-env NODE_ENV=development nodemon --exec ts-node -r tsconfig-paths/register --files ./src/server.ts",
-        "start": "npm run serve:dev",
+        "build:dev": "npm run build:ts:dev",
+        "build:alpha": "npm run build:ts:alpha",
+        "serve": "cross-env NODE_ENV=development nodemon --exec ts-node -r tsconfig-paths/register --files ./src/app.ts",
+        "start:prod": "npm run build && node --inspect ./dist/app.js",
+        "start:dev": "cross-env NODE_ENV=development node --inspect ./dist_dev/app.js",
         "swagger": "tsoa spec",
         "tsoa": "tsoa",
-        "test": "cross-env NODE_ENV=test  TS_NODE_FILES=true mocha -w  --timeout 5000 -r tsconfig-paths/register -r ts-node/register ./test/**/*.test.ts"
+        "test": "cross-env NODE_ENV=test TS_NODE_FILES=true mocha -w  --timeout 5000 -r tsconfig-paths/register -r ts-node/register ./test/**/*.test.ts"
     },
     "dependencies": {
         "@types/cors": "^2.8.10",
@@ -101,7 +102,7 @@
         "http-proxy-middleware": "^2.0.0",
         "mocha": "^9.0.3",
         "mysql2": "^2.3.0",
-        "nodemon": "^2.0.7",
+        "nodemon": "^2.0.14",
         "promise-mysql": "^5.0.4",
         "sass": "1.32.6",
         "sequelize-auto": "^0.8.4",
@@ -109,7 +110,7 @@
         "supertest": "^6.1.4",
         "ts-jest": "26.5.0",
         "ts-loader": "^8.2.0",
-        "ts-node": "^10.2.1",
+        "ts-node": "^10.3.0",
         "tsconfig-paths": "^3.9.0",
         "tsconfig-paths-webpack-plugin": "^3.5.1",
         "typescript": "^4.4.4",
@@ -117,14 +118,10 @@
         "webpack-node-externals": "^3.0.0"
     },
     "_moduleAlias": {
-        "@entities/*": "./dist/entities/*",
-        "@repository/*": "./dist/repository/*",
         "@service/*": "./dist/service/*",
         "@controllers/*": "./dist/controllers/*",
-        "@config/*": "./dist/config/*",
-        "@strategy/*": "./dist/strategy/*",
-        "@dto/*": "./dist/dto/*",
         "@routes/*": "./dist/routes/*",
-        "@modules/*": "./dist/lib/*"
+        "@modules/*": "./dist/modules/*",
+        "@models/*": "./dist/models/*"
     }
 }

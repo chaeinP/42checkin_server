@@ -40,13 +40,11 @@ bower_components
 Thumbs.db
 
 # Ignore built ts files
-dist
-dist/**/*
-test_dist/**/*
+dist/
+dist_dev/
 
 # ignore yarn.lock
 yarn.lock
-
 
 test_deploy.sh
 deploy.sh

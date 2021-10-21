@@ -1,15 +1,26 @@
 {
     "compilerOptions": {
+        "outDir": "./dist",
+        "rootDir": "src",
+        "baseUrl": ".",
         "module": "commonjs",
         "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
         "target": "ES2017",
-        "noImplicitAny": true,
+        "lib": ["es2020"],
+        "downlevelIteration": true,
+        "declaration": true,
+        "newLine": "LF",
+        "noImplicitThis": true,
+        "noFallthroughCasesInSwitch": true,
+        "strictBindCallApply": true,
+        /*"noUnusedParameters": false,*/
+        /*"noImplicitReturns": true,*/
+        /*"noUnusedLocals": true,*/
+        /*"strictNullChecks": true,*/
+        /*"noImplicitAny": true,*/
         "moduleResolution": "node",
-        "sourceMap": false,
-        "outDir": "./dist",
-        "rootDir": "src",
-        "baseUrl": "./",
+        "sourceMap": true,
         "skipLibCheck": true,
 		"typeRoots": ["./node_modules/@types", "./src/@types/express.d.ts"],
         "paths": {
@@ -18,7 +29,9 @@
             "@modules/*": [ "./src/modules/*" ],
             "@models/*": [ "./src/models/*" ],
             "@routes/*": [ "./src/routes/*" ],
-            "@types/*": [ "./src/@types/*" ]
+            "@types/*": [ "./src/@types/*" ],
+            "@tsoa/cli/*": ["../packages/cli/src/*"],
+            "@tsoa/runtime/*": ["../packages/runtime/src/*"]
         },
 
         /* Experimental Options */
@@ -28,11 +41,10 @@
         /* Advanced Options */
         "forceConsistentCasingInFileNames": true,
 
-
-        "resolveJsonModule": true
+        "resolveJsonModule": true,
     },
     "include": [
         "src",
 		"src/@types/*.d.ts"
-    ]
+    ],
 }
