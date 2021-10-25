@@ -18,6 +18,7 @@ let config = {
     info: true,
     fatal: true,
     sql: true,
+    api: true,
 }
 /**
  * root: 파일위치
@@ -247,11 +248,11 @@ const logger = {
             isNewRecord: false
           }
          */
-        return http.log(request);
+        return config.api ? http.log(request) : null;
     },
     res(httpStatus: number, response: any) {
         context.set('httpStatus', httpStatus);
-        return http.log(getPlanObject(response));
+        return config.api ? http.log(getPlanObject(response)) : null;
     }
 };
 

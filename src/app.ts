@@ -22,6 +22,7 @@ function getOrigin() {
 	}
 	return origin;
 }
+logger.init({console: false, sql: false, api: false});
 
 app.use(cookieParser());
 app.use(express.json());

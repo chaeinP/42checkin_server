@@ -15,7 +15,7 @@
         "build": "npm run build-ts",
         "build-dev": "npm run build-dev-ts",
         "build-alpha": "npm run build-alpha-ts",
-        "serve": "cross-env NODE_ENV=development nodemon --exec ts-node -r tsconfig-paths/register --files ./src/server.ts",
+        "serve": "cross-env NODE_ENV=local nodemon --exec ts-node -r tsconfig-paths/register --files ./src/server.ts",
         "start": "npm run serve",
         "test": "cross-env NODE_ENV=test  TS_NODE_FILES=true mocha -w  --timeout 5000 -r tsconfig-paths/register -r ts-node/register ./test/**/*.test.ts"
     },
