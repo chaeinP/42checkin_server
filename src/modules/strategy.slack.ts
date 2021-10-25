@@ -56,10 +56,10 @@ const strategeyCallback = async (
 const StrategySlack = () =>
 	new PassortStrategySlack(
 		{
-			clientID: env.slack.client.id,
-			clientSecret: env.slack.client.secret,
+			clientID: env.slack.oauth.client.id,
+			clientSecret: env.slack.oauth.client.secret,
             skipUserProfile: false, // default
-            scope: ['identity.basic', 'identity.email', 'identity.avatar', 'identity.team']
+            scope: ['users.profile:read']
 		},
 		strategeyCallback
 	);
