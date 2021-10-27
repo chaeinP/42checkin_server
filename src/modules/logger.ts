@@ -192,7 +192,7 @@ const logger = {
     init (options: any) {
         config = {...config, ...options};
         log.log('initialized...');
-        console.log('initialized...');
+        if (config.console) console.log('initialized...');
     },
     // errorHandle에서 slack으로 보내는 메시지용
     handler (...args: any[]) {

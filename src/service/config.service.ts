@@ -47,6 +47,7 @@ export const setConfig = async (body: { env: Partial<IConfig>, date: string }) =
     if (Number.isInteger(env.seocho)) setting.seocho = env.seocho;
 	if (env.begin_at) setting.begin_at = env.begin_at;
 	if (env.end_at) setting.end_at = env.end_at;
+    if (env.auth) setting.auth = env.auth;
 	return setting.save()
 		.then(_ => setting)
 		.catch(_ => {

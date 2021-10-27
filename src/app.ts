@@ -3,14 +3,18 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import tracer from 'cls-rtracer';
 import context from 'express-http-context';
-import env from '@modules/env';
+import env from './modules/env';
 import passport from 'passport';
+import cron from 'node-schedule';
+import axios from 'axios';
 import logger from './modules/logger';
 
 import * as requestIp from 'request-ip';
 import * as Api from '@routes/routes';
 
 import {errorConverter, errorHandler} from '@modules/error';
+import {getTimezoneDate} from "@modules/util";
+import * as configService from "@service/config.service";
 
 const port = env.port || 3000;
 export const app = express();
@@ -23,6 +27,38 @@ function getOrigin() {
 	return origin;
 }
 logger.init({console: false, sql: false, api: false});
+
+/**
+ *
+*/
+const check42Intra = async () => {
+    let strategy;
+    const today = getTimezoneDate(new Date()).toISOString().slice(0, 10)
+    let config = await configService.getConfig(today);
+    try {
+        strategy = config.auth || '42';
+        const res = await axios.get('https://intra.42.fr');
+        if (res.status !== 200) {
+            strategy = 'Slack';
+        }
+    } catch (e) {
+        logger.error(e);
+        strategy = 'Slack';
+    }
+
+    if (config?.auth !== strategy) {
+        await configService.setConfig({
+            env: {
+                auth: strategy
+            },
+            date: today
+        });
+    }
+}
+
+(async() => {
+    cron.scheduleJob('*/3 * * * *', check42Intra);
+})();
 
 app.use(cookieParser());
 app.use(express.json());
@@ -44,9 +80,10 @@ app.use((req, res, next) => {
 app.use(Api.path, Api.router);
 app.use(errorConverter);
 app.use(errorHandler);
-const server = app.listen(port, () => {
+app.listen(port, () => {
 	logger.log(`=================================`);
     logger.log(`======= ENV: ${env.node_env} =============`);
     logger.log(`🚀 App listening on the port ${port}`);
     logger.log(`=================================`);
 });
+

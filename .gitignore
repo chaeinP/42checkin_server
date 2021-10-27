@@ -39,10 +39,10 @@ Thumbs.db
 dist
 dist/**/*
 test_dist/**/*
+dist.*
 
 # ignore yarn.lock
 yarn.lock
-
 
 test_deploy.sh
 deploy.sh
