@@ -5,7 +5,9 @@ const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const nodeExternals = require('webpack-node-externals');
 const dotenv = require('dotenv');
 const { NODE_ENV } = process.env;
-console.log({ NODE_ENV});
+
+console.log('process.env.NODE_ENV:', process.env.NODE_ENV);
+console.log('process.env.DATABASE_USERNAME:', process.env.DATABASE_USERNAME);
 
 const config = {
 	production: {
@@ -31,7 +33,7 @@ dotenv.config({
 });
 
 const output_path = config[NODE_ENV].output_path;
-console.log(process.env.DATABASE_USERNAME);
+
 module.exports = {
 	entry: './src/server.ts',
 	target: 'node',
@@ -43,7 +45,7 @@ module.exports = {
 		filename: 'app.js',
 		path: path.resolve(__dirname, output_path)
 	},
-	devtool: 'source-map',
+	devtool: 'eval-cheap-module-source-map',
 	resolve: {
 		// Add `.ts` and `.tsx` as a resolvable extension.
 		extensions: ['.ts', '.tsx', '.js'],
@@ -80,6 +82,8 @@ module.exports = {
 			'process.env.CLIENT_ID': JSON.stringify(process.env.CLIENT_ID),
 			'process.env.CLIENT_SECRET': JSON.stringify(process.env.CLIENT_SECRET),
 			'process.env.CLIENT_CALLBACK': JSON.stringify(process.env.CLIENT_CALLBACK),
+            'process.env.SLACK_OAUTH_CLIENT_ID': JSON.stringify(process.env.SLACK_OAUTH_CLIENT_ID),
+            'process.env.SLACK_OAUTH_CLIENT_SECRET': JSON.stringify(process.env.SLACK_OAUTH_CLIENT_SECRET),
 			'process.env.JWT_SECRET': JSON.stringify(process.env.JWT_SECRET),
 			'process.env.LOG_DEBUG': JSON.stringify(process.env.LOG_DEBUG),
 			'process.env.DISCORD_GAEPO_ID': JSON.stringify(process.env.DISCORD_GAEPO_ID),
