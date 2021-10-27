@@ -12,6 +12,7 @@ export interface ConfigAttributes {
     checkout_at?: number;
     seocho?: number;
     gaepo?: number;
+    auth?: string;
     deleted_at?: Date;
     updated_at?: Date;
     created_at?: Date;
@@ -33,6 +34,7 @@ export class Config extends Model<ConfigAttributes, configCreationAttributes> im
     checkout_at?: number;
     seocho?: number;
     gaepo?: number;
+    auth?: string;
     deleted_at?: Date;
     updated_at?: Date;
     created_at?: Date;
@@ -47,7 +49,9 @@ export class Config extends Model<ConfigAttributes, configCreationAttributes> im
             },
             env: {
                 type: DataTypes.STRING(45),
-                unique: "env_UNIQUE"
+            },
+            auth: {
+                type: DataTypes.STRING(10),
             },
             begin_at: {
                 type: DataTypes.DATE,

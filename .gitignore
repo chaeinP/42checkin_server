@@ -21,11 +21,7 @@ coverage
 
 # API keys and secrets
 .env
-.env.development
-.env.production
-.env.example
-.env.test
-.env.alpha
+.env.*
 
 # Dependency directory
 node_modules
@@ -43,10 +39,10 @@ Thumbs.db
 dist
 dist/**/*
 test_dist/**/*
+dist.*
 
 # ignore yarn.lock
 yarn.lock
-
 
 test_deploy.sh
 deploy.sh

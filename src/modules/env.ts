@@ -59,6 +59,12 @@ const env = {
             id: process.env.SLACK_CLIENT_ID,
             secret: process.env.SLACK_CLIENT_SECRET,
         },
+        oauth: {
+            client: {
+                id: process.env.SLACK_OAUTH_CLIENT_ID,
+                secret: process.env.SLACK_OAUTH_CLIENT_SECRET,
+            },
+        }
     },
     passport: {
         strategy:process.env.PASSPORT_STRATEGY,
