@@ -59,7 +59,8 @@ const StrategySlack = () =>
 			clientID: env.slack.oauth.client.id,
 			clientSecret: env.slack.oauth.client.secret,
             skipUserProfile: false, // default
-            scope: ['users.profile:read']
+            scope: ['identity.basic']
+            // scope: ['identity.basic', 'identity.email', 'identity.avatar', 'identity.team']
 		},
 		strategeyCallback
 	);

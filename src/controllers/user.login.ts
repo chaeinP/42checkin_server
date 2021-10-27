@@ -30,7 +30,12 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
  */
 export const callback = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        logger.log(req.user?.jwt, req.user?.ft);
+        let ft = req.user?.ft;
+        if (typeof req.user?.ft?.get === 'function') {
+            ft = <any>req.user.ft.get({plain: true});
+            if (ft.profile) delete ft['profile'];
+        }
+        logger.log(req.user?.jwt, ft);
         const { token, cookieOption } = await authService.getAuth(req.user?.ft);
         res.cookie(env.cookie.auth, token, cookieOption);
         res.clearCookie('redirect');
