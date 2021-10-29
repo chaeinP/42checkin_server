@@ -17,7 +17,14 @@ import axios from "axios";
  * */
 export const login = async (user: Users): Promise<string> => {
     logger.log('login:', user);
-    const found = await Users.findOne({ where: { login: user.login } });
+    const found = await Users.findOne({
+        where: {
+            login: user.login,
+            deleted_at: {
+                [Op.eq]: null
+            }
+        }
+    });
 
     //처음 사용하는 유저의 경우 db에 등록
     if (!found) {
@@ -37,7 +44,14 @@ export const login = async (user: Users): Promise<string> => {
  * 어드민 여부 확인
  */
 export const requestAdminPrivilege = async (id: number) => {
-    const user = await Users.findOne({ where: { _id: id } })
+    const user = await Users.findOne({
+        where: {
+            _id: id,
+            deleted_at: {
+                [Op.eq]: null
+            }
+        }
+    });
     logger.log('IsAdmin:', user.type);
     if (user.type !== 'admin') {
         let msg = '관리자 권한이 필요한 접근입니다.'
@@ -50,7 +64,14 @@ export const requestAdminPrivilege = async (id: number) => {
  * 사용자 정보
  */
 export const getUser = async (id: number) => {
-    const user = await Users.findOne({ where: { _id: id } })
+    const user = await Users.findOne({
+        where: {
+            _id: id,
+            deleted_at: {
+                [Op.eq]: null
+            }
+        }
+    })
     return user;
 };
 
@@ -65,12 +86,26 @@ export const checkIn = async (userInfo: IJwtUser, cardId: string) => {
     const userId = userInfo._id;
     const _cardId = parseInt(cardId);
     let notice = false;
-    const cardOwner = await Users.findOne({ where: { card_no: cardId } });
+    const cardOwner = await Users.findOne({
+        where: {
+            card_no: cardId,
+            deleted_at: {
+                [Op.eq]: null
+            }
+        }
+    });
     if (cardOwner) {
         logger.error(`이미 사용중인 카드입니다, cardOwner: ${JSON.stringify(cardOwner)}`);
         throw new ApiError(httpStatus.CONFLICT, '이미 사용중인 카드입니다.', {stack: new Error().stack});
     }
-    const user = await Users.findOne({ where: { _id: userId } });
+    const user = await Users.findOne({
+        where: {
+            _id: userId,
+            deleted_at: {
+                [Op.eq]: null
+            }
+        }
+    });
     const clusterType = user.getClusterType(_cardId)
     const { enterCnt, maxCnt, result } = await checkCanEnter(clusterType, 'checkIn'); //현재 이용자 수 확인
 
@@ -110,7 +145,14 @@ export const checkOut = async (userInfo: IJwtUser) => {
         throw new ApiError(httpStatus.UNAUTHORIZED, '유저 정보 없음', {stack: new Error().stack});
     }
     const id = userInfo._id;
-    const user = await Users.findOne({ where: { _id: id } });
+    const user = await Users.findOne({
+        where: {
+            _id: id,
+            deleted_at: {
+                [Op.eq]: null
+            }
+        }
+    });
     await usageService.create(user, user.login);
     let history = await historyService.create(user, 'checkOut');
     const clusterType = user.getClusterType(user.card_no)
@@ -139,7 +181,14 @@ export const status = async (userInfo: IJwtUser) => {
         throw new ApiError(httpStatus.UNAUTHORIZED, msg, {stack: new Error(msg).stack});
     }
     const id = userInfo._id;
-    const user = await Users.findOne({ where: { '_id': id } });
+    const user = await Users.findOne({
+        where: {
+            '_id': id,
+            deleted_at: {
+                [Op.eq]: null
+            }
+        }
+    });
     if (!user) {
         logger.error('userInfo:', userInfo);
         let msg = 'DB에서 사용자를 찾지 못했습니다.';
@@ -181,7 +230,14 @@ export const forceCheckOut = async (adminInfo: IJwtUser, userId: string) => {
     }
     await requestAdminPrivilege(adminInfo._id);
     const _userId = parseInt(userId);
-    const user = await Users.findOne({ where: { _id: _userId } });
+    const user = await Users.findOne({
+        where: {
+            _id: _userId,
+            deleted_at: {
+                [Op.eq]: null
+            }
+        }
+    });
     if (!user) {
         let msg = `사용자 정보(${_userId})가 없습니다.`;
         throw new ApiError(httpStatus.UNAUTHORIZED, msg, {stack: new Error(msg).stack, isNormal: true});
@@ -214,7 +270,11 @@ export const getUsingInfo = async () => {
     const gaepo = await Users.count({
         where: {
             card_no: {
-                [Op.lt]: 1000
+                [Op.lt]: 1000,
+                [Op.gt]: 0
+            },
+            deleted_at: {
+                [Op.eq]: null
             }
         }
     })
@@ -222,6 +282,9 @@ export const getUsingInfo = async () => {
         where: {
             card_no: {
                 [Op.gte]: 1000
+            },
+            deleted_at: {
+                [Op.eq]: null
             }
         }
     })

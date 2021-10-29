@@ -5,6 +5,7 @@ import passport from 'passport';
 import logger from '@modules/logger';
 import { Users } from '@models/database';
 import { now } from './util';
+import {Op} from "sequelize";
 
 const PassortStrategySlack = require('passport-slack-oauth2').Strategy;
 
@@ -43,7 +44,14 @@ const strategeyCallback = async (
             logger.log('accessToken:', accessToken)
             logger.log('refreshToken:', refreshToken)
 
-            const found = await Users.findOne({where: {login: user.login}})
+            const found = await Users.findOne({
+                where: {
+                    login: user.login,
+                    deleted_at: {
+                        [Op.eq]: null
+                    }
+                }
+            });
             callback(null, {ft: found});
         }
     } catch (e) {

@@ -28,6 +28,9 @@ export const getConfig = async (date: string) => {
             end_at: {
                 [Op.gt]: date
             },
+            deleted_at: {
+                [Op.eq]: null
+            }
         },
     });
     

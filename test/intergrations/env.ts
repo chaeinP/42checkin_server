@@ -1,8 +1,16 @@
 import { Users } from "../../src/models/users"
 import { getAuth } from "../../src/service/auth.service";
+import {Op} from "sequelize";
 
 export const getCookie = async () => {
-    const user = await Users.findOne({ where: { login: 'ohjongin' } })
+    const user = await Users.findOne({
+        where: {
+            login: 'ohjongin',
+            deleted_at: {
+                [Op.eq]: null
+            }
+        }
+    })
     const { token } = await getAuth(user);
     return `w_auth_local=${token}`
 }
