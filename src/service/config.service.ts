@@ -2,7 +2,7 @@ import env from '@modules/env';
 import ApiError from '@modules/api.error';
 import httpStatus from 'http-status';
 import { Config, Config as IConfig } from '@models/config';
-import { Op } from 'sequelize';
+import Sequelize, { Op } from 'sequelize';
 import logger from "@modules/logger";
 import {getTimezoneDateString} from "@modules/util";
 
@@ -11,7 +11,7 @@ import {getTimezoneDateString} from "@modules/util";
  * @param date YYYY-MM-DD
  * @returns
  */
-export const getConfig = async (date: string) => {
+export const getConfig = async (date: string, comment?: string) => {
 	const node_env = env.node_env ? env.node_env : 'development';
 
     if (!date) {
@@ -19,7 +19,13 @@ export const getConfig = async (date: string) => {
         date = getTimezoneDateString(new Date()).slice(0,10);
     }
 
+    const _comment = comment ? comment : '';
 	const setting = await Config.findOne({
+        attributes: {
+            include: [
+                [Sequelize.literal(`/* ${_comment} */ 1`), '_comment'],
+            ],
+        },
         where: {
             env: node_env,
             begin_at: {
@@ -30,8 +36,9 @@ export const getConfig = async (date: string) => {
             },
             deleted_at: {
                 [Op.eq]: null
-            }
+            },
         },
+        order: [['_id', 'DESC']]
     });
     
 	if (setting) {

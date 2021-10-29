@@ -26,7 +26,7 @@ function getOrigin() {
 	}
 	return origin;
 }
-logger.init({console: false, sql: false, api: false});
+logger.init({});
 
 /**
  *
@@ -34,7 +34,7 @@ logger.init({console: false, sql: false, api: false});
 const check42Intra = async () => {
     let strategy;
     const today = getTimezoneDate(new Date()).toISOString().slice(0, 10)
-    let config = await configService.getConfig(today);
+    let config = await configService.getConfig(today, '42checkin_no_logging');
     try {
         strategy = config.auth || '42';
         const res = await axios.get('https://intra.42.fr');
