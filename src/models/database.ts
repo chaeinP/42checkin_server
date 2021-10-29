@@ -28,6 +28,8 @@ const database = new sequelize.Sequelize(name, username, password, {
     timezone: '+09:00',
     logQueryParameters: process.env.NODE_ENV === 'development',
     logging: (query) => {
+        if (query?.includes('42checkin_no_logging')) return;
+        if (query?.includes('SELECT 1+1 AS result')) return;
         logger.sql(query);
     }
 });
