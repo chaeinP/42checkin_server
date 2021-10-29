@@ -19,6 +19,9 @@ export const getUserHistory = async (login: string, page: number, listSize: numb
         }],
         where: {
             login,
+            deleted_at: {
+                [Op.eq]: null
+            },
             [Op.and]: [
                 Sequelize.literal('`User`.`login` = `History`.`login`'),
             ],
@@ -42,6 +45,9 @@ export const getCardHistory = async (id: number, page: number, listSize: number)
         }],
         where: {
             card_no: id,
+            deleted_at: {
+                [Op.eq]: null
+            },
             [Op.and]: [
                 Sequelize.literal('`User`.`login` = `History`.`login`'),
             ],
@@ -105,9 +111,12 @@ export const getCluster = async (clusterType: CLUSTER_CODE, page: number, listSi
         }],
         where: {
             card_no: clusterCondition[clusterType],
+            deleted_at: {
+                [Op.eq]: null
+            },
             [Op.and]: [
                 Sequelize.literal('`User`.`login` = `History`.`login`'),
-            ],
+            ]
         },
         order: [['_id', 'DESC']],
         offset: listSize * (page - 1),
@@ -134,8 +143,19 @@ export const getCheckIn = async (clusterType: CLUSTER_CODE, page: number, listSi
     const {rows, count} = await Users.findAndCountAll({
         attributes: ['_id', ['checkin_at', 'created_at'], 'state', 'login', 'card_no'],
         where: Sequelize.and(
-            {card_no: clusterCondition[clusterType]},
-            {card_no: {[Op.ne]: null}}),
+            {
+                card_no: clusterCondition[clusterType],
+            },
+            {
+                deleted_at: {
+                    [Op.eq]: null
+                }
+            },
+            {
+                card_no: {
+                    [Op.ne]: null
+                }
+            }),
         order: [['_id', 'DESC']],
         offset: listSize * (page - 1),
         limit: listSize,

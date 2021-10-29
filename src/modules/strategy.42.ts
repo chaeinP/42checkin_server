@@ -5,6 +5,7 @@ import passport from 'passport';
 import logger from '@modules/logger';
 import { Users } from '@models/database';
 import { now } from './util';
+import {Op} from "sequelize";
 
 let FortyTwoStrategy = require('passport-42').Strategy;
 
@@ -44,7 +45,14 @@ const strategeyCallback = (
             logger.log('accessToken:', accessToken)
             logger.log('refreshToken:', refreshToken)
 
-            const found = await Users.findOne({ where: { login: user.login } })
+            const found = await Users.findOne({
+                where: {
+                    login: user.login,
+                    deleted_at: {
+                        [Op.eq]: null
+                    }
+                }
+            });
             if (found) {
                 found.email = user.email;
                 found.access_token = user.access_token;
