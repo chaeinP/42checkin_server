@@ -11,7 +11,7 @@ import {getUser} from "@service/user.service";
 const isBetween = (target: string, min: any, max: any) => {
     let now = getTimeNumber(target);
     let checkin_at = (min !== null && min !== undefined) ? getTimeNumber(min) : -1;
-    let checkout_at = (max !== null && max !== undefined) ? getTimeNumber(max) : 10000;
+    let checkout_at = (max !== null && max !== undefined) ? getTimeNumber(max) : Number.MAX_SAFE_INTEGER;
 
     let result = (now >= checkin_at) && (now < checkout_at);
     if (!result) {
