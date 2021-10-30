@@ -5,7 +5,7 @@ import httpStatus from 'http-status';
 import logger from '@modules/logger';
 import ApiError from "@modules/api.error";
 import {getConfig} from "@service/config.service";
-import {getLocalDate, getTimeNumber, getTimezoneDate} from "@modules/util";
+import {getTimeNumber, getTimezoneDate} from "@modules/util";
 import {getUser} from "@service/user.service";
 
 const isBetween = (target: string, min: any, max: any) => {
@@ -22,7 +22,7 @@ const isBetween = (target: string, min: any, max: any) => {
     return result;
 }
 
-const isCheckAvailable = async (msg: string, req: Request, res: Response, next: NextFunction) => {
+const isCheckAvailable = async (message: string, req: Request, res: Response, next: NextFunction) => {
     logger.log(req.user?.jwt, req.params?.cardid);
 
     const user = await getUser(req.user?.jwt?._id);
@@ -46,7 +46,7 @@ const isCheckAvailable = async (msg: string, req: Request, res: Response, next: 
             checkin_at = '00:00'
             checkout_at = '24:00'
         }
-        let msg = `체크아웃 가능 시간이 아닙니다.\n(가능시간: ${checkin_at} ~ ${checkout_at})`;
+        let msg = `${message}\n(가능시간: ${checkin_at} ~ ${checkout_at})`;
         errorHandler(new ApiError(httpStatus.NOT_FOUND, msg, {
             stack: new Error(msg).stack,
             isFatal: false
@@ -66,10 +66,9 @@ export const checkIn = async (req: Request, res: Response, next: NextFunction) =
         logger.log(req.user?.jwt, req.params?.cardid);
 
         if (!await isCheckAvailable('체크인 가능 시간이 아닙니다.', req, res, next)) return;
-        const body = await userService.checkIn(req.user.jwt, req.params.cardid);
-        logger.info(body);
-        logger.res(httpStatus.OK, body);
-        res.status(httpStatus.OK).json(body);
+        const isSuccess = await userService.checkIn(req.user.jwt, req.params.cardid);
+        logger.res(httpStatus.OK, { result: isSuccess });
+        res.status(httpStatus.OK).json( { result: isSuccess });
     } catch (e) {
         errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack, isFatal: true}), req, res, next);
     }
@@ -84,10 +83,9 @@ export const checkOut = async (req: Request, res: Response, next: NextFunction) 
         logger.log(req.user?.jwt);
 
         if (!await isCheckAvailable('체크아웃 가능 시간이 아닙니다.', req, res, next)) return;
-        const body = await userService.checkOut(req.user.jwt);
-        logger.info(body);
-        logger.res(httpStatus.OK, body);
-        res.status(httpStatus.OK).json(body);
+        const isSuccess = await userService.checkOut(req.user.jwt);
+        logger.res(httpStatus.OK, {result: isSuccess});
+        res.status(httpStatus.OK).json({result: isSuccess});
     } catch (e) {
         errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack, isFatal: true}), req, res, next);
     }

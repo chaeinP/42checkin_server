@@ -1,12 +1,12 @@
 import httpStatus from 'http-status';
-import { Op } from 'sequelize';
-import { generateToken, IJwtUser } from '@modules/strategy.jwt';
+import {Op} from 'sequelize';
+import {generateToken, IJwtUser} from '@modules/strategy.jwt';
 import logger from '@modules/logger';
 import ApiError from '@modules/api.error';
-import { CHECK_STATE, CLUSTER_CODE, CLUSTER_TYPE } from '@modules/cluster';
-import { Users } from '@models/users';
-import { noticer } from '@modules/discord';
-import { getLocalDate } from '@modules/util';
+import {CHECK_STATE, CLUSTER_CODE, CLUSTER_TYPE} from '@modules/cluster';
+import {Users} from '@models/users';
+import {noticer} from '@modules/discord';
+import {getLocalDate} from '@modules/util';
 import * as historyService from '@service/history.service';
 import * as configService from '@service/config.service';
 import * as usageService from '@service/usage.service';
@@ -64,15 +64,14 @@ export const requestAdminPrivilege = async (id: number) => {
  * 사용자 정보
  */
 export const getUser = async (id: number) => {
-    const user = await Users.findOne({
+    return await Users.findOne({
         where: {
             _id: id,
             deleted_at: {
                 [Op.eq]: null
             }
         }
-    })
-    return user;
+    });
 };
 
 /**
@@ -85,7 +84,6 @@ export const checkIn = async (userInfo: IJwtUser, cardId: string) => {
     }
     const userId = userInfo._id;
     const _cardId = parseInt(cardId);
-    let notice = false;
     const cardOwner = await Users.findOne({
         where: {
             card_no: cardId,
@@ -106,13 +104,22 @@ export const checkIn = async (userInfo: IJwtUser, cardId: string) => {
             }
         }
     });
+
+    const _user = Object.assign(user);
+    delete _user['profile'];
+    logger.info('checkIn', JSON.stringify(_user));
+
+    if (['checkin'].includes(user.state)) {
+        throw new ApiError(httpStatus.BAD_REQUEST, '이미 체크인 하셨습니다.', {stack: new Error().stack});
+    }
+
     const clusterType = user.getClusterType(_cardId)
     const { enterCnt, maxCnt, result } = await checkCanEnter(clusterType, 'checkIn'); //현재 이용자 수 확인
 
     logger.log('login: ', user.login, 'card_no: ', _cardId, 'max: ', maxCnt, 'used: ', enterCnt);
     if (!result) {
         logger.error({use: enterCnt, max: maxCnt});
-        throw new ApiError(httpStatus.CONFLICT, '수용할 수 있는 최대 인원을 초과했습니다.', {stack: new Error().stack});
+        throw new ApiError(httpStatus.CONFLICT, '클러스터 출입 최대 인원을 초과했습니다.', {stack: new Error().stack});
     }
 
     // Users table에 log_id를 남기면서 순서가 뒤바뀌어서 card_no가 null이 되는 현상이 발생.
@@ -120,20 +127,17 @@ export const checkIn = async (userInfo: IJwtUser, cardId: string) => {
     user.card_no = _cardId;
     let history = await historyService.create(user, 'checkIn');
     await user.setState('checkIn', user.login, _cardId, history._id);
+
     // 남은 인원이 5명이하인 경우, 몇 명 남았는지 디스코드로 노티
     if (enterCnt + 1 >= maxCnt - 5) {
         try {
             await noticer(CLUSTER_CODE[clusterType], maxCnt - enterCnt + 1);
-            notice = true;
         } catch (e) {
             logger.error(e);
         }
     }
 
-    return {
-        result: true,
-        notice
-    };
+    return true;
 };
 
 /**
@@ -154,6 +158,14 @@ export const checkOut = async (userInfo: IJwtUser) => {
         }
     });
 
+    const _user = Object.assign(user);
+    delete _user['profile'];
+    logger.info('checkOut', JSON.stringify(_user));
+
+    if (!['checkin'].includes(user.state)) {
+        throw new ApiError(httpStatus.BAD_REQUEST, '이미 체크아웃 하셨습니다.', {stack: new Error().stack});
+    }
+
     await usageService.create(user, user.login);
     let history = await historyService.create(user, 'checkOut');
     const clusterType = user.getClusterType(user.card_no)
@@ -168,9 +180,6 @@ export const checkOut = async (userInfo: IJwtUser) => {
             logger.error(e);
         }
     }
-    const _user = Object.assign(user);
-    delete _user['profile'];
-    logger.info('checkOut', JSON.stringify(_user));
 
     return true;
 };
