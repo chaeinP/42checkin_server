@@ -11,7 +11,10 @@ const DIVIDER_FOR_DURATION = 1000;
  * 사용 시간 정보를 생성한다.
  */
 export const create = async (user: Users, actor: string): Promise<void> => {
-    logger.log('user:', JSON.stringify(user));
+
+    const _user = Object.assign(user);
+    delete _user['profile'];
+    logger.log('user:', JSON.stringify(_user));
 
     let duration: number = (new Date().getTime() - user.checkin_at.getTime()) / DIVIDER_FOR_DURATION;
 

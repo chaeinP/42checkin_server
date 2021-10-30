@@ -153,6 +153,7 @@ export const checkOut = async (userInfo: IJwtUser) => {
             }
         }
     });
+
     await usageService.create(user, user.login);
     let history = await historyService.create(user, 'checkOut');
     const clusterType = user.getClusterType(user.card_no)
@@ -167,7 +168,10 @@ export const checkOut = async (userInfo: IJwtUser) => {
             logger.error(e);
         }
     }
-    logger.info('checkOut', JSON.stringify(user));
+    const _user = Object.assign(user);
+    delete _user['profile'];
+    logger.info('checkOut', JSON.stringify(_user));
+
     return true;
 };
 
