@@ -109,7 +109,7 @@ export const checkIn = async (userInfo: IJwtUser, cardId: string) => {
     delete _user['profile'];
     logger.info('checkIn', JSON.stringify(_user));
 
-    if (['checkin'].includes(user.state)) {
+    if (['checkin'].includes(user.state?.toLowerCase())) {
         throw new ApiError(httpStatus.BAD_REQUEST, '이미 체크인 하셨습니다.', {stack: new Error().stack});
     }
 
@@ -162,7 +162,7 @@ export const checkOut = async (userInfo: IJwtUser) => {
     delete _user['profile'];
     logger.info('checkOut', JSON.stringify(_user));
 
-    if (!['checkin'].includes(user.state)) {
+    if (!['checkin'].includes(user.state?.toLowerCase())) {
         throw new ApiError(httpStatus.BAD_REQUEST, '이미 체크아웃 하셨습니다.', {stack: new Error().stack});
     }
 
