@@ -8,16 +8,20 @@ import {getTimezoneDateString} from "@modules/util";
 
 /**
  *
- * @param date YYYY-MM-DD
+ * @param date YYYY-MM-DD, KST 기준
+ * @param comment config API 호출시 SQL에 추가하는 comment
  * @returns
  */
 export const getConfig = async (date: string, comment?: string) => {
 	const node_env = env.node_env ? env.node_env : 'development';
 
-    if (!date) {
+    /*if (!date) {
         logger.error(`Invalid Date: ${date}`);
         date = getTimezoneDateString(new Date()).slice(0,10);
-    }
+    }*/
+    // 11월 1일 02:00 에 config date가 '2021-10-31'으로 호출됨
+    // 무조건 오늘 기준으로 처리하도록 임시 수정
+    date = getTimezoneDateString(new Date()).slice(0,10);
 
     const _comment = comment ? comment : '';
 	const setting = await Config.findOne({
