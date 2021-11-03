@@ -107,7 +107,7 @@ export const getCluster = async (clusterType: CLUSTER_CODE, page: number, listSi
     const {rows, count} = await History.findAndCountAll({
         include: [{
             model: Users,
-            attributes: ['state', '_id', 'login', 'card_no'],
+            attributes: ['state', '_id', 'login', 'card_no', 'log_id'],
         }],
         where: {
             card_no: clusterCondition[clusterType],
