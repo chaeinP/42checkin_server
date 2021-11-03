@@ -226,6 +226,10 @@ export const status = async (userInfo: IJwtUser) => {
         user: {
             login: user.login,
             card: user.card_no,
+            state: user.state,
+            log_id: user.log_id,
+            checkin_at: user.checkin_at,
+            checkout_at: user.checkout_at,
             profile_image_url: imageUrl
         },
         cluster: await getUsingInfo(),
