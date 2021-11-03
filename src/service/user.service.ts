@@ -106,7 +106,7 @@ export const checkIn = async (userInfo: IJwtUser, cardId: string) => {
     });
 
     const _user = Object.assign(user);
-    delete _user['profile'];
+    _user['profile'] = {};
     logger.info('checkIn', JSON.stringify(_user));
 
     if (['checkin'].includes(user.state?.toLowerCase())) {
@@ -159,7 +159,7 @@ export const checkOut = async (userInfo: IJwtUser) => {
     });
 
     const _user = Object.assign(user);
-    delete _user['profile'];
+    _user['profile'] = {};
     logger.info('checkOut', JSON.stringify(_user));
 
     if (!['checkin'].includes(user.state?.toLowerCase())) {

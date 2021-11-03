@@ -13,7 +13,7 @@ const DIVIDER_FOR_DURATION = 1000;
 export const create = async (user: Users, actor: string): Promise<void> => {
 
     const _user = Object.assign(user);
-    delete _user['profile'];
+    _user['profile'] = {};
     logger.log('user:', JSON.stringify(_user));
 
     let duration: number = (new Date().getTime() - user.checkin_at.getTime()) / DIVIDER_FOR_DURATION;
