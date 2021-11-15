@@ -232,7 +232,7 @@ export const status = async (userInfo: IJwtUser) => {
         try {
             res = await axios.get(url);
         } catch (e) {
-            logger.error(e);
+            logger.error(`${url} not found... use default...`);
         }
         imageUrl = (res?.status === 200) ? url : `https://cdn.intra.42.fr/users/default.png`;
     }
