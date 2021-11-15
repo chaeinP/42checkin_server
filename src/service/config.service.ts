@@ -15,13 +15,10 @@ import {getTimezoneDateString} from "@modules/util";
 export const getConfig = async (date: string, comment?: string) => {
 	const node_env = env.node_env ? env.node_env : 'development';
 
-    /*if (!date) {
-        logger.error(`Invalid Date: ${date}`);
+    if (!date) {
         date = getTimezoneDateString(new Date()).slice(0,10);
-    }*/
-    // 11월 1일 02:00 에 config date가 '2021-10-31'으로 호출됨
-    // 무조건 오늘 기준으로 처리하도록 임시 수정
-    date = getTimezoneDateString(new Date()).slice(0,10);
+        logger.log(`Date is empty... Use today: ${date}`);
+    }
 
     const _comment = comment ? comment : '';
 	const setting = await Config.findOne({
