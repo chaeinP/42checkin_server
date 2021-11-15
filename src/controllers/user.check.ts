@@ -40,13 +40,13 @@ const isCheckAvailable = async (message: string, req: Request, res: Response, ne
     let now = getTimezoneDate(new Date()).toISOString().slice(11, 19);
     if (!isBetween(now, config.checkin_at, config.checkout_at)) {
         logger.log('now: ', now, ', checkin_at: ', config.checkin_at, ', checkout_at: ', config.checkout_at);
-        let checkin_at = config.checkin_at ? config.checkin_at : '';
-        let checkout_at = config.checkout_at ? config.checkout_at : '';
-        if (!config.checkin_at && !config.checkout_at) {
-            checkin_at = '00:00'
-            checkout_at = '24:00'
+        let open_at = config.open_at ? config.open_at : '';
+        let close_at = config.close_at ? config.close_at : '';
+        if (!config.checkin_at && !config.close_at) {
+            open_at = '00:00'
+            close_at = '24:00'
         }
-        let msg = `${message}\n(가능시간: ${checkin_at} ~ ${checkout_at})`;
+        let msg = `${message}\n(가능시간: ${open_at} ~ ${close_at})`;
         errorHandler(new ApiError(httpStatus.NOT_FOUND, msg, {
             stack: new Error(msg).stack,
             isFatal: false
