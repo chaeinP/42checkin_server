@@ -43,7 +43,7 @@ export const login = async (user: Users): Promise<string> => {
 /**
  * 어드민 여부 확인
  */
-export const requestAdminPrivilege = async (id: number) => {
+export const isAdmin = async (id: number) => {
     const user = await Users.findOne({
         where: {
             _id: id,
@@ -52,8 +52,17 @@ export const requestAdminPrivilege = async (id: number) => {
             }
         }
     });
-    logger.log('IsAdmin:', user.type);
-    if (user.type !== 'admin') {
+    logger.log('isAdmin:', user.type);
+    return user.type;
+};
+
+/**
+ * 어드민 여부 확인
+ */
+export const requestAdminPrivilege = async (id: number) => {
+    const userType = await isAdmin(id);
+    logger.log('IsAdmin:', userType);
+    if (userType !== 'admin') {
         let msg = '관리자 권한이 필요한 접근입니다.'
         throw new ApiError(httpStatus.FORBIDDEN, msg, {stack: new Error(msg).stack});
     }
@@ -218,8 +227,14 @@ export const status = async (userInfo: IJwtUser) => {
     let imageUrl = rawProfile?.image_url;
     if (!imageUrl) {
         let url = `https://cdn.intra.42.fr/users/${user.login}.jpg`;
-        let res = await axios.get(url);
-        imageUrl = (res.status === 200) ? url : `https://cdn.intra.42.fr/users/default.png`;
+        let res;
+
+        try {
+            res = await axios.get(url);
+        } catch (e) {
+            logger.error(e);
+        }
+        imageUrl = (res?.status === 200) ? url : `https://cdn.intra.42.fr/users/default.png`;
     }
 
     return {
