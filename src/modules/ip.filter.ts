@@ -5,7 +5,7 @@ import env from '@modules/env';
 import ApiError from '@modules/api.error';
 import {errorHandler} from '@modules/error';
 import requestIp from "request-ip";
-import {getUser} from "@service/user.service";
+import {isAdmin} from "@service/user.service";
 
 const ipFilter = (rules: Function[]) => async (req: Request, res: Response, next: NextFunction) => {
     const clientIp = requestIp.getClientIp(req);
@@ -35,12 +35,14 @@ const isGuestWiFi = (ip: string) => {
 
 export const GuestWiFiIpFilter = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        logger.log(req.user);
-        const user = await getUser(req.user?.jwt?._id);
-        const isAdmin = ['admin'].includes(user.type);
+        logger.log('req.user:', req.user);
+        let skipWiFi = false;
+        if (req.user?.jwt?._id) {
+            skipWiFi = await isAdmin(req.user?.jwt?._id);
+        }
 
         const rules: Function[] = [];
-        if (!isAdmin && env.ip.filter) {
+        if (!skipWiFi && env.ip.filter) {
             rules.push(checkIsWhitelist, isGuestWiFi);
         }
         return ipFilter(rules)(req, res, next);
