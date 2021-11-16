@@ -212,8 +212,14 @@ export const status = async (userInfo: IJwtUser) => {
     let imageUrl = rawProfile?.image_url;
     if (!imageUrl) {
         let url = `https://cdn.intra.42.fr/users/${user.login}.jpg`;
-        let res = await axios.get(url);
-        imageUrl = (res.status === 200) ? url : `https://cdn.intra.42.fr/users/default.png`;
+        let res;
+
+        try {
+            res = await axios.get(url);
+        } catch (e) {
+            logger.error(`${url} not found... use default...`);
+        }
+        imageUrl = (res?.status === 200) ? url : `https://cdn.intra.42.fr/users/default.png`;
     }
 
     return {

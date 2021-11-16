@@ -178,10 +178,10 @@ const sql = dailyfile({
     }
 });
 
-const http = dailyfile({
+const net = dailyfile({
     ...jsonConfig,
     ...{
-        allLogsFileName: 'htp',
+        allLogsFileName: 'net',
         level: 'log',
         format: jsonFormat,
     }
@@ -248,11 +248,11 @@ const logger = {
             isNewRecord: false
           }
          */
-        return config.api ? http.log(request) : null;
+        return config.api ? net.log(request) : null;
     },
     res(httpStatus: number, response: any) {
         context.set('httpStatus', httpStatus);
-        return config.api ? http.log(getPlanObject(response)) : null;
+        return config.api ? net.log(getPlanObject(response)) : null;
     }
 };
 
