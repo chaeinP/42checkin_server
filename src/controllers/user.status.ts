@@ -12,7 +12,7 @@ import {getPlanObject} from "@modules/util";
  */
 export const userStatus = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        logger.log(req.user?.jwt);
+        logger.log('req.user?.jwt:', req.user?.jwt);
         const body = await userService.status(req.user.jwt);
         logger.info(body);
         logger.res(httpStatus.OK, body);
@@ -25,7 +25,7 @@ export const userStatus = async (req: Request, res: Response, next: NextFunction
 
 export const usingStatus = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        logger.log(req.user?.jwt);
+        logger.log('req.user?.jwt:', req.user?.jwt);
         const body = await userService.getUsingInfo();
         logger.info(body);
         logger.res(httpStatus.OK, body);
@@ -41,7 +41,7 @@ export const usingStatus = async (req: Request, res: Response, next: NextFunctio
  */
 export const userUsageDaily = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        logger.log(req.user?.jwt, req.query?.from, req.query?.to);
+        logger.log('req.user?.jwt:', req.user?.jwt, req.query?.from, req.query?.to);
         const body = await usageService.getUsagesDaily(req.user.jwt, req.query.from, req.query.to);
         logger.info(getPlanObject(body));
         logger.res(httpStatus.OK, body);
@@ -57,7 +57,7 @@ export const userUsageDaily = async (req: Request, res: Response, next: NextFunc
  */
 export const userUsageList = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        logger.log(req.user?.jwt, req.query?.from, req.query?.to);
+        logger.log('req.user?.jwt:', req.user?.jwt, req.query?.from, req.query?.to);
         const body = await usageService.getUsagesList(req.user.jwt, req.query.from, req.query.to);
         logger.info(getPlanObject(body));
         logger.res(httpStatus.OK, body);
@@ -73,7 +73,7 @@ export const userUsageList = async (req: Request, res: Response, next: NextFunct
  */
 export const forceCheckout = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        logger.log(req.user?.jwt, req.params?.userId);
+        logger.log('req.user?.jwt:', req.user?.jwt, req.params?.userId);
         const { userId } = req.params;
         const body = await userService.forceCheckOut(req.user.jwt, userId);
         logger.info(getPlanObject(body));
