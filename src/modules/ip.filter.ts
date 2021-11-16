@@ -37,12 +37,10 @@ export const GuestWiFiIpFilter = async (req: Request, res: Response, next: NextF
     try {
         logger.log(req.user);
         const user = await getUser(req.user?.jwt?._id);
-        if (['admin'].includes(user.type)) {
-            return next();
-        }
+        const isAdmin = ['admin'].includes(user.type);
 
         const rules: Function[] = [];
-        if (env.ip.filter) {
+        if (!isAdmin && env.ip.filter) {
             rules.push(checkIsWhitelist, isGuestWiFi);
         }
         return ipFilter(rules)(req, res, next);
