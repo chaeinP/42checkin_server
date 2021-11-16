@@ -51,7 +51,7 @@ router.get('/login/callback/slack', async function onLoginCallbackSlack(req, res
         next();
     })(req, res, next);
 }, Login.callback);
-router.post('/checkIn/:cardid', passport.authenticate('jwt'), GuestWiFiIpFilter, Check.checkIn);
+router.post('/checkIn/:cardid', GuestWiFiIpFilter, passport.authenticate('jwt'), Check.checkIn);
 router.post('/checkOut', passport.authenticate('jwt'), Check.checkOut);
 router.get('/status', passport.authenticate('jwt'), Status.userStatus);
 router.get('/using', Status.usingStatus);
