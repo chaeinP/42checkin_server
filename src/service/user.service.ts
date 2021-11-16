@@ -41,46 +41,39 @@ export const login = async (user: Users): Promise<string> => {
 };
 
 /**
- * 어드민 여부 확인
+ * 사용자 정보
  */
-export const isAdmin = async (id: number) => {
-    const user = await Users.findOne({
+export const getUser = async (user_id: number) => {
+    return await Users.findOne({
         where: {
-            _id: id,
+            _id: user_id,
             deleted_at: {
                 [Op.eq]: null
             }
         }
     });
-    logger.log('isAdmin:', user.type);
-    return user.type;
 };
 
 /**
  * 어드민 여부 확인
  */
-export const requestAdminPrivilege = async (id: number) => {
-    const userType = await isAdmin(id);
-    logger.log('IsAdmin:', userType);
-    if (userType !== 'admin') {
+export const isAdmin = async (user_id: number) => {
+    const user = await getUser(user_id);
+    logger.log('user.type:', user.type);
+    return ['admin'].includes(user.type);
+};
+
+/**
+ * 어드민이 아닌 경우 Assert 오류
+ */
+export const assertAdminPrivilege = async (user_id: number) => {
+    const admin = await isAdmin(user_id);
+    logger.log('IsAdmin:', admin);
+    if (!admin) {
         let msg = '관리자 권한이 필요한 접근입니다.'
         throw new ApiError(httpStatus.FORBIDDEN, msg, {stack: new Error(msg).stack});
     }
     return true;
-};
-
-/**
- * 사용자 정보
- */
-export const getUser = async (id: number) => {
-    return await Users.findOne({
-        where: {
-            _id: id,
-            deleted_at: {
-                [Op.eq]: null
-            }
-        }
-    });
 };
 
 /**
@@ -105,14 +98,7 @@ export const checkIn = async (userInfo: IJwtUser, cardId: string) => {
         logger.error(`이미 사용중인 카드입니다, cardOwner: ${JSON.stringify(cardOwner)}`);
         throw new ApiError(httpStatus.CONFLICT, '이미 사용중인 카드입니다.', {stack: new Error().stack});
     }
-    const user = await Users.findOne({
-        where: {
-            _id: userId,
-            deleted_at: {
-                [Op.eq]: null
-            }
-        }
-    });
+    const user = await getUser(userId);
 
     const _user = Object.assign(user);
     _user['profile'] = {};
@@ -221,7 +207,6 @@ export const status = async (userInfo: IJwtUser) => {
     try {
         rawProfile = JSON.parse(user.profile._raw);
     } catch (e) {
-        logger.error(e);
     }
 
     let imageUrl = rawProfile?.image_url;
@@ -254,7 +239,7 @@ export const forceCheckOut = async (adminInfo: IJwtUser, userId: string) => {
         let msg = '관리자 권한이 필요한 접근입니다.'
         throw new ApiError(httpStatus.UNAUTHORIZED, msg, {stack: new Error(msg).stack, isNormal: true});
     }
-    await requestAdminPrivilege(adminInfo._id);
+    await assertAdminPrivilege(adminInfo._id);
     const _userId = parseInt(userId);
     const user = await Users.findOne({
         where: {

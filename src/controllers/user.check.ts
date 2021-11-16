@@ -70,6 +70,7 @@ export const checkIn = async (req: Request, res: Response, next: NextFunction) =
         logger.res(httpStatus.OK, { result: isSuccess });
         res.status(httpStatus.OK).json( { result: isSuccess });
     } catch (e) {
+        logger.error(e);
         errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack, isFatal: true}), req, res, next);
     }
 
@@ -87,6 +88,7 @@ export const checkOut = async (req: Request, res: Response, next: NextFunction) 
         logger.res(httpStatus.OK, {result: isSuccess});
         res.status(httpStatus.OK).json({result: isSuccess});
     } catch (e) {
+        logger.error(e);
         errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack, isFatal: true}), req, res, next);
     }
 };

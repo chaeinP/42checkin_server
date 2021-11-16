@@ -18,6 +18,7 @@ export const userStatus = async (req: Request, res: Response, next: NextFunction
         logger.res(httpStatus.OK, body);
         res.json(body).status(httpStatus.OK);
     } catch (e) {
+        logger.error(e);
         errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack, isFatal: true}), req, res, next);
     }
 };
@@ -30,6 +31,7 @@ export const usingStatus = async (req: Request, res: Response, next: NextFunctio
         logger.res(httpStatus.OK, body);
         res.status(httpStatus.OK).json(body);
     } catch (e) {
+        logger.error(e);
         errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack, isFatal: true}), req, res, next);
     }
 };
@@ -45,6 +47,7 @@ export const userUsageDaily = async (req: Request, res: Response, next: NextFunc
         logger.res(httpStatus.OK, body);
         res.json(body).status(httpStatus.OK);
     } catch (e) {
+        logger.error(e);
         errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack, isFatal: true}), req, res, next);
     }
 };
@@ -60,6 +63,7 @@ export const userUsageList = async (req: Request, res: Response, next: NextFunct
         logger.res(httpStatus.OK, body);
         res.json(body).status(httpStatus.OK);
     } catch (e) {
+        logger.error(e);
         errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack, isFatal: true}), req, res, next);
     }
 };
@@ -76,6 +80,7 @@ export const forceCheckout = async (req: Request, res: Response, next: NextFunct
         logger.res(httpStatus.OK, body);
         res.json(body).status(httpStatus.OK);
     } catch (e) {
+        logger.error(e);
         errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack, isFatal: true}), req, res, next);
     }
 };

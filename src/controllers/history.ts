@@ -23,6 +23,7 @@ export const getUserHistory = async (req: Request<{ login: string }, {}, {}, { p
         logger.res(STATUS_OK, body)
         res.json(body).status(STATUS_OK);
     } catch (e) {
+        logger.error(e);
         errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack, isFatal: true}), req, res, () => {});
     }
 };
@@ -43,6 +44,7 @@ export const getCardHistory = async (req: Request<{ id: string }, {}, {}, { page
         logger.res(STATUS_OK, body)
         res.json(body).status(STATUS_OK);
     } catch (e) {
+        logger.error(e);
         errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack, isFatal: true}), req, res, () => {});
     }
 };
@@ -62,6 +64,7 @@ const getClusterHistory = async (req: Request<{ type: string }, {}, {}, { page: 
         logger.res(STATUS_OK, body)
         res.json(body).status(STATUS_OK);
     } catch (e) {
+        logger.error(e);
         errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack, isFatal: true}), req, res, () => {});
     }
 
@@ -91,6 +94,7 @@ export const getCheckInUsers = async (req: Request<{ type: string }, {}, {}, { p
         logger.res(STATUS_OK, body)
         res.json(body).status(STATUS_OK);
     } catch (e) {
+        logger.error(e);
         errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack, isFatal: true}), req, res, () => {});
     }
 };
