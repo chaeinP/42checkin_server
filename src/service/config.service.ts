@@ -41,7 +41,7 @@ export const getConfig = async (date: string, comment?: string) => {
                 [Op.eq]: null
             },
         },
-        order: [['_id', 'DESC']]
+        order: [['created_at', 'DESC'], ['_id', 'DESC']]
     });
     
 	if (setting) {
@@ -53,7 +53,7 @@ export const getConfig = async (date: string, comment?: string) => {
 	}
 };
 
-export const setConfig = async (body: { values: Partial<IConfig>, date: string }, jwt: IJwtUser) => {
+export const setConfig = async (body: { values: Partial<IConfig>, date: string }, jwt?: IJwtUser) => {
     const { values, date } = body;
     let setting = await getConfig(date);
 	if (Number.isInteger(values.gaepo)) setting.gaepo = values.gaepo;
