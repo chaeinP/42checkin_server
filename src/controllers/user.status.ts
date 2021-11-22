@@ -1,11 +1,11 @@
-import logger from '@modules/logger';
-import * as userService from '@service/user.service';
-import * as usageService from '@service/usage.service';
+import logger from '../modules/logger';
+import * as userService from '../service/user.service';
+import * as usageService from '../service/usage.service';
 import { Request, Response, NextFunction } from 'express';
-import { errorHandler } from '@modules/error';
+import { errorHandler } from '../modules/error';
 import httpStatus from 'http-status';
-import ApiError from "@modules/api.error";
-import {getPlanObject} from "@modules/util";
+import ApiError from "../modules/api.error";
+import {getPlanObject} from "../modules/util";
 
 /**
  * 유저 상태조회

@@ -1,15 +1,15 @@
 import httpStatus from 'http-status';
 import {Op} from 'sequelize';
-import {generateToken, IJwtUser} from '@modules/strategy.jwt';
-import logger from '@modules/logger';
-import ApiError from '@modules/api.error';
-import {CHECK_STATE, CLUSTER_CODE, CLUSTER_TYPE} from '@modules/cluster';
-import {Users} from '@models/users';
-import {noticer} from '@modules/discord';
-import {getLocalDate} from '@modules/util';
-import * as historyService from '@service/history.service';
-import * as configService from '@service/config.service';
-import * as usageService from '@service/usage.service';
+import {generateToken, IJwtUser} from '../modules/strategy.jwt';
+import logger from '../modules/logger';
+import ApiError from '../modules/api.error';
+import {CHECK_STATE, CLUSTER_CODE, CLUSTER_TYPE} from '../modules/cluster';
+import {Users} from '../models/users';
+import {noticer} from '../modules/discord';
+import {getLocalDate} from '../modules/util';
+import * as historyService from '../service/history.service';
+import * as configService from '../service/config.service';
+import * as usageService from '../service/usage.service';
 import axios from "axios";
 
 /**

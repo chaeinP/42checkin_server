@@ -1,11 +1,11 @@
 import { NextFunction, Request, Response } from 'express';
 import httpStatus from 'http-status';
-import logger from '@modules/logger';
-import env from '@modules/env';
-import ApiError from '@modules/api.error';
-import {errorHandler} from '@modules/error';
-import requestIp from "request-ip";
-import {isAdmin} from "@service/user.service";
+import logger from '../modules/logger';
+import env from '../modules/env';
+import ApiError from '../modules/api.error';
+import {errorHandler} from '../modules/error';
+import requestIp from 'request-ip';
+import {isAdmin} from '../service/user.service';
 
 const ipFilter = (rules: Function[]) => async (req: Request, res: Response, next: NextFunction) => {
     const clientIp = requestIp.getClientIp(req);

@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
-import * as historyService from '@service/history.service';
-import { CLUSTER_CODE } from '@modules/cluster';
-import logger from '@modules/logger';
+import * as historyService from '../service/history.service';
+import { CLUSTER_CODE } from '../modules/cluster';
+import logger from '../modules/logger';
 import httpStatus from 'http-status';
-import ApiError from "@modules/api.error";
-import {errorHandler} from "@modules/error";
+import ApiError from '../modules/api.error';
+import {errorHandler} from '../modules/error';
 
 const STATUS_OK = httpStatus.OK;
 export const getUserHistory = async (req: Request<{ login: string }, {}, {}, { page: string, listSize: string }>, res: Response) => {

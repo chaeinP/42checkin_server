@@ -1,8 +1,8 @@
-import ApiError from '@modules/api.error';
-import logger from '@modules/logger';
-import { sendErrorMessage } from '@modules/slack';
+import ApiError from '../modules/api.error';
+import logger from '../modules/logger';
+import { sendErrorMessage } from '../modules/slack';
 import { Request, Response, NextFunction } from 'express';
-import env from '@modules/env';
+import env from '../modules/env';
 import httpStatus from "http-status";
 import tracer from 'cls-rtracer';
 

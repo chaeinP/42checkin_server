@@ -1,6 +1,6 @@
-import env from '@modules/env';
+import env from '../modules/env';
 import axios from "axios";
-import { CLUSTER_CODE, CLUSTER_TYPE } from "@modules/cluster";
+import { CLUSTER_CODE, CLUSTER_TYPE } from "../modules/cluster";
 import logger from "./logger";
 import FormData from 'form-data';
 

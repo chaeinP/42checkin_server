@@ -1,16 +1,16 @@
 import {Router} from 'express';
 import passport from 'passport';
-import env from '@modules/env';
-import * as Login from '@controllers/user.login';
-import * as Status from '@controllers/user.status';
-import * as Check from '@controllers/user.check';
-import {GuestWiFiIpFilter} from '@modules/ip.filter';
-import StrategyJwt from '@modules/strategy.jwt';
-import Strategy42 from '@modules/strategy.42';
-import StrategySlack from "@modules/strategy.slack";
-import logger from "@modules/logger";
-import {getTimezoneDate} from "@modules/util";
-import * as configService from "@service/config.service";
+import env from '../modules/env';
+import * as Login from '../controllers/user.login';
+import * as Status from '../controllers/user.status';
+import * as Check from '../controllers/user.check';
+import {GuestWiFiIpFilter} from '../modules/ip.filter';
+import StrategyJwt from '../modules/strategy.jwt';
+import StrategySlack from "../modules/strategy.slack";
+import logger from "../modules/logger";
+import {getTimezoneDate} from '../modules/util';
+import * as configService from '../service/config.service';
+import Strategy42 from "../modules/strategy.42";
 
 export const path = '/user';
 export const router = Router();

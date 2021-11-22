@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
-import env from '@modules/env';
-import * as authService from '@service/auth.service';
-import { errorHandler} from '@modules/error';
+import env from '../modules/env';
+import * as authService from '../service/auth.service';
+import { errorHandler} from '../modules/error';
 import httpStatus from 'http-status';
-import ApiError from '@modules/api.error';
-import logger from "@modules/logger";
+import ApiError from '../modules/api.error';
+import logger from '../modules/logger';
 
 export const login = async (req: Request, res: Response, next: NextFunction) => {
     logger.log(req.user?.jwt, req.query?.redirect);

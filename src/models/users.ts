@@ -1,9 +1,9 @@
-import { CHECK_STATE, CLUSTER_CODE, CLUSTER_TYPE } from '@modules/cluster';
-import { now } from '@modules/util';
+import { CHECK_STATE, CLUSTER_CODE, CLUSTER_TYPE } from '../modules/cluster';
+import { now } from '../modules/util';
 import * as Sequelize from 'sequelize';
 import {Association, DataTypes, Model, Optional} from 'sequelize';
 import { History } from './history';
-import logger from "@modules/logger";
+import logger from '../modules/logger';
 
 export interface UsersAttributes {
     _id: number;

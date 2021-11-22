@@ -1,8 +1,8 @@
-import env from '@modules/env';
+import env from '../modules/env';
 import axios from 'axios';
 import {Tracer} from 'tracer';
 import ApiError from './api.error';
-import logger from '@modules/logger';
+import logger from '../modules/logger';
 import context from 'express-http-context';
 import * as os from "os";
 

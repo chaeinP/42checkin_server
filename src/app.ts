@@ -10,11 +10,11 @@ import axios from 'axios';
 import logger from './modules/logger';
 
 import * as requestIp from 'request-ip';
-import * as Api from '@routes/routes';
+import * as Api from './routes/routes';
 
-import {errorConverter, errorHandler} from '@modules/error';
-import {getTimezoneDate} from "@modules/util";
-import * as configService from "@service/config.service";
+import {errorConverter, errorHandler} from './modules/error';
+import {getTimezoneDate} from './modules/util';
+import * as configService from './service/config.service';
 
 const port = env.port || 3000;
 export const app = express();
