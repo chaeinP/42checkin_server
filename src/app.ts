@@ -26,10 +26,9 @@ function getOrigin() {
 	}
 	return origin;
 }
-logger.init({});
 
 /**
- *
+ * 42 intra 장애가 잦아서 slack 로그인 전환 여부 확인을 위한 health check
 */
 const check42Intra = async () => {
     let strategy;
@@ -48,7 +47,7 @@ const check42Intra = async () => {
 
     if (config?.auth !== strategy) {
         await configService.setConfig({
-            env: {
+            values: {
                 auth: strategy
             },
             date: today

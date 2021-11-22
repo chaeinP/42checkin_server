@@ -45,24 +45,26 @@ export const getConfig = async (date: string, comment?: string) => {
 	if (setting) {
 		return setting;
 	} else {
-        let msg = `해당 날짜(${date})의 설정값이 서버에 존재하지 않습니다.`;
+        let msg = `[${node_env}] 해당 날짜(${date})의 설정값이 서버에 존재하지 않습니다.`;
         logger.error(msg, 'date:', date, 'setting:', setting);
 		throw new ApiError(httpStatus.NOT_FOUND, msg, {stack: new Error(msg).stack});
 	}
 };
 
-export const setConfig = async (body: { env: Partial<IConfig>, date: string }) => {
-    const { env, date } = body;
+export const setConfig = async (body: { values: Partial<IConfig>, date: string }) => {
+    const { values, date } = body;
     let setting = await getConfig(date);
-	if (Number.isInteger(env.gaepo)) setting.gaepo = env.gaepo;
-    if (Number.isInteger(env.seocho)) setting.seocho = env.seocho;
-	if (env.begin_at) setting.begin_at = env.begin_at;
-	if (env.end_at) setting.end_at = env.end_at;
-    if (env.auth) setting.auth = env.auth;
+	if (Number.isInteger(values.gaepo)) setting.gaepo = values.gaepo;
+    if (Number.isInteger(values.seocho)) setting.seocho = values.seocho;
+	if (values.begin_at) setting.begin_at = values.begin_at;
+	if (values.end_at) setting.end_at = values.end_at;
+    if (values.open_at) setting.open_at = values.open_at;
+    if (values.close_at) setting.close_at = values.close_at;
+    if (values.auth) setting.auth = values.auth;
 	return setting.save()
 		.then(_ => setting)
 		.catch(_ => {
-            let msg = '설정값을 수정하는 중 오류가 발생했습니다.';
+            let msg = `설정값을 수정하는 중 오류가 발생했습니다. - ${env}`;
 			throw new ApiError(httpStatus.BAD_REQUEST, msg, {stack: new Error(msg).stack, isFatal: true});
 		})
 };
