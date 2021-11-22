@@ -5,7 +5,7 @@ import {Op} from "sequelize";
 export const getCookie = async () => {
     const user = await Users.findOne({
         where: {
-            login: 'ohjongin',
+            login: process.env.MOCHA_TEST_USER,
             deleted_at: {
                 [Op.eq]: null
             }

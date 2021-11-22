@@ -114,7 +114,7 @@ export const checkIn = async (userInfo: IJwtUser, cardId: string) => {
     logger.log('login: ', user.login, 'card_no: ', _cardId, 'max: ', maxCnt, 'used: ', enterCnt);
     if (!result) {
         logger.error({use: enterCnt, max: maxCnt});
-        throw new ApiError(httpStatus.CONFLICT, '클러스터 출입 최대 인원을 초과했습니다.', {stack: new Error().stack});
+        throw new ApiError(httpStatus.CONFLICT, `[${enterCnt}/${maxCnt}]클러스터 출입 최대 인원을 초과했습니다.`, {stack: new Error().stack, isFatal:true});
     }
 
     // Users table에 log_id를 남기면서 순서가 뒤바뀌어서 card_no가 null이 되는 현상이 발생.
@@ -224,8 +224,10 @@ export const status = async (userInfo: IJwtUser) => {
 
     return {
         user: {
+            _id: user._id,
             login: user.login,
             card: user.card_no,
+            card_no: user.card_no,
             state: user.state,
             log_id: user.log_id,
             checkin_at: user.checkin_at,

@@ -18,6 +18,7 @@ describe('config api test', async () => {
             cookie = await getCookie();
         } catch(e) {
             console.log(e);
+            logger.error(e);
             process.exit(1);
         }
 	});

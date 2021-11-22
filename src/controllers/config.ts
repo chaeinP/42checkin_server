@@ -21,7 +21,7 @@ export const getConfig = async (req: Request<{}, {}, {}, { date: string }>, res:
 export const setConfig = async (req: Request, res: Response, next: NextFunction) => {
     try {
         logger.log(req.user?.jwt, req.body);
-        const body = await configService.setConfig(req.body);
+        const body = await configService.setConfig(req.body, req.user?.jwt);
         logger.info(body);
         logger.res(httpStatus.OK, body);
         res.status(httpStatus.OK).json(body)

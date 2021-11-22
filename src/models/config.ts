@@ -13,6 +13,7 @@ export interface ConfigAttributes {
     seocho?: number;
     gaepo?: number;
     auth?: string;
+    actor?: string;
     deleted_at?: Date;
     updated_at?: Date;
     created_at?: Date;
@@ -35,6 +36,7 @@ export class Config extends Model<ConfigAttributes, configCreationAttributes> im
     seocho?: number;
     gaepo?: number;
     auth?: string;
+    actor?: string;
     deleted_at?: Date;
     updated_at?: Date;
     created_at?: Date;
@@ -52,6 +54,9 @@ export class Config extends Model<ConfigAttributes, configCreationAttributes> im
             },
             auth: {
                 type: DataTypes.STRING(10),
+            },
+            actor: {
+                type: DataTypes.STRING(50),
             },
             begin_at: {
                 type: DataTypes.DATE,

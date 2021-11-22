@@ -27,7 +27,7 @@ describe('log api test', async () => {
 			expect(res.body.list).to.an('array');
 			expect(res.body.lastPage).to.an('number');
 			if (res.body.list.length) {
-				expect(res.body.list[0]).to.have.keys('_id','login','type','card_no','deleted_at','updated_at','created_at','User')
+				expect(res.body.list[0]).to.have.keys('_id','login', 'actor', 'type','card_no','deleted_at','updated_at','created_at','User')
 			}
 		});
 	});
@@ -38,7 +38,7 @@ describe('log api test', async () => {
 			expect(res.body.list).to.an('array');
 			expect(res.body.lastPage).to.an('number');
             if (res.body.list.length) {
-                expect(res.body.list[0]).to.have.keys('_id', 'login', 'type', 'card_no', 'deleted_at', 'updated_at', 'created_at', 'User')
+                expect(res.body.list[0]).to.have.keys('_id', 'login', 'actor', 'type', 'card_no', 'deleted_at', 'updated_at', 'created_at', 'User')
             }
 		});
 	});
@@ -48,29 +48,29 @@ describe('log api test', async () => {
 			const res = await request(app).get(`/log/${CLUSTER_CODE[CLUSTER_CODE.gaepo]}`).query({page: 1, listSize: 50}).set('Cookie', [sessionCookie]);
 			expect(res.body.list).to.an('array');
 			expect(res.body.lastPage).to.an('number');
-			expect(res.body.list[0]).to.have.keys('_id','login','type','card_no','deleted_at','updated_at','created_at','User')
+			expect(res.body.list[0]).to.have.keys('_id','login', 'actor','type','card_no','deleted_at','updated_at','created_at','User')
 			expect(res.body.list[0].card_no).to.lt(999)
 		});
 	});
 
-	const userName = 'yurlee';
+	const userName = process.env.MOCHA_TEST_USER;
 	describe((`[${userName}]가 사용한 카드 로그 조회`), () => {
 		it(`객체로된 배열 형태의 데이터를 반환하는가? 내부에 닉네임이 존재하는가?`, async () => {
 			const res = await request(app).get(`/log/user/${userName}`).query({page: 1, listSize: 50}).set('Cookie', [sessionCookie]);
 			expect(res.body.list).to.an('array');
 			expect(res.body.lastPage).to.an('number');
-			expect(res.body.list[0]).to.have.keys('_id','login','type','card_no','deleted_at','updated_at','created_at','User');
+			expect(res.body.list[0]).to.have.keys('_id','login', 'actor','type','card_no','deleted_at','updated_at','created_at','User');
 			expect(res.body.list[0].User.login).to.equal(userName);
 		});
 	});
 
 	describe((`클러스터별 미반납 카드 조회`), () => {
 		it(`입력한 클러스터의 로그를 객체로된 배열 형태로 데이터를 반환하는가? 내부에 클러스터코드가 존재하는가?`, async () => {
-			const res = await request(app).get(`/log/Checkin/${CLUSTER_CODE.gaepo}`).query({page: 1, listSize: 50}).set('Cookie', [sessionCookie]);
+			const res = await request(app).get(`/log/cluster/${CLUSTER_CODE.gaepo}/checkin`).query({page: 1, listSize: 50}).set('Cookie', [sessionCookie]);
 			expect(res.body.list).to.an('array');
 			expect(res.body.lastPage).to.an('number');
 			if (res.body.list[0]) {
-				expect(res.body.list[0]).to.have.keys('_id','login','type','card_no','deleted_at','updated_at','created_at','User');
+				expect(res.body.list[0]).to.have.keys('_id', 'login', 'card_no', 'log_id', 'state', 'created_at');
 				expect(res.body.list[0].card_no).to.lt(999)
 			}
 		});
@@ -78,7 +78,7 @@ describe('log api test', async () => {
 
 	describe((`존재하지 않는 클러스터의 미반납 카드 조회`), () => {
 		it(`에러를 발생시키는가?`, async () => {
-			const res = await request(app).get(`/log/Checkin/123`).query({page: 1, listSize: 50}).set('Cookie', [sessionCookie]);
+			const res = await request(app).get(`/log/cluster/123/checkin`).query({page: 1, listSize: 50}).set('Cookie', [sessionCookie]);
 			expect(res.body.code).to.equal(httpStatus.NOT_FOUND);
 		});
 	});

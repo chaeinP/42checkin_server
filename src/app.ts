@@ -51,7 +51,7 @@ const check42Intra = async () => {
                 auth: strategy
             },
             date: today
-        });
+        }, undefined);
     }
 }
 

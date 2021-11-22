@@ -4,7 +4,6 @@ import context from 'express-http-context';
 import {getPlanObject} from './util';
 
 const rootFolder = './logs';
-const pmId = process.env.pm_id ? process.env.pm_id : 0;
 const splitFormat = `yyyymmdd`;
 const logFormat = '{{timestamp}} {{title}} {{file}}:{{line}} ({{method}}) {{tid}} [{{login}}] {{message}}';
 const jsonFormat = '{ timestamp:{{timestamp}}, level:{{title}}, file:{{file}}, line:{{line}}, method:{{method}}, tid:{{tid}}, user:{{login}}, httpStatus:{{httpStatus}}, payload:{{message}} }';
@@ -18,7 +17,7 @@ let config = {
     info: true,
     fatal: true,
     sql: true,
-    api: true,
+    net: true,
 }
 /**
  * root: 파일위치
@@ -75,12 +74,7 @@ let logConfig = {
         data.login = login ? login : '';
     },
     transport: function(data: any) {
-        const isProd = process.env.NODE_ENV?.toLowerCase()?.includes('prod')
-            || process.env.ENV_TYPE?.toLowerCase()?.includes('prod');
-        if (isProd) {
-            return;
-        }
-        console.log(data.output);
+        if (config.console) console.log(data.output);
     }
 }
 
@@ -103,12 +97,7 @@ let jsonConfig = {
         data.httpStatus = httpStatus ? httpStatus : '';
     },
     transport: function(data: any) {
-        const isProd = process.env.NODE_ENV?.toLowerCase()?.includes('prod')
-            || process.env.ENV_TYPE?.toLowerCase()?.includes('prod');
-        if (isProd) {
-            return;
-        }
-        console.log(data.output);
+        if (config.console) console.log(data.output);
     }
 }
 
@@ -191,8 +180,7 @@ const net = dailyfile({
 const logger = {
     init (options: any) {
         config = {...config, ...options};
-        log.log('initialized...');
-        if (config.console) console.log('initialized...');
+        console.log('initialized...', options, config);
     },
     // errorHandle에서 slack으로 보내는 메시지용
     handler (...args: any[]) {
@@ -248,11 +236,11 @@ const logger = {
             isNewRecord: false
           }
          */
-        return config.api ? net.log(request) : null;
+        return config.net ? net.log(request) : null;
     },
     res(httpStatus: number, response: any) {
         context.set('httpStatus', httpStatus);
-        return config.api ? net.log(getPlanObject(response)) : null;
+        return config.net ? net.log(getPlanObject(response)) : null;
     }
 };
 

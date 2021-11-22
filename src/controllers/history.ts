@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import * as historyService from '@service/history.service';
 import { CLUSTER_CODE } from '@modules/cluster';
 import logger from '@modules/logger';
@@ -23,8 +23,9 @@ export const getUserHistory = async (req: Request<{ login: string }, {}, {}, { p
         logger.res(STATUS_OK, body)
         res.json(body).status(STATUS_OK);
     } catch (e) {
+        const statusCode = e.statusCode || httpStatus.INTERNAL_SERVER_ERROR;
         logger.error(e);
-        errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack, isFatal: true}), req, res, () => {});
+        errorHandler(new ApiError(statusCode, e.message, {stack:e.stack, isFatal: true}), req, res, () => {});
     }
 };
 
@@ -44,8 +45,9 @@ export const getCardHistory = async (req: Request<{ id: string }, {}, {}, { page
         logger.res(STATUS_OK, body)
         res.json(body).status(STATUS_OK);
     } catch (e) {
+        const statusCode = e.statusCode || httpStatus.INTERNAL_SERVER_ERROR;
         logger.error(e);
-        errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack, isFatal: true}), req, res, () => {});
+        errorHandler(new ApiError(statusCode, e.message, {stack:e.stack, isFatal: true}), req, res, () => {});
     }
 };
 
@@ -64,8 +66,9 @@ const getClusterHistory = async (req: Request<{ type: string }, {}, {}, { page: 
         logger.res(STATUS_OK, body)
         res.json(body).status(STATUS_OK);
     } catch (e) {
+        const statusCode = e.statusCode || httpStatus.INTERNAL_SERVER_ERROR;
         logger.error(e);
-        errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack, isFatal: true}), req, res, () => {});
+        errorHandler(new ApiError(statusCode, e.message, {stack:e.stack, isFatal: true}), req, res, () => {});
     }
 
 }
@@ -77,10 +80,10 @@ export const getSeochoHistory = async (req: Request<{ type: string }, {}, {}, { 
     await getClusterHistory(req, res, CLUSTER_CODE.seocho);
 };
 
-export const getCheckInUsers = async (req: Request<{ type: string }, {}, {}, { page: string, listSize: string }>, res: Response) => {
+export const getClusterCheckinUsers = async (req: Request<{ cluster: string }, {}, {}, { page: string, listSize: string }>, res: Response) => {
     try {
         logger.log('jwt:', req.user?.jwt, ', req.query:', JSON.stringify(req.query));
-        const type = parseInt(req.params?.type);
+        const type = parseInt(req.params?.cluster);
         const page = parseInt(req.query?.page);
         const listSize = parseInt(req.query?.listSize);
         logger.log('type:', type, ', page:', page, ', listSize:', listSize);
@@ -89,12 +92,13 @@ export const getCheckInUsers = async (req: Request<{ type: string }, {}, {}, { p
             return;
         }
 
-        const body = await historyService.getCheckIn(type, page, listSize);
+        const body = await historyService.getClusterCheckinUsers(type, page, listSize);
         logger.info(body);
         logger.res(STATUS_OK, body)
         res.json(body).status(STATUS_OK);
     } catch (e) {
+        const statusCode = e.statusCode || httpStatus.INTERNAL_SERVER_ERROR;
         logger.error(e);
-        errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack, isFatal: true}), req, res, () => {});
+        errorHandler(new ApiError(statusCode, e.message, {stack:e.stack, isFatal: true}), req, res, () => {});
     }
 };

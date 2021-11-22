@@ -130,7 +130,7 @@ export const getCluster = async (clusterType: CLUSTER_CODE, page: number, listSi
 /**
  * 특정 클러스터의 미반납카드를 조회한다.
  */
-export const getCheckIn = async (clusterType: CLUSTER_CODE, page: number, listSize: number) => {
+export const getClusterCheckinUsers = async (clusterType: CLUSTER_CODE, page: number, listSize: number) => {
     if (!CLUSTER_CODE[clusterType]) {
         let msg = `존재하지 않는 클러스터 코드(${clusterType})입니다.`;
         throw new ApiError(httpStatus.NOT_FOUND, msg, {stack: new Error(msg).stack});

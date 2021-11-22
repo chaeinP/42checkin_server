@@ -5,6 +5,8 @@ import { Config, Config as IConfig } from '@models/config';
 import Sequelize, { Op } from 'sequelize';
 import logger from "@modules/logger";
 import {getTimezoneDateString} from "@modules/util";
+import {IJwtUser} from "@modules/strategy.jwt";
+import {getUser} from "@service/user.service";
 
 /**
  *
@@ -51,7 +53,7 @@ export const getConfig = async (date: string, comment?: string) => {
 	}
 };
 
-export const setConfig = async (body: { values: Partial<IConfig>, date: string }) => {
+export const setConfig = async (body: { values: Partial<IConfig>, date: string }, jwt: IJwtUser) => {
     const { values, date } = body;
     let setting = await getConfig(date);
 	if (Number.isInteger(values.gaepo)) setting.gaepo = values.gaepo;
@@ -61,6 +63,14 @@ export const setConfig = async (body: { values: Partial<IConfig>, date: string }
     if (values.open_at) setting.open_at = values.open_at;
     if (values.close_at) setting.close_at = values.close_at;
     if (values.auth) setting.auth = values.auth;
+
+    if (jwt) {
+        const user = await getUser(jwt._id);
+        setting.actor = user.login;
+    }
+
+    setting.updated_at = new Date();
+
 	return setting.save()
 		.then(_ => setting)
 		.catch(_ => {

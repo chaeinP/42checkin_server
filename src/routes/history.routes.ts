@@ -8,4 +8,5 @@ router.get('/card/:id', historyController.getCardHistory);
 router.get('/user/:login', historyController.getUserHistory);
 router.get('/gaepo', historyController.getGaepoHistory);
 router.get('/seocho', historyController.getSeochoHistory);
-router.get('/CheckIn/:type', historyController.getCheckInUsers);
+router.get('/cluster/:cluster/checkin', historyController.getClusterCheckinUsers);
+router.get('/CheckIn/:cluster', historyController.getClusterCheckinUsers);
