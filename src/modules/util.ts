@@ -7,8 +7,7 @@ export const isError = (e: any) => {
 };
 
 export const getTimeFormat = (timestamp: moment.MomentInput, format: string) => {
-	const str = moment(timestamp).tz(TZ).format(format);
-	return str;
+    return moment(timestamp).tz(TZ).format(format);
 }
 
 export const now = () => {
@@ -40,7 +39,13 @@ export const getTimeNumber = (t : string) => {
     return (hour * 3600) + (minute * 60) + seconds;
 }
 
+export const isEmptyObject = (obj: any) => {
+    return !obj || Object.keys(obj).length === 0;
+}
+
 export const getPlanObject = (data: any) => {
+    if (isEmptyObject(data)) return Array.isArray(data) ? [] : {};
+
     let result = { ...data};
     try {
         if (Array.isArray(data?.list)) {

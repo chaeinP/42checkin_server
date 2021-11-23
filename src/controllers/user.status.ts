@@ -44,7 +44,7 @@ export const usingStatus = async (req: Request, res: Response, next: NextFunctio
 export const userUsageDaily = async (req: Request, res: Response, next: NextFunction) => {
     try {
         logger.log('req.user?.jwt:', req.user?.jwt, req.query?.from, req.query?.to);
-        const body = await usageService.getUsagesDaily(req.user.jwt, req.query.from, req.query.to);
+        const body = await usageService.getUsagesDaily(req.user?.jwt, req.query?.from, req.query?.to);
         logger.info(getPlanObject(body));
         logger.res(httpStatus.OK, body);
         res.json(body).status(httpStatus.OK);

@@ -4,6 +4,7 @@ import { Users } from 'src/models/users';
 import { Usages } from '../models/usages';
 import { now } from '../modules/util';
 import {IJwtUser} from '../modules/strategy.jwt';
+import {getUser} from './user.service';
 
 const DIVIDER_FOR_DURATION = 1000;
 
@@ -11,10 +12,7 @@ const DIVIDER_FOR_DURATION = 1000;
  * 사용 시간 정보를 생성한다.
  */
 export const create = async (user: Users, actor: string): Promise<void> => {
-
-    const _user = Object.assign(user);
-    _user['profile'] = {};
-    logger.log('user:', JSON.stringify(_user));
+    logger.log('user:', JSON.stringify(user));
 
     let duration: number = (new Date().getTime() - user.checkin_at.getTime()) / DIVIDER_FOR_DURATION;
 
@@ -33,16 +31,9 @@ export const create = async (user: Users, actor: string): Promise<void> => {
  * 사용 시간 정보를 생성한다.
  */
 export const getUsagesDaily = async (userInfo: IJwtUser, from: string, to: string): Promise<any> => {
-    // noinspection DuplicatedCode
     logger.log('userInfo:', JSON.stringify(userInfo), ', from:', from, ', to:', to);
-    const user = await Users.findOne({
-        where: {
-            _id: userInfo._id,
-            deleted_at: {
-                [Op.eq]: null
-            }
-        }
-    });
+    const user = await getUser(userInfo._id);
+    logger.log('user:', JSON.stringify(user), 'from:', from, 'to:', to);
 
     const conditions = {
         login: user.login,
@@ -70,16 +61,9 @@ export const getUsagesDaily = async (userInfo: IJwtUser, from: string, to: strin
 };
 
 export const getUsagesList = async (userInfo: IJwtUser, from: string, to: string): Promise<any> => {
-    // noinspection DuplicatedCode
     logger.log('userInfo:', JSON.stringify(userInfo), ', from:', from, ', to:', to);
-    const user = await Users.findOne({
-        where: {
-            _id: userInfo._id,
-            deleted_at: {
-                [Op.eq]: null
-            }
-        }
-    });
+
+    const user = await getUser(userInfo._id);
     logger.log('user:', JSON.stringify(user), 'from:', from, 'to:', to);
 
     const conditions = {
