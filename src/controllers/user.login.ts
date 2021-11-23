@@ -46,6 +46,7 @@ export const callback = async (req: Request, res: Response, next: NextFunction) 
         }
     } catch (e) {
         logger.error(e);
-        errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack, isFatal: true}), req, res, next);
+        const statusCode = e.statusCode || httpStatus.INTERNAL_SERVER_ERROR;
+        errorHandler(new ApiError(statusCode, e.message, {stack:e.stack, isFatal: true}), req, res, next);
     }
 };
