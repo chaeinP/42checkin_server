@@ -1,12 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
-import * as userService from '@service/user.service';
-import { errorHandler} from '@modules/error';
+import * as userService from '../service/user.service';
+import { errorHandler} from '../modules/error';
 import httpStatus from 'http-status';
-import logger from '@modules/logger';
-import ApiError from "@modules/api.error";
-import {getConfig} from "@service/config.service";
-import {getTimeNumber, getTimezoneDate} from "@modules/util";
-import {getUser} from "@service/user.service";
+import logger from '../modules/logger';
+import ApiError from '../modules/api.error';
+import {getConfig} from '../service/config.service';
+import {getTimeNumber, getTimezoneDate} from '../modules/util';
+import {getUser} from '../service/user.service';
 
 const isBetween = (target: string, min: any, max: any) => {
     let now = getTimeNumber(target);

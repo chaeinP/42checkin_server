@@ -1,11 +1,11 @@
-import env from '@modules/env';
+import env from '../modules/env';
 
 import jwt from 'jsonwebtoken';
 import * as userService from './user.service';
 import httpStatus from 'http-status';
-import ApiError from '@modules/api.error';
-import { Users } from '@models/users';
-import logger from "@modules/logger";
+import ApiError from '../modules/api.error';
+import { Users } from '../models/users';
+import logger from '../modules/logger';
 
 export const getAuth = async (user: Users) => {
 	if (!user) {

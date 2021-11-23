@@ -1,0 +1,15 @@
+{
+    "apps": [
+        {
+            "name": "42checkin-dev",
+            "script": "./dist.dev/server.js",
+            "node_args": "-r ts-node/register -r tsconfig-paths/register",
+            "instances": 1,
+            "instance_var": "INSTANCE_ID",
+            "exec_mode": "cluster",
+            "env": {
+                "NODE_ENV": "development"
+            }
+        }
+    ]
+}

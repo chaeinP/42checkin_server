@@ -1,11 +1,11 @@
-import {CLUSTER_CODE, clusterCondition} from '@modules/cluster';
+import {CLUSTER_CODE, clusterCondition} from '../modules/cluster';
 import logger from '../modules/logger';
-import ApiError from '@modules/api.error';
+import ApiError from '../modules/api.error';
 import httpStatus from 'http-status';
 import Sequelize, {Op} from 'sequelize';
 import {Users} from 'src/models/users';
-import {History} from '@models/history';
-import {now} from '@modules/util';
+import {History} from '../models/history';
+import {now} from '../modules/util';
 
 /**
  * 유저의 로그정보를 조회한다.

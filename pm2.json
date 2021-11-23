@@ -1,13 +1,13 @@
 {
     "apps": [
         {
-            "name": "42checkin-dev",
-            "script": "./dist_dev/app.js",
+            "name": "42checkin",
+            "script": "./dist/app.js",
             "instances": 1,
             "instance_var": "INSTANCE_ID",
             "exec_mode": "cluster",
             "env": {
-                "NODE_ENV": "development"
+                "NODE_ENV": "production"
             }
         }
     ]

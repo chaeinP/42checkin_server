@@ -1,12 +1,12 @@
-import env from '@modules/env';
-import ApiError from '@modules/api.error';
+import env from '../modules/env';
+import ApiError from '../modules/api.error';
 import httpStatus from 'http-status';
-import { Config, Config as IConfig } from '@models/config';
+import { Config, Config as IConfig } from '../models/config';
 import Sequelize, { Op } from 'sequelize';
-import logger from "@modules/logger";
-import {getTimezoneDateString} from "@modules/util";
-import {IJwtUser} from "@modules/strategy.jwt";
-import {getUser} from "@service/user.service";
+import logger from "../modules/logger";
+import {getTimezoneDateString} from "../modules/util";
+import {IJwtUser} from '../modules/strategy.jwt';
+import {getUser} from '../service/user.service';
 
 /**
  *

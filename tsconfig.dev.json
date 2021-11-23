@@ -9,7 +9,7 @@
         "emitDecoratorMetadata": true,
         "moduleResolution": "node",
         "sourceMap": true,
-        "outDir": "./dist",
+        "outDir": "./dist.dev",
         "rootDir": "src",
         "baseUrl": "./",
         "skipLibCheck": true,

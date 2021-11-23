@@ -1,9 +1,9 @@
-import * as configService from '@service/config.service';
+import * as configService from '../service/config.service';
 import { Request, Response, NextFunction } from 'express';
-import { errorHandler } from '@modules/error';
-import logger from '@modules/logger';
+import { errorHandler } from '../modules/error';
+import logger from '../modules/logger';
 import httpStatus from 'http-status';
-import ApiError from "@modules/api.error";
+import ApiError from "../modules/api.error";
 
 export const getConfig = async (req: Request<{}, {}, {}, { date: string }>, res: Response, next: NextFunction) => {
     try {

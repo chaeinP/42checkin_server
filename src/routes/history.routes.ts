@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import * as historyController from '@controllers/history';
+import * as historyController from '../controllers/history';
 
 export const router = Router();
 export const path = '/log';

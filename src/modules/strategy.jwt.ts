@@ -1,9 +1,9 @@
 import { ExtractJwt, Strategy, StrategyOptions } from 'passport-jwt';
 import { Request } from 'express';
-import env from '@modules/env';
+import env from '../modules/env';
 import jwt from 'jsonwebtoken';
-import logger from '@modules/logger';
-import { Users } from '@models/users';
+import logger from '../modules/logger';
+import { Users } from '../models/users';
 import context from 'express-http-context';
 
 const opts: StrategyOptions = {

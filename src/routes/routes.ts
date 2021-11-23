@@ -1,12 +1,12 @@
 import {Router} from "express";
 
-import * as userRouter from '@routes/user.routes'
-import * as configRouter from '@routes/config.routes'
-import * as historyRouter from '@routes/history.routes';
+import * as userRouter from '../routes/user.routes'
+import * as configRouter from '../routes/config.routes'
+import * as historyRouter from '../routes/history.routes';
 import {exec} from 'child_process';
 
-import {Sequelize} from "@models/database";
-import logger from "@modules/logger";
+import {Sequelize} from "../models/database";
+import logger from "../modules/logger";
 import passport from "passport";
 import httpStatus from 'http-status';
 

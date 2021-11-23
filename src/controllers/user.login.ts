@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
-import env from '@modules/env';
-import * as authService from '@service/auth.service';
-import { errorHandler} from '@modules/error';
+import env from '../modules/env';
+import * as authService from '../service/auth.service';
+import { errorHandler} from '../modules/error';
 import httpStatus from 'http-status';
-import ApiError from '@modules/api.error';
-import logger from "@modules/logger";
+import ApiError from '../modules/api.error';
+import logger from '../modules/logger';
 
 export const login = async (req: Request, res: Response, next: NextFunction) => {
     logger.log(req.user?.jwt, req.query?.redirect);
@@ -46,6 +46,7 @@ export const callback = async (req: Request, res: Response, next: NextFunction) 
         }
     } catch (e) {
         logger.error(e);
-        errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack, isFatal: true}), req, res, next);
+        const statusCode = e.statusCode || httpStatus.INTERNAL_SERVER_ERROR;
+        errorHandler(new ApiError(statusCode, e.message, {stack:e.stack, isFatal: true}), req, res, next);
     }
 };

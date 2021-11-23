@@ -9,7 +9,7 @@ import { History } from './history';
 import { Users } from "./users";
 import { Usages } from "./usages";
 
-import env from '@modules/env';
+import env from '../modules/env';
 import logger from "../modules/logger";
 
 /*
