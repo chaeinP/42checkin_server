@@ -6,7 +6,7 @@ import {getPlanObject} from './util';
 const rootFolder = './logs';
 const splitFormat = `yyyymmdd`;
 const logFormat = '{{timestamp}} {{title}} {{file}}:{{line}} ({{method}}) {{tid}} [{{login}}] {{message}}';
-const jsonFormat = '{ timestamp:{{timestamp}}, level:{{title}}, file:{{file}}, line:{{line}}, method:{{method}}, tid:{{tid}}, user:{{login}}, httpStatus:{{httpStatus}}, payload:{{message}} }';
+const jsonFormat = '{ "timestamp":"{{timestamp}}", "type":"{{type}}", "version":"{{version}}", "level":"{{title}}", "file":"{{file}}", "line":{{line}}, "method":"{{method}}", "tid":"{{tid}}", "user":"{{login}}", "httpStatus":"{{httpStatus}}", "payload":{{message}} }';
 const dateformat = 'yyyy-mm-dd"T"HH:MM:ss.lo';
 
 let config = {
@@ -95,6 +95,11 @@ let jsonConfig = {
 
         const httpStatus = context.get('httpStatus');
         data.httpStatus = httpStatus ? httpStatus : '';
+
+        data.type = httpStatus ? 'res' : 'req';
+
+        const version = require("../../package.json").version;
+        data.version = version
     },
     transport: function(data: any) {
         if (config.console) console.log(data.output);
@@ -184,23 +189,17 @@ const logger = {
     },
     // errorHandle에서 slack으로 보내는 메시지용
     handler (...args: any[]) {
-        const isProd = process.env.NODE_ENV?.toLowerCase()?.includes('prod')
-            || process.env.ENV_TYPE?.toLowerCase()?.includes('prod');
-        if (isProd && config.console) console.log(...args);
+        if (config.console) console.log(...args);
         log.log(...args);
         return config.fatal ? handler.fatal(...args) : null;
     },
     fatal (...args: any[]) {
-        const isProd = process.env.NODE_ENV?.toLowerCase()?.includes('prod')
-            || process.env.ENV_TYPE?.toLowerCase()?.includes('prod');
-        if (isProd && config.console) console.log(...args);
+        if (config.console) console.log(...args);
         log.log(...args);
         return config.fatal ? fatal.fatal(...args) : null;
     },
     error (...args: any[]) {
-        const isProd = process.env.NODE_ENV?.toLowerCase()?.includes('prod')
-            || process.env.ENV_TYPE?.toLowerCase()?.includes('prod');
-        if (isProd) console.log(...args);
+        if (config.console) console.log(...args);
         log.log(...args);
         return config.error ? error.error(...args) : null;
     },
@@ -208,10 +207,6 @@ const logger = {
         return config.info ? info.info(...args) : null;
     },
     debug (...args: any[]) {
-        const isProd = process.env.NODE_ENV?.toLowerCase()?.includes('prod')
-            || process.env.ENV_TYPE?.toLowerCase()?.includes('prod');
-        if (isProd) return;
-
         return config.debug ? debug.debug(...args) : null;
     },
     sql (...args: any[]) {
@@ -236,13 +231,12 @@ const logger = {
             isNewRecord: false
           }
          */
-        return config.net ? net.log(request) : null;
+        return config.net ? net.log('req', request) : null;
     },
     res(httpStatus: number, response: any) {
         context.set('httpStatus', httpStatus);
-        return config.net ? net.log(getPlanObject(response)) : null;
+        return config.net ? net.log('res', getPlanObject(response)) : null;
     }
 };
-
 
 export default logger;
