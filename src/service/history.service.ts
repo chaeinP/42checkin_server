@@ -3,7 +3,7 @@ import logger from '../modules/logger';
 import ApiError from '../modules/api.error';
 import httpStatus from 'http-status';
 import Sequelize, {Op} from 'sequelize';
-import {Users} from 'src/models/users';
+import {Users} from '../models/users';
 import {History} from '../models/history';
 import {now} from '../modules/util';
 
