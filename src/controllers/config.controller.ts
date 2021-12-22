@@ -1,40 +1,74 @@
 import * as configService from '@service/config.service';
-import { Request, Response, NextFunction } from 'express';
-import { errorHandler } from '@modules/error';
 import logger from '@modules/logger';
 import httpStatus from 'http-status';
-import ApiError from "@modules/api.error";
-import {Controller, Get, Route} from "tsoa";
+import {Body, Controller, Get, Put, Query, Route} from 'tsoa';
 
-export const getConfig = async (req: Request<{}, {}, {}, { date: string }>, res: Response, next: NextFunction) => {
-    try {
-        logger.log(req.user?.jwt, req.query?.date);
-        const body = await configService.getConfig(req.query.date);
-        logger.info(body);
-        logger.res(httpStatus.OK, body);
-        res.status(httpStatus.OK).json(body)
-    } catch (e) {
-        errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack, isFatal: true}), req, res, next);
-    }
-};
+export class ConfigDto {
+    _id: number;
+    actor: string;
+    auth: string;
+    begin_at: Date;
+    checkin_at: number;
+    checkout_at: number;
+    close_at: number;
+    created_at: Date;
+    deleted_at: Date;
+    end_at: Date;
+    env: string;
+    gaepo: number;
+    open_at: number;
+    seocho: number;
+    updated_at: Date;
+}
 
-export const setConfig = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        logger.log(req.user?.jwt, req.body);
-        const body = await configService.setConfig(req.body);
-        logger.info(body);
-        logger.res(httpStatus.OK, body);
-        res.status(httpStatus.OK).json(body)
-    } catch (e) {
-        errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack, isFatal: true}), req, res, next);
-    }
-};
+export class ConfigRequest {
+    values: ConfigDto;
+    date: string
+}
 
-
-@Route("config")
+@Route('config')
 export class ConfigController extends Controller {
-    @Get("/health")
-    public async getHealth(): Promise<void> {
+    /**
+     * Retrieves the configuration of server.
+     * @param query
+     */
+    @Get('/')
+    public async getConfig(@Query() query?: any): Promise<ConfigDto> {
+        return new Promise(async (resolve, reject) => {
+            let payload;
+            let { date } = query;
+            try {
+                this.setStatus(httpStatus.OK);
+                logger.log('date:', date);
+                payload = await configService.getConfig(date);
+                logger.info(payload);
+            } catch (e) {
+                logger.error(e);
+                reject(e)
+            }
 
+            resolve(payload);
+        });
+    }
+
+    /**
+     * Retrieves the configuration of server.
+     * @param config
+     * @param jwt
+     */
+    @Put('/')
+    public async setConfig(@Body() config: ConfigRequest) {
+        return new Promise(async (resolve, reject) => {
+            let payload;
+            try {
+                this.setStatus(httpStatus.OK);
+                payload = await configService.setConfig(config?.date, config?.values);
+            } catch (e) {
+                logger.error(e);
+                reject(e)
+            }
+
+            resolve(payload);
+        });
     }
 }

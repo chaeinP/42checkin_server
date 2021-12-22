@@ -4,6 +4,7 @@ import {DataTypes, Model, Optional} from 'sequelize';
 export interface ConfigAttributes {
     _id: number;
     env?: string;
+    auth?: string;
     begin_at?: Date;
     end_at?: Date;
     open_at?: number;
@@ -12,6 +13,7 @@ export interface ConfigAttributes {
     checkout_at?: number;
     seocho?: number;
     gaepo?: number;
+    actor?: string;
     deleted_at?: Date;
     updated_at?: Date;
     created_at?: Date;
@@ -25,6 +27,7 @@ export type configCreationAttributes = Optional<ConfigAttributes, configOptional
 export class Config extends Model<ConfigAttributes, configCreationAttributes> implements ConfigAttributes {
     _id: number;
     env?: string;
+    auth?: string;
     begin_at?: Date;
     end_at?: Date;
     open_at?: number;
@@ -33,6 +36,7 @@ export class Config extends Model<ConfigAttributes, configCreationAttributes> im
     checkout_at?: number;
     seocho?: number;
     gaepo?: number;
+    actor?: string;
     deleted_at?: Date;
     updated_at?: Date;
     created_at?: Date;

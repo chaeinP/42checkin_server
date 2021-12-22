@@ -46,10 +46,11 @@ const strategeyCallback = (
 
             const found = await Users.findOne({ where: { login: user.login } })
             if (found) {
-                found.email = user.email;
+                if (user.email) found.email = user.email;
+                if (user.profile) found.profile = user.profile;
+
                 found.access_token = user.access_token;
                 found.refresh_token = user.refresh_token;
-                found.profile = user.profile;
                 found.updated_at = new Date();
                 
                 await found.save();

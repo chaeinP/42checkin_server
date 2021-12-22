@@ -1,8 +1,8 @@
-import ApiError from '@modules/api.error';
-import logger from '@modules/logger';
-import { sendErrorMessage } from '@modules/slack';
-import { Request, Response, NextFunction } from 'express';
-import env from '@modules/env';
+import ApiError from '../modules/api.error';
+import logger from '../modules/logger';
+import {sendErrorMessage} from '../modules/slack';
+import {NextFunction, Request, Response} from 'express';
+import env from '../modules/env';
 import httpStatus from "http-status";
 import tracer from 'cls-rtracer';
 
@@ -36,20 +36,20 @@ export const errorHandler = (err: ApiError, req: Request, res: Response, next: N
         stack: ''
 	};
 
-	if (['development', 'devtest'].includes(env.node_env)) {
+	if (['development', 'devtest', 'local', 'test'].includes(env.node_env)) {
         response.stack = err.stack;
     }
 
-    try {
-        if (err.isFatal || !err.isNormal) {
+    if (err.isFatal || !err.isNormal) {
+        try {
             sendErrorMessage({
                 ...logger.handler(err),
                 statusCode: err.statusCode || req.statusCode,
                 uid: tracer.id()
             })
+        } catch (e) {
+            logger.error(e);
         }
-    } catch (e) {
-        logger.error(e);
     }
     logger.log(response);
     logger.res(err.statusCode || req.statusCode, response);

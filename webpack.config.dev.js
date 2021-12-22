@@ -4,37 +4,14 @@ const webpack = require('webpack');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const nodeExternals = require('webpack-node-externals');
 const dotenv = require('dotenv');
-const { NODE_ENV } = process.env;
-console.log({ NODE_ENV});
 
-const config = {
-	production: {
-		env: './.env.production' ,
-		output_path: 'dist'
-	},
-    development: {
-        env: './.env.development',
-        output_path: 'dist.dev'
-    },
-	local: {
-		env: './.env.local',
-		output_path: 'dist.local'
-	},
-    test: {
-        env: './.env.test',
-        output_path: 'dist.test'
-    },
-	alpha: {
-		env: './.env.alpha',
-		output_path: 'dist.alpha'
-	},
-}
+console.log('process.env.NODE_ENV:', process.env.NODE_ENV);
 
 dotenv.config({
-	path: config[NODE_ENV].env
+	path: `./.env.${process.env.NODE_ENV}`
 });
+const output_path = `dist.${process.env.NODE_ENV}`;
 
-const output_path = config[NODE_ENV].output_path;
 module.exports = {
 	entry: './src/app.ts',
 	target: 'node',
@@ -46,7 +23,10 @@ module.exports = {
 		filename: 'app.js',
 		path: path.resolve(__dirname, output_path)
 	},
-    devtool: 'cheap-module-eval-source-map',
+    // https://stackoverflow.com/questions/42747034/webpack-babel-wrong-line-numbers-in-stack-trace
+    // cheap-inline-module-source-map //For PROD builds
+    // eval-inline-source-map //For DEV builds
+    devtool: 'eval-inline-source-map',
 	resolve: {
 		// Add `.ts` and `.tsx` as a resolvable extension.
 		extensions: ['.ts', '.tsx', '.js'],

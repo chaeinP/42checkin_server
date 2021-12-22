@@ -4,8 +4,7 @@ import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import { getTimeFormat } from '../../../src/modules/util';
 import { Sequelize } from '../../../src/models/database';
-// @ts-ignore
-import { getCookie } from '../env';
+import { getCookie } from '../mock';
 import logger from '../../../src/modules/logger';
 
 let cookie = '';
