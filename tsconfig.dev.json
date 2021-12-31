@@ -1,0 +1,52 @@
+{
+    "compilerOptions": {
+        "outDir": "./dist.dev",
+        "rootDir": "src",
+        "baseUrl": ".",
+        "module": "commonjs",
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "target": "ES2017",
+        "lib": ["es2020"],
+        "downlevelIteration": true,
+        "declaration": true,
+        "newLine": "LF",
+        "noImplicitThis": true,
+        "noFallthroughCasesInSwitch": true,
+        "strictBindCallApply": true,
+        /*"noUnusedParameters": false,*/
+        /*"noImplicitReturns": true,*/
+        /*"noUnusedLocals": true,*/
+        /*"strictNullChecks": true,*/
+        /*"noImplicitAny": true,*/
+        "moduleResolution": "node",
+        "sourceMap": true,
+        "skipLibCheck": true,
+		"typeRoots": ["./node_modules/@types", "./src/@types/express.d.ts"],
+        "paths": {
+            "@service/*": [ "./src/service/*" ],
+            "@controllers/*": [ "./src/controllers/*" ],
+            "@modules/*": [ "./src/modules/*" ],
+            "@models/*": [ "./src/models/*" ],
+            "@routes/*": [ "./src/routes/*" ],
+            "@types/*": [ "./src/@types/*" ],
+            "@tsoa/cli/*": ["../packages/cli/src/*"],
+            "@tsoa/runtime/*": ["../packages/runtime/src/*"],
+            "tsoa": ["node_modules/tsoa/dist"],
+            "tsoa/": ["node_modules/tsoa/dist/"]
+        },
+
+        /* Experimental Options */
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+
+        /* Advanced Options */
+        "forceConsistentCasingInFileNames": true,
+
+        "resolveJsonModule": true,
+    },
+    "include": [
+        "src",
+		"src/@types/*.d.ts"
+    ],
+}

@@ -21,7 +21,7 @@ passport.use(StrategySlack());
 
 router.get('/login/', Login.login, passport.authenticate(strategy, passportOptions));
 router.get('/login/callback', passport.authenticate(strategy, passportOptions), Login.callback);
-router.post('/checkIn/:cardid', GuestWiFiIpFilter, passport.authenticate('jwt'), Check.checkIn);
+router.post('/checkIn/:cardid', passport.authenticate('jwt'), GuestWiFiIpFilter, Check.checkIn);
 router.post('/checkOut', passport.authenticate('jwt'), Check.checkOut);
 router.get('/status', passport.authenticate('jwt'), Status.userStatus);
 router.get('/using', Status.usingStatus);

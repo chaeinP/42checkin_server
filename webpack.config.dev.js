@@ -26,7 +26,7 @@ module.exports = {
     // https://stackoverflow.com/questions/42747034/webpack-babel-wrong-line-numbers-in-stack-trace
     // cheap-inline-module-source-map //For PROD builds
     // eval-inline-source-map //For DEV builds
-    devtool: 'eval-inline-source-map',
+    devtool: 'cheap-module-eval-source-map',
 	resolve: {
 		// Add `.ts` and `.tsx` as a resolvable extension.
 		extensions: ['.ts', '.tsx', '.js'],

@@ -5,10 +5,12 @@ import { expect } from 'chai';
 import httpStatus from 'http-status';
 import { CLUSTER_CODE } from '../../../src/modules/cluster';
 import { Config as IConfig } from '../../../src/models/config';
-import { getTimeFormat } from '../../../src/modules/util';
+import {getTimeFormat, getTimezoneDate} from '../../../src/modules/util';
 // @ts-ignore
-import { getCookie } from '../env';
+import { getCookie } from '../mock';
 import {Sequelize} from "../../../src/models/database";
+import { getCallerInfo } from '../../../src/modules/util';
+import logger from '../../../src/modules/logger';
 
 let cookie = '';
 
@@ -23,9 +25,9 @@ let cookie = '';
  * 7. 남은인원 5명이하일 경우 디스코드 알림발송
  * 8. 남은인원 0명일 경우 체크인 시도
  */
-describe('최대 수용인원수 가까이 입장했을때, 체크인 시스템 경계 테스트 진행', async () => {
+describe(`[${getCallerInfo()}] 최대 수용인원수 가까이 입장했을때, 체크인 시스템 경계 테스트 진행`, async () => {
     let originCapacity: IConfig;
-    let date = getTimeFormat(new Date(), 'YYYY-MM-DD');
+    const today = getTimezoneDate(new Date()).toISOString().slice(0, 10)
 
     before(async () => {
         // 서버에서 디비가 연결될 경우 emit하는 값을 감지한 후 done()을 호출해, 테스트 케이스를 시작한다.
@@ -33,9 +35,9 @@ describe('최대 수용인원수 가까이 입장했을때, 체크인 시스템 
         cookie = await getCookie();
         const forceCheckoutAll = (users: any) =>
             Promise.all(
-                users.map((log: { User: any }) => {
+                users.map((user: any) => {
                     return request(app)
-                        .post(`/user/forceCheckout/${log.User._id}`)
+                        .post(`/user/forceCheckout/${user._id}`)
                         .set('Cookie', [cookie]);
                 })
             );
@@ -48,30 +50,31 @@ describe('최대 수용인원수 가까이 입장했을때, 체크인 시스템 
         await checkoutAllIn(CLUSTER_CODE.seocho);
         await checkoutAllIn(CLUSTER_CODE.gaepo);
         const res = await request(app).get(`/user/using`).set('Cookie', [cookie])
+        logger.log(JSON.stringify(res));
     });
 
-    describe(`시나리오 테스트시작전 준비상황 확인 및 환경 설정`, () => {
+    describe(`[${getCallerInfo()}] 시나리오 테스트시작전 준비상황 확인 및 환경 설정`, () => {
         it('체크인한 유저가 0명인지 확인', async () => {
-            const res = await request(app).get(`/user/using`).query({ date }).set('Cookie', [cookie]);
+            const res = await request(app).get(`/user/using`).query({ today }).set('Cookie', [cookie]);
             expect(res.body[CLUSTER_CODE[0]]).to.be.equal(0);
             expect(res.body[CLUSTER_CODE[1]]).to.be.equal(0);
         });
 
         it('최대수용가능 인원수를 확인', async () => {
-            const res = await request(app).get(`/config`).query({ date }).set('Cookie', [cookie]);
+            const res = await request(app).get(`/config`).query({ today }).set('Cookie', [cookie]);
             originCapacity = res.body;
             expect(res.body.gaepo).to.be.a('number');
             expect(res.body.env).to.be.a('string');
         });
 
         it('최대수용가능 인원수를 5명으로 수정', async () => {
-            const res = await request(app).put(`/config`).send({ env: { gaepo: 5 }, date }).set('Cookie', [cookie]);
+            const res = await request(app).put(`/config`).send({ env: { gaepo: 5 }, today }).set('Cookie', [cookie]);
             expect(res.body.gaepo).to.be.equal(5);
             expect(res.body.env).to.be.a('string');
         });
     });
 
-    describe(`출입가능 인원이 5명이하인 경우 체크인 테스트`, () => {
+    describe(`[${getCallerInfo()}] 출입가능 인원이 5명이하인 경우 체크인 테스트`, () => {
         it('5명이하일때, 체크인 시도 반환값 중 notice가 true인가?', async () => {
             // 체크인
             const cardID = 9;
@@ -81,14 +84,14 @@ describe('최대 수용인원수 가까이 입장했을때, 체크인 시스템 
         });
     });
 
-    describe(`출입가능인원이 꽉찬 경우 테스트`, () => {
+    describe(`[${getCallerInfo()}] 출입가능인원이 꽉찬 경우 테스트`, () => {
         it('유저의 상태로 체크아웃으로 변경', async () => {
             const res = await request(app).post(`/user/checkOut`).set('Cookie', [cookie]);
             expect(res.body.result).to.equal(true);
         });
 
         it('최대수용가능 인원수를 0명으로 수정', async () => {
-            const res = await request(app).put(`/config`).send({ env: { gaepo: 0 }, date }).set('Cookie', [cookie]);
+            const res = await request(app).put(`/config`).send({ env: { gaepo: 0 }, today }).set('Cookie', [cookie]);
             expect(res.body.gaepo).to.be.equal(0);
             expect(res.body.env).to.be.a('string');
         });
@@ -103,7 +106,7 @@ describe('최대 수용인원수 가까이 입장했을때, 체크인 시스템 
         it('최대수용가능 인원수를 원래대로 복구', async () => {
             const res = await request(app)
                 .put(`/config`)
-                .send({ env: originCapacity, date })
+                .send({ env: originCapacity, today })
                 .set('Cookie', [cookie]);
             expect(res.body.gaepo).to.be.equal(originCapacity.gaepo);
             expect(res.body.env).to.be.a('string');

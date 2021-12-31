@@ -4,8 +4,8 @@ import { errorHandler} from '@modules/error';
 import httpStatus from 'http-status';
 import logger from '@modules/logger';
 import ApiError from "@modules/api.error";
-import {getConfig} from "@service/config.service";
-import {getLocalDate, getTimeNumber, getTimezoneDate} from "@modules/util";
+import {getConfigByDate} from "@service/config.service";
+import { getTimeNumber, getTimezoneDate} from "@modules/util";
 import {getUser} from "@service/user.service";
 
 const isBetween = (target: string, min: any, max: any) => {
@@ -30,7 +30,7 @@ const isCheckAvailable = async (msg: string, req: Request, res: Response, next: 
 
     // noinspection DuplicatedCode
     const today = getTimezoneDate(new Date()).toISOString().slice(0, 10)
-    const config = await getConfig(today);
+    const config = await getConfigByDate(today);
     if (!config) {
         let msg = `해당 날짜(${today})의 설정값이 서버에 존재하지 않습니다.`;
         logger.error(msg, 'date:', today, 'setting:', config);
@@ -65,7 +65,8 @@ export const checkIn = async (req: Request, res: Response, next: NextFunction) =
         logger.res(httpStatus.OK, body);
         res.status(httpStatus.OK).json(body);
     } catch (e) {
-        errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack, isFatal: true}), req, res, next);
+        const statusCode = e.statusCode || httpStatus.INTERNAL_SERVER_ERROR;
+        errorHandler(new ApiError(statusCode, e.message, {stack:e.stack, isFatal: true}), req, res, next);
     }
 
 };
@@ -83,6 +84,7 @@ export const checkOut = async (req: Request, res: Response, next: NextFunction) 
         logger.res(httpStatus.OK, body);
         res.status(httpStatus.OK).json(body);
     } catch (e) {
-        errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack, isFatal: true}), req, res, next);
+        const statusCode = e.statusCode || httpStatus.INTERNAL_SERVER_ERROR;
+        errorHandler(new ApiError(statusCode, e.message, {stack:e.stack, isFatal: true}), req, res, next);
     }
 };

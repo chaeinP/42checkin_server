@@ -6,7 +6,7 @@ import ApiError from '@modules/api.error';
 import { CHECK_STATE, CLUSTER_CODE, CLUSTER_TYPE } from '@modules/cluster';
 import { Users } from '@models/users';
 import { noticer } from '@modules/discord';
-import { getLocalDate } from '@modules/util';
+import {getLocalDate, getTimezoneDateString} from '@modules/util';
 import * as historyService from '@service/history.service';
 import * as configService from '@service/config.service';
 import * as usageService from '@service/usage.service';
@@ -34,12 +34,35 @@ export const login = async (user: Users): Promise<string> => {
 };
 
 /**
+ * 사용자 정보
+ */
+export const getUser = async (user_id: number) => {
+    return await Users.findOne({
+        where: {
+            _id: user_id,
+            deleted_at: {
+                [Op.eq]: null
+            }
+        }
+    });
+};
+
+/**
  * 어드민 여부 확인
  */
-export const requestAdminPrivilege = async (id: number) => {
-    const user = await Users.findOne({ where: { _id: id } })
-    logger.log('IsAdmin:', user.type);
-    if (user.type !== 'admin') {
+export const isAdmin = async (user_id: number) => {
+    const user = await getUser(user_id);
+    logger.log('user.type:', user.type);
+    return ['admin'].includes(user.type);
+};
+
+/**
+ * 어드민이 아닌 경우 Assert 오류
+ */
+export const assertAdminPrivilege = async (user_id: number) => {
+    const admin = await isAdmin(user_id);
+    logger.log('IsAdmin:', admin);
+    if (!admin) {
         let msg = '관리자 권한이 필요한 접근입니다.'
         throw new ApiError(httpStatus.FORBIDDEN, msg, {stack: new Error(msg).stack});
     }
@@ -47,37 +70,43 @@ export const requestAdminPrivilege = async (id: number) => {
 };
 
 /**
- * 사용자 정보
- */
-export const getUser = async (id: number) => {
-    const user = await Users.findOne({ where: { _id: id } })
-    return user;
-};
-
-/**
  * 유저 및 카드 체크인 처리
  */
 export const checkIn = async (userInfo: IJwtUser, cardId: string) => {
+    let notice = false;
+
     logger.log('userInfo: ', userInfo, ', cardId: ', cardId);
     if (!userInfo) {
         throw new ApiError(httpStatus.UNAUTHORIZED, '유저 정보 없음', {stack: new Error().stack});
     }
+
     const userId = userInfo._id;
+    const user = await getUser(userId);
+    if (['checkin'].includes(user.state?.toLowerCase())) {
+        throw new ApiError(httpStatus.CONFLICT, '이미 체크인 하셨습니다.', {stack: new Error().stack});
+    }
+
     const _cardId = parseInt(cardId);
-    let notice = false;
-    const cardOwner = await Users.findOne({ where: { card_no: cardId } });
+    const cardOwner = await Users.findOne({
+        where: {
+            card_no: cardId,
+            deleted_at: {
+                [Op.eq]: null
+            }
+        }
+    });
     if (cardOwner) {
         logger.error(`이미 사용중인 카드입니다, cardOwner: ${JSON.stringify(cardOwner)}`);
         throw new ApiError(httpStatus.CONFLICT, '이미 사용중인 카드입니다.', {stack: new Error().stack});
     }
-    const user = await Users.findOne({ where: { _id: userId } });
+
     const clusterType = user.getClusterType(_cardId)
     const { enterCnt, maxCnt, result } = await checkCanEnter(clusterType, 'checkIn'); //현재 이용자 수 확인
 
     logger.log('login: ', user.login, 'card_no: ', _cardId, 'max: ', maxCnt, 'used: ', enterCnt);
     if (!result) {
         logger.error({use: enterCnt, max: maxCnt});
-        throw new ApiError(httpStatus.CONFLICT, '수용할 수 있는 최대 인원을 초과했습니다.', {stack: new Error().stack});
+        throw new ApiError(httpStatus.CONFLICT, `[${enterCnt}/${maxCnt}]클러스터 출입 최대 인원을 초과했습니다.`, {stack: new Error().stack, isFatal:true});
     }
 
     // Users table에 log_id를 남기면서 순서가 뒤바뀌어서 card_no가 null이 되는 현상이 발생.
@@ -97,7 +126,7 @@ export const checkIn = async (userInfo: IJwtUser, cardId: string) => {
 
     return {
         result: true,
-        notice
+        notice: notice
     };
 };
 
@@ -109,6 +138,7 @@ export const checkOut = async (userInfo: IJwtUser) => {
     if (!userInfo) {
         throw new ApiError(httpStatus.UNAUTHORIZED, '유저 정보 없음', {stack: new Error().stack});
     }
+
     const id = userInfo._id;
     const user = await Users.findOne({ where: { _id: id } });
     await usageService.create(user, user.login);
@@ -125,8 +155,11 @@ export const checkOut = async (userInfo: IJwtUser) => {
             logger.error(e);
         }
     }
+
     logger.info('checkOut', JSON.stringify(user));
-    return true;
+    return {
+        result: true,
+    };
 };
 
 /**
@@ -179,7 +212,7 @@ export const forceCheckOut = async (adminInfo: IJwtUser, userId: string) => {
         let msg = '관리자 권한이 필요한 접근입니다.'
         throw new ApiError(httpStatus.UNAUTHORIZED, msg, {stack: new Error(msg).stack, isNormal: true});
     }
-    await requestAdminPrivilege(adminInfo._id);
+    await assertAdminPrivilege(adminInfo._id);
     const _userId = parseInt(userId);
     const user = await Users.findOne({ where: { _id: _userId } });
     if (!user) {
@@ -204,7 +237,9 @@ export const forceCheckOut = async (adminInfo: IJwtUser, userId: string) => {
     if (enterCnt >= maxCnt - 5) {
         await noticer(CLUSTER_CODE[clusterType], maxCnt - enterCnt - 1);
     }
-    return user;
+    return {
+        result: true,
+    };
 };
 
 /**
@@ -241,7 +276,8 @@ export const getUsingInfo = async () => {
 const checkCanEnter = async (clusterType: CLUSTER_TYPE, checkType?: CHECK_STATE) => {
     const enterCnt = (await getUsingInfo())[clusterType];
     // 최대인원을 넘었으면 다 찼으면 체크인 불가
-    const config = await configService.getConfig(getLocalDate(new Date()).toISOString());
+    const today = getTimezoneDateString(new Date()).slice(0,10);
+    const config = await configService.getConfigByDate(today, 'checkCanEnter');
     const maxCnt = config[clusterType];
     return {
         enterCnt,

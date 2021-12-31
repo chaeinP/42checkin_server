@@ -33,7 +33,7 @@ function getOrigins() {
 const check42Intra = async () => {
     let strategy;
     const today = getTimezoneDate(new Date()).toISOString().slice(0, 10)
-    let config = await configService.getConfig(today, '42checkin_no_logging');
+    let config = await configService.getConfigByDate(today, '42checkin_no_logging');
     try {
         const res = await axios.get('https://intra.42.fr');
         strategy = res.status === 200 ? '42' : 'Slack';
@@ -43,7 +43,7 @@ const check42Intra = async () => {
     }
 
     if (config?.auth !== strategy) {
-        await configService.setConfig(today,{
+        await configService.setConfigByDate(today,{
             auth: strategy
         });
     }

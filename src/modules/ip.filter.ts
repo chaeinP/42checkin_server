@@ -5,6 +5,7 @@ import env from '@modules/env';
 import ApiError from '@modules/api.error';
 import {errorHandler} from '@modules/error';
 import requestIp from "request-ip";
+import {getUser} from "@service/user.service";
 
 const ipFilter = (rules: Function[]) => async (req: Request, res: Response, next: NextFunction) => {
     const clientIp = requestIp.getClientIp(req);
@@ -32,14 +33,18 @@ const isGuestWiFi = (ip: string) => {
 	return ips.includes(ip);
 };
 
-export const GuestWiFiIpFilter = (req: Request, res: Response, next: NextFunction) => {
+export const GuestWiFiIpFilter = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        const user = await getUser(req.user?.jwt?._id);
+        const isAdmin = ['admin'].includes(user.type);
+
         const rules: Function[] = [];
-        if (env.ip.filter) {
+        if (!isAdmin && env.ip.filter) {
             rules.push(checkIsWhitelist, isGuestWiFi);
         }
         return ipFilter(rules)(req, res, next);
     } catch (e) {
-        errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, e.message, {stack:e.stack, isFatal: true}), req, res, next);
+        const statusCode = e.statusCode || httpStatus.INTERNAL_SERVER_ERROR;
+        errorHandler(new ApiError(statusCode, e.message, {stack:e.stack, isFatal: true}), req, res, next);
     }
 };

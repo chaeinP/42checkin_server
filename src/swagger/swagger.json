@@ -51,13 +51,109 @@
 				},
 				"type": "object",
 				"additionalProperties": false
+			},
+			"ConfigDto": {
+				"properties": {
+					"_id": {
+						"type": "number",
+						"format": "double"
+					},
+					"actor": {
+						"type": "string"
+					},
+					"auth": {
+						"type": "string"
+					},
+					"begin_at": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"checkin_at": {
+						"type": "number",
+						"format": "double"
+					},
+					"checkout_at": {
+						"type": "number",
+						"format": "double"
+					},
+					"close_at": {
+						"type": "number",
+						"format": "double"
+					},
+					"created_at": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"deleted_at": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"end_at": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"env": {
+						"type": "string"
+					},
+					"gaepo": {
+						"type": "number",
+						"format": "double"
+					},
+					"open_at": {
+						"type": "number",
+						"format": "double"
+					},
+					"seocho": {
+						"type": "number",
+						"format": "double"
+					},
+					"updated_at": {
+						"type": "string",
+						"format": "date-time"
+					}
+				},
+				"required": [
+					"_id",
+					"actor",
+					"auth",
+					"begin_at",
+					"checkin_at",
+					"checkout_at",
+					"close_at",
+					"created_at",
+					"deleted_at",
+					"end_at",
+					"env",
+					"gaepo",
+					"open_at",
+					"seocho",
+					"updated_at"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ConfigRequest": {
+				"properties": {
+					"values": {
+						"$ref": "#/components/schemas/ConfigDto"
+					},
+					"date": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"values",
+					"date"
+				],
+				"type": "object",
+				"additionalProperties": false
 			}
 		},
 		"securitySchemes": {}
 	},
 	"info": {
 		"title": "42checkin",
-		"version": "2.1.5",
+		"version": "2.2.6",
 		"description": "Cluster checkin service for 42 Seoul cadets.",
 		"license": {
 			"name": "MIT"
@@ -116,16 +212,59 @@
 				"parameters": []
 			}
 		},
-		"/config/health": {
+		"/config": {
 			"get": {
-				"operationId": "GetHealth",
+				"operationId": "GetConfig",
 				"responses": {
-					"204": {
-						"description": "No content"
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ConfigDto"
+								}
+							}
+						}
 					}
 				},
+				"description": "Retrieves the configuration of server.",
 				"security": [],
-				"parameters": []
+				"parameters": [
+					{
+						"in": "query",
+						"name": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"put": {
+				"operationId": "SetConfig",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"description": "Retrieves the configuration of server.",
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ConfigRequest"
+							}
+						}
+					}
+				}
 			}
 		}
 	},

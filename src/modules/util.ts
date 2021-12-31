@@ -1,4 +1,5 @@
 import moment from 'moment-timezone';
+import path from "path";
 
 const TZ = 'Asia/Seoul';
 
@@ -58,4 +59,56 @@ export const getPlanObject = (data: any) => {
     }
 
     return result;
+}
+
+// Stack trace format :
+// https://github.com/v8/v8/wiki/Stack%20Trace%20API
+// https://v8.dev/docs/stack-trace-api
+const stackReg = /at\s+(.*)\s+\((.*):(\d*):(\d*)\)/i;
+const stackReg2 = /at\s+(.*):(\d*):(\d*)/i;
+
+/**
+ * Use CallSite to extract filename and number, for more info read: https://v8.dev/docs/stack-trace-api#customizing-stack-traces
+ * @returns {string} filename and line number separated by a colon
+ */
+const getRunStack = (depth) => {
+    let data = {
+        method: null,
+        path: null,
+        line: null,
+        pos: null,
+        file: null,
+        stack: null
+    };
+
+    if (!depth) depth = 2;
+
+    // get call stack, and analyze it
+    // get all file,method and line number
+    let stack = (new Error()).stack.split('\n')
+    let stacklist = stack.length > depth ? stack.slice(depth) : stack.slice(stack.length - 1);
+    let s =  stacklist[0],
+        sp = stackReg.exec(s) || stackReg2.exec(s);
+    if (sp && sp.length === 5) {
+        data.method = sp[1];
+        data.path = sp[2];
+        data.line = sp[3];
+        data.pos = sp[4];
+        data.file = path.basename(data.path);
+        data.stack = stacklist.join('\n');
+    }
+
+    return data;
+};
+
+export const getCaller = () => {
+    let data = getRunStack(4);
+    return { file: data.file,
+        line: data.line,
+        func: data.method };
+};
+
+export const getCallerInfo = () => {
+    const { file, line } = getCaller();
+    return `${file}:${line}`;
 }

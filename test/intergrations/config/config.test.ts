@@ -4,12 +4,14 @@ import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import { getTimeFormat } from '../../../src/modules/util';
 import { Sequelize } from '../../../src/models/database';
+// @ts-ignore
 import { getCookie } from '../mock';
 import logger from '../../../src/modules/logger';
+import { getCallerInfo } from '../../../src/modules/util';
 
 let cookie = '';
 
-describe('config api test', async () => {
+describe(`[${getCallerInfo()}] config api test`, async () => {
 	before(async () => {
         try {
             logger.init({console: false});
@@ -20,7 +22,7 @@ describe('config api test', async () => {
         }
 	});
 
-	describe((`설정 테이블의 값을 조회`), () => {
+	describe((`[${getCallerInfo()}] 설정 테이블의 값을 조회`), () => {
 		it('현재 환경의 이름값으로 값을 조회합니다.', async () => {
             const YYYYMMDD = getTimeFormat(new Date(), 'YYYY-MM-DD');
             const query = { date: YYYYMMDD };
@@ -32,14 +34,14 @@ describe('config api test', async () => {
 		});
 	});
 
-	describe((`설정 테이블의 값을 수정`), () => {
+	describe((`[${getCallerInfo()}] 설정 테이블의 값을 수정`), () => {
 		it('특정 날짜를 선택하여 최대입장 인원수를 수정하고 다시 되돌립니다.', async () => {
             const YYYYMMDD = getTimeFormat(new Date(), 'YYYY-MM-DD');
             const query = { date: YYYYMMDD };
             const { body: { gaepo: oldGaepoCnt } } = await request(app).get(`/config`).query(query).set('Cookie', [cookie]);
             const maxCnt = 200;
             const body = {
-                env: {
+                values: {
                     gaepo: maxCnt,
                 },
                 date: YYYYMMDD
@@ -50,28 +52,27 @@ describe('config api test', async () => {
             expect(res.body.begin_at).to.be.a('string')
             expect(res.body.end_at).to.be.a('string')
 			expect(res.body.env).to.be.a('string')
-            body.env.gaepo = oldGaepoCnt;
+            body.values.gaepo = oldGaepoCnt;
 			await request(app).put(`/config`).send(body).set('Cookie', [cookie]);
 		});
 
 		it('특정 날짜를 선택하여 입장가능 시간을 수정하고 다시 되돌립니다.', async () => {
             const YYYYMMDD = getTimeFormat(new Date(), 'YYYY-MM-DD');
             const query = { date: YYYYMMDD };
-            const { body: { begin_at: oldBegin_at } } = await request(app).get(`/config`).query(query).set('Cookie', [cookie]);
-            const date = new Date();
+            const { body: { open_at: open_at, close_at: close_at } } = await request(app).get(`/config`).query(query).set('Cookie', [cookie]);
             const body = {
-                env: {
-                    begin_at: date,
+                values: {
+                    open_at: '13:00',
+                    close_at: '14:00'
                 },
                 date: YYYYMMDD
             };
 			const res = await request(app).put(`/config`).send(body).set('Cookie', [cookie]);
-            expect(res.body.begin_at).eq(date.toISOString());
-            expect(res.body.seocho).to.be.a('number')
-            expect(res.body.begin_at).to.be.a('string')
-            expect(res.body.end_at).to.be.a('string')
-			expect(res.body.env).to.be.a('string')
-            body.env.begin_at = oldBegin_at;
+            expect(res.body.open_at).eq('13:00');
+            expect(res.body.close_at).eq('14:00');
+			expect(res.body.env).to.be.a('string');
+            body.values.open_at = open_at;
+            body.values.close_at = close_at;
 			await request(app).put(`/config`).send(body).set('Cookie', [cookie]);
 		});
 	});

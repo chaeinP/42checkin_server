@@ -22,6 +22,7 @@ export class ConfigDto {
 }
 
 export class ConfigRequest {
+    env: ConfigDto;
     values: ConfigDto;
     date: string
 }
@@ -40,8 +41,8 @@ export class ConfigController extends Controller {
             try {
                 this.setStatus(httpStatus.OK);
                 logger.log('date:', date);
-                payload = await configService.getConfig(date);
-                logger.info(payload);
+                payload = await configService.getConfigByDate(date);
+                logger.log(payload);
             } catch (e) {
                 logger.error(e);
                 reject(e)
@@ -61,8 +62,13 @@ export class ConfigController extends Controller {
         return new Promise(async (resolve, reject) => {
             let payload;
             try {
+                // 규격 변경으로 인한 하위 호환성 확보를 위한 방어코드
+                if (config && !config.values && config.env) {
+                    config.values = config.env;
+                }
+
                 this.setStatus(httpStatus.OK);
-                payload = await configService.setConfig(config?.date, config?.values);
+                payload = await configService.setConfigByDate(config?.date, config?.values);
             } catch (e) {
                 logger.error(e);
                 reject(e)

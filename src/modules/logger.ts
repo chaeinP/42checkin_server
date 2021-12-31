@@ -2,6 +2,7 @@ import {dailyfile} from 'tracer';
 import tracer from 'cls-rtracer';
 import context from 'express-http-context';
 import {getPlanObject} from './util';
+import getCurrentLine from 'get-current-line';
 
 const rootFolder = './logs';
 const pmId = process.env.pm_id ? process.env.pm_id : 0;
@@ -10,7 +11,7 @@ const logFormat = '{{timestamp}} {{title}} {{file}}:{{line}} ({{method}}) {{tid}
 const jsonFormat = '{ timestamp:{{timestamp}}, level:{{title}}, file:{{file}}, line:{{line}}, method:{{method}}, tid:{{tid}}, user:{{login}}, httpStatus:{{httpStatus}}, payload:{{message}} }';
 const dateformat = 'yyyy-mm-dd"T"HH:MM:ss.lo';
 
-let config = {
+exports.filter = {
     console: true,
     debug: true,
     log: true,
@@ -67,6 +68,8 @@ let logConfig = {
     stackIndex: 1,
     level: 'info',
     preprocess: function(data: any) {
+        let info = getCurrentLine({frames: 3});
+
         data.title = convTitle(data.title)?.toUpperCase();
         data.tid = `${tracer.id() ? tracer.id() : '00000000-0000-0000-0000-000000000000'}`;
 
@@ -79,7 +82,7 @@ let logConfig = {
         if (isProd) {
             return;
         }
-        console.log(data.output);
+        if (exports.filter.console) console.log(data.output);
     }
 }
 
@@ -107,7 +110,7 @@ let jsonConfig = {
         if (isProd) {
             return;
         }
-        console.log(data.output);
+        if (exports.filter.console) console.log(data.output);
     }
 }
 
@@ -177,10 +180,10 @@ const sql = dailyfile({
     }
 });
 
-const http = dailyfile({
+const net = dailyfile({
     ...jsonConfig,
     ...{
-        allLogsFileName: 'htp',
+        allLogsFileName: 'net',
         level: 'log',
         format: jsonFormat,
     }
@@ -189,47 +192,47 @@ const http = dailyfile({
 // noinspection DuplicatedCode
 const logger = {
     init (options: any) {
-        config = {...config, ...options};
-        log.log('initialized...');
-        console.log('initialized...');
+        exports.filter = {...exports.filter, ...options};
+        log.log('logger initialized...', exports.filter);
+        console.log('logger initialized...', exports.filter);
     },
     // errorHandle에서 slack으로 보내는 메시지용
     handler (...args: any[]) {
         const isProd = process.env.NODE_ENV?.toLowerCase()?.includes('prod')
             || process.env.ENV_TYPE?.toLowerCase()?.includes('prod');
-        if (isProd && config.console) console.log(...args);
+        if (isProd && exports.filter.console) console.log(...args);
         log.log(...args);
-        return config.fatal ? handler.fatal(...args) : null;
+        return exports.filter.fatal ? handler.fatal(...args) : null;
     },
     fatal (...args: any[]) {
         const isProd = process.env.NODE_ENV?.toLowerCase()?.includes('prod')
             || process.env.ENV_TYPE?.toLowerCase()?.includes('prod');
-        if (isProd && config.console) console.log(...args);
+        if (isProd && exports.filter.console) console.log(...args);
         log.log(...args);
-        return config.fatal ? fatal.fatal(...args) : null;
+        return exports.filter.fatal ? fatal.fatal(...args) : null;
     },
     error (...args: any[]) {
         const isProd = process.env.NODE_ENV?.toLowerCase()?.includes('prod')
             || process.env.ENV_TYPE?.toLowerCase()?.includes('prod');
         if (isProd) console.log(...args);
         log.log(...args);
-        return config.error ? error.error(...args) : null;
+        return exports.filter.error ? error.error(...args) : null;
     },
     info (...args: any[]) {
-        return config.info ? info.info(...args) : null;
+        return exports.filter.info ? info.info(...args) : null;
     },
     debug (...args: any[]) {
         const isProd = process.env.NODE_ENV?.toLowerCase()?.includes('prod')
             || process.env.ENV_TYPE?.toLowerCase()?.includes('prod');
         if (isProd) return;
 
-        return config.debug ? debug.debug(...args) : null;
+        return exports.filter.debug ? debug.debug(...args) : null;
     },
     sql (...args: any[]) {
-        return config.log ? sql.log(...args) : null;
+        return exports.filter.log ? sql.log(...args) : null;
     },
     log (...args: any[]) {
-        return config.log ? log.log(...args) : null;
+        return exports.filter.log ? log.log(...args) : null;
     },
     req (request: any) {
         /*
@@ -247,11 +250,11 @@ const logger = {
             isNewRecord: false
           }
          */
-        return http.log(request);
+        return net.log(request);
     },
     res(httpStatus: number, response: any) {
         context.set('httpStatus', httpStatus);
-        return http.log(getPlanObject(response));
+        return net.log(getPlanObject(response));
     }
 };
 
