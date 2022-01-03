@@ -1,5 +1,5 @@
 // noinspection DuplicatedCode
-import logger from '../modules/logger';
+import logger from 'src/modules/logger';
 import mysql from "promise-mysql";
 import dotenv from "dotenv";
 import path from "path";
