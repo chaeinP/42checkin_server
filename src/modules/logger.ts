@@ -19,6 +19,7 @@ exports.filter = {
     info: true,
     fatal: true,
     sql: true,
+    api: true,
 }
 /**
  * root: 파일위치
@@ -68,8 +69,6 @@ let logConfig = {
     stackIndex: 1,
     level: 'info',
     preprocess: function(data: any) {
-        let info = getCurrentLine({frames: 3});
-
         data.title = convTitle(data.title)?.toUpperCase();
         data.tid = `${tracer.id() ? tracer.id() : '00000000-0000-0000-0000-000000000000'}`;
 
@@ -250,11 +249,11 @@ const logger = {
             isNewRecord: false
           }
          */
-        return net.log(request);
+        return exports.filter.api ? net.log(request) : null;
     },
     res(httpStatus: number, response: any) {
         context.set('httpStatus', httpStatus);
-        return net.log(getPlanObject(response));
+        return exports.filter.api ? net.log(getPlanObject(response)) : null;
     }
 };
 

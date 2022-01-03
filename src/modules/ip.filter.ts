@@ -44,6 +44,7 @@ export const GuestWiFiIpFilter = async (req: Request, res: Response, next: NextF
         }
         return ipFilter(rules)(req, res, next);
     } catch (e) {
+        logger.error(e);
         const statusCode = e.statusCode || httpStatus.INTERNAL_SERVER_ERROR;
         errorHandler(new ApiError(statusCode, e.message, {stack:e.stack, isFatal: true}), req, res, next);
     }

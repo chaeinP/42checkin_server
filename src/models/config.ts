@@ -51,7 +51,9 @@ export class Config extends Model<ConfigAttributes, configCreationAttributes> im
             },
             env: {
                 type: DataTypes.STRING(45),
-                unique: "env_UNIQUE"
+            },
+            auth: {
+                type: DataTypes.STRING(10),
             },
             begin_at: {
                 type: DataTypes.DATE,
@@ -84,6 +86,9 @@ export class Config extends Model<ConfigAttributes, configCreationAttributes> im
             gaepo: {
                 type: DataTypes.INTEGER,
                 allowNull: true
+            },
+            actor: {
+                type: DataTypes.STRING(50),
             },
             deleted_at: {
                 type: DataTypes.DATE,

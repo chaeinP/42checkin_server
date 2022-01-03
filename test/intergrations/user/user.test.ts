@@ -9,7 +9,7 @@ import {getCookie, getUserId, getUserLoginName} from '../mock';
 import { getCallerInfo } from '../../../src/modules/util';
 
 let cookie = '';
-const userStatusKeys = ['login', 'card', 'profile_image_url'];
+const userStatusKeys = ['login', 'card', 'state', 'log_id', 'checkin_at', 'checkout_at', 'profile_image_url'];
 const clusterKeys = ['gaepo', 'seocho'];
 
 describe(`[${getCallerInfo()}] user api test`, async () => {

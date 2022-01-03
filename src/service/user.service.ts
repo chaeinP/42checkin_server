@@ -1,6 +1,6 @@
 import httpStatus from 'http-status';
-import { Op } from 'sequelize';
-import { generateToken, IJwtUser } from '@modules/strategy.jwt';
+import {Op} from 'sequelize';
+import {generateToken, IJwtUser} from '@modules/strategy.jwt';
 import logger from '@modules/logger';
 import ApiError from '@modules/api.error';
 import { CHECK_STATE, CLUSTER_CODE, CLUSTER_TYPE } from '@modules/cluster';
@@ -17,7 +17,14 @@ import axios from "axios";
  * */
 export const login = async (user: Users): Promise<string> => {
     logger.log('login:', user);
-    const found = await Users.findOne({ where: { login: user.login } });
+    const found = await Users.findOne({
+        where: {
+            login: user.login,
+            deleted_at: {
+                [Op.eq]: null
+            }
+        }
+    });
 
     //처음 사용하는 유저의 경우 db에 등록
     if (!found) {
@@ -34,39 +41,46 @@ export const login = async (user: Users): Promise<string> => {
 };
 
 /**
- * 사용자 정보
+ * 어드민 여부 확인
  */
-export const getUser = async (user_id: number) => {
-    return await Users.findOne({
+export const isAdmin = async (id: number) => {
+    const user = await Users.findOne({
         where: {
-            _id: user_id,
+            _id: id,
             deleted_at: {
                 [Op.eq]: null
             }
         }
     });
+    logger.log('isAdmin:', user.type);
+    return user.type;
 };
 
 /**
  * 어드민 여부 확인
  */
-export const isAdmin = async (user_id: number) => {
-    const user = await getUser(user_id);
-    logger.log('user.type:', user.type);
-    return ['admin'].includes(user.type);
-};
-
-/**
- * 어드민이 아닌 경우 Assert 오류
- */
-export const assertAdminPrivilege = async (user_id: number) => {
-    const admin = await isAdmin(user_id);
-    logger.log('IsAdmin:', admin);
-    if (!admin) {
+export const assertAdminPrivilege = async (id: number) => {
+    const userType = await isAdmin(id);
+    logger.log('IsAdmin:', userType);
+    if (userType !== 'admin') {
         let msg = '관리자 권한이 필요한 접근입니다.'
         throw new ApiError(httpStatus.FORBIDDEN, msg, {stack: new Error(msg).stack});
     }
     return true;
+};
+
+/**
+ * 사용자 정보
+ */
+export const getUser = async (id: number) => {
+    return await Users.findOne({
+        where: {
+            _id: id,
+            deleted_at: {
+                [Op.eq]: null
+            }
+        }
+    });
 };
 
 /**
@@ -114,6 +128,7 @@ export const checkIn = async (userInfo: IJwtUser, cardId: string) => {
     user.card_no = _cardId;
     let history = await historyService.create(user, 'checkIn');
     await user.setState('checkIn', user.login, _cardId, history._id);
+
     // 남은 인원이 5명이하인 경우, 몇 명 남았는지 디스코드로 노티
     if (enterCnt + 1 >= maxCnt - 5) {
         try {
@@ -140,7 +155,23 @@ export const checkOut = async (userInfo: IJwtUser) => {
     }
 
     const id = userInfo._id;
-    const user = await Users.findOne({ where: { _id: id } });
+    const user = await Users.findOne({
+        where: {
+            _id: id,
+            deleted_at: {
+                [Op.eq]: null
+            }
+        }
+    });
+
+    const _user = Object.assign(user);
+    _user['profile'] = {};
+    logger.info('checkOut', JSON.stringify(_user));
+
+    if (!['checkin'].includes(user.state?.toLowerCase())) {
+        throw new ApiError(httpStatus.BAD_REQUEST, '이미 체크아웃 하셨습니다.', {stack: new Error().stack});
+    }
+
     await usageService.create(user, user.login);
     let history = await historyService.create(user, 'checkOut');
     const clusterType = user.getClusterType(user.card_no)
@@ -172,7 +203,14 @@ export const status = async (userInfo: IJwtUser) => {
         throw new ApiError(httpStatus.UNAUTHORIZED, msg, {stack: new Error(msg).stack});
     }
     const id = userInfo._id;
-    const user = await Users.findOne({ where: { '_id': id } });
+    const user = await Users.findOne({
+        where: {
+            '_id': id,
+            deleted_at: {
+                [Op.eq]: null
+            }
+        }
+    });
     if (!user) {
         logger.error('userInfo:', userInfo);
         let msg = 'DB에서 사용자를 찾지 못했습니다.';
@@ -189,14 +227,24 @@ export const status = async (userInfo: IJwtUser) => {
     let imageUrl = rawProfile?.image_url;
     if (!imageUrl) {
         let url = `https://cdn.intra.42.fr/users/${user.login}.jpg`;
-        let res = await axios.get(url);
-        imageUrl = (res.status === 200) ? url : `https://cdn.intra.42.fr/users/default.png`;
+        let res;
+
+        try {
+            res = await axios.get(url);
+        } catch (e) {
+            logger.error(`${url} not found... use default...`);
+        }
+        imageUrl = (res?.status === 200) ? url : `https://cdn.intra.42.fr/users/default.png`;
     }
 
     return {
         user: {
             login: user.login,
             card: user.card_no,
+            state: user.state,
+            log_id: user.log_id,
+            checkin_at: user.checkin_at,
+            checkout_at: user.checkout_at,
             profile_image_url: imageUrl
         },
         cluster: await getUsingInfo(),
@@ -214,7 +262,14 @@ export const forceCheckOut = async (adminInfo: IJwtUser, userId: string) => {
     }
     await assertAdminPrivilege(adminInfo._id);
     const _userId = parseInt(userId);
-    const user = await Users.findOne({ where: { _id: _userId } });
+    const user = await Users.findOne({
+        where: {
+            _id: _userId,
+            deleted_at: {
+                [Op.eq]: null
+            }
+        }
+    });
     if (!user) {
         let msg = `사용자 정보(${_userId})가 없습니다.`;
         throw new ApiError(httpStatus.UNAUTHORIZED, msg, {stack: new Error(msg).stack, isNormal: true});
@@ -249,7 +304,11 @@ export const getUsingInfo = async () => {
     const gaepo = await Users.count({
         where: {
             card_no: {
-                [Op.lt]: 1000
+                [Op.lt]: 1000,
+                [Op.gt]: 0
+            },
+            deleted_at: {
+                [Op.eq]: null
             }
         }
     })
@@ -257,6 +316,9 @@ export const getUsingInfo = async () => {
         where: {
             card_no: {
                 [Op.gte]: 1000
+            },
+            deleted_at: {
+                [Op.eq]: null
             }
         }
     })
