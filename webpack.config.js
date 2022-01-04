@@ -24,7 +24,7 @@ module.exports = {
 		filename: 'app.js',
 		path: path.resolve(__dirname, output_path)
 	},
-	devtool: 'cheap-module-eval-source-map',
+	devtool: 'source-map',
 	resolve: {
 		// Add `.ts` and `.tsx` as a resolvable extension.
 		extensions: ['.ts', '.tsx', '.js'],

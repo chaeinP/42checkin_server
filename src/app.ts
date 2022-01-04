@@ -16,6 +16,9 @@ import {errorConverter, errorHandler} from '@modules/error';
 import {getTimezoneDate} from '@modules/util';
 import * as configService from '@service/config.service';
 
+import sourceMapSupport from 'source-map-support'
+sourceMapSupport.install();
+
 const port = env.port || 3000;
 export const app = express();
 
@@ -75,7 +78,7 @@ app.use(mainRouter.path, mainRouter.router);
 app.use(errorConverter);
 app.use(errorHandler);
 app.listen(port, () => {
-    logger.log(`= [${env.node_env}] =============`);
+    logger.log(`= [${env.node_env}] ===================`);
     logger.log(`🚀 App listening on the port ${port}`);
     logger.log(`=================================`);
 });
