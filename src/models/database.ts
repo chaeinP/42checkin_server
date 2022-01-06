@@ -1,7 +1,7 @@
 import sequelize from 'sequelize';
-import type { ConfigAttributes, configCreationAttributes } from "./config";
+import type { IConfig, configCreationAttributes } from "./config";
 import type { HistoryAttributes, historyCreationAttributes } from "./history";
-import type { UsersAttributes, usersCreationAttributes } from "./users";
+import type { IUser, usersCreationAttributes } from "./users";
 import type { UsageAttributes, usageCreationAttributes } from "./usages";
 
 import { Config } from "./config";
@@ -51,17 +51,17 @@ export {
 };
 
 export type {
-    ConfigAttributes,
+    IConfig,
     configCreationAttributes,
     HistoryAttributes,
     historyCreationAttributes,
-    UsersAttributes,
+    IUser,
     usersCreationAttributes,
     UsageAttributes,
     usageCreationAttributes,
 };
 
-export function Sequelize() {
+export function Database() {
     Config.initModel(database);
     History.initModel(database);
     Users.initModel(database);
@@ -73,4 +73,4 @@ export function Sequelize() {
     return database;
 }
 
-Sequelize();
+Database();

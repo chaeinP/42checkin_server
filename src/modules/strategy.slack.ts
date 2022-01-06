@@ -1,13 +1,11 @@
 import env from '@modules/env';
-import ApiError from './api.error';
-import httpStatus from 'http-status';
 import passport from 'passport';
 import logger from '@modules/logger';
-import { Users } from '@models/database';
-import { now } from './util';
+import {Users} from '@models/database';
+import {now} from './util';
 import {Op} from "sequelize";
 
-const PassortStrategySlack = require('passport-slack-oauth2').Strategy;
+const PassportStrategySlack = require('passport-slack-oauth2').Strategy;
 
 // noinspection DuplicatedCode
 const validate = async (token: string, refreshToken: string, profile: any) => {
@@ -62,7 +60,7 @@ const strategeyCallback = async (
 };
 
 const StrategySlack = () =>
-	new PassortStrategySlack(
+	new PassportStrategySlack(
 		{
 			clientID: env.slack.oauth.client.id,
 			clientSecret: env.slack.oauth.client.secret,

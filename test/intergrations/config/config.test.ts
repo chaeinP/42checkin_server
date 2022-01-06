@@ -3,7 +3,7 @@ import { app } from '../../../src/app';
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import { getTimeFormat } from '../../../src/modules/util';
-import { Sequelize } from '../../../src/models/database';
+import { Database } from '../../../src/models/database';
 // @ts-ignore
 import { getCookie } from '../mock';
 import logger from '../../../src/modules/logger';
@@ -15,7 +15,7 @@ describe(`[${getCallerInfo()}] config api test`, async () => {
 	before(async () => {
         try {
             logger.init({console: false});
-            await Sequelize().authenticate();
+            await Database().authenticate();
             cookie = await getCookie();
         } catch(e) {
             console.log(e);

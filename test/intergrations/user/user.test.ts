@@ -3,7 +3,7 @@ import { app } from '../../../src/app';
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import httpStatus from 'http-status';
-import { Sequelize } from '../../../src/models/database';
+import { Database } from '../../../src/models/database';
 // @ts-ignore
 import {getCookie, getUserId, getUserLoginName} from '../mock';
 import { getCallerInfo } from '../../../src/modules/util';
@@ -15,7 +15,7 @@ const clusterKeys = ['gaepo', 'seocho'];
 describe(`[${getCallerInfo()}] user api test`, async () => {
     before(async () => {
         try {
-            await Sequelize().authenticate();
+            await Database().authenticate();
             cookie = await getCookie();
             await request(app).post(`/user/checkOut`).set('Cookie', [cookie]);
         } catch (e) {
@@ -45,14 +45,14 @@ describe(`[${getCallerInfo()}] user api test`, async () => {
 	const cardID = 9;
 	const userID = await getUserId();
 	describe(`[${getCallerInfo()}] ${cardID}번 카드 체크인`, () => {
-		it('체크인이 정상적으로 작동하는가?', async () => {
+		it('체크인이 정상적으로 작동하는가?', async (done) => {
 			const res = await request(app).post(`/user/checkIn/${cardID}`).set('Cookie', [ cookie ]);
 			expect(res.body.result).to.equal(true);
 		});
 	});
 
 	describe(`[${getCallerInfo()}] ${cardID}번 카드 중복 체크인`, () => {
-		it('중복 체크인시 에러가 발생하는가?', async () => {
+		it('중복 체크인시 에러가 발생하는가?', async (done) => {
 			const res = await request(app).post(`/user/checkIn/${cardID}`).set('Cookie', [ cookie ]);
 			expect(res.status).to.equal(httpStatus.CONFLICT);
 			expect(res.body.code).to.equal(httpStatus.CONFLICT);
@@ -68,14 +68,14 @@ describe(`[${getCallerInfo()}] user api test`, async () => {
 	});
 
 	describe(`[${getCallerInfo()}] 유저 체크아웃`, () => {
-		it('체크아웃이 정상적으로 작동하는가?', async () => {
+		it('체크아웃이 정상적으로 작동하는가?', async (done) => {
 			const res = await request(app).post(`/user/checkOut`).set('Cookie', [ cookie ]);
 			expect(res.body.result).to.equal(true);
 		});
 	});
 
-	describe(`[${getCallerInfo()}] 다음 테스트를 위해${cardID}번 카드로 체크인`, () => {
-		it('체크인이 정상적으로 작동하는가?', async () => {
+	describe(`[${getCallerInfo()}] 다음 테스트를 위해 ${cardID}번 카드로 체크인`, () => {
+		it('체크인이 정상적으로 작동하는가?', async (done) => {
 			const res = await request(app).post(`/user/checkIn/${cardID}`).set('Cookie', [ cookie ]);
 			expect(res.body.result).to.equal(true);
 		});
@@ -83,7 +83,7 @@ describe(`[${getCallerInfo()}] user api test`, async () => {
 
 	// 체크인 후, 강제 체크아웃
 	describe(`[${getCallerInfo()}] 유저 강제 체크아웃`, () => {
-		it('강제체크아웃이 정상적으로 작동하는가?', async () => {
+		it('강제체크아웃이 정상적으로 작동하는가?', async (done) => {
 			const res = await request(app).post(`/user/forceCheckout/${userID}`).set('Cookie', [ cookie ]);
 			expect(res.body.result).to.equal(true);
 		});
@@ -91,7 +91,7 @@ describe(`[${getCallerInfo()}] user api test`, async () => {
 
 	// 체크인 후, 강제 체크아웃 중복실행
 	describe(`[${getCallerInfo()}] 이미 체크아웃된 유저 강제 체크아웃`, () => {
-		it('에러가 발생하는가?', async () => {
+		it('에러가 발생하는가?', async (done) => {
 			const res = await request(app).post(`/user/forceCheckout/${userID}`).set('Cookie', [ cookie ]);
 			expect(res.status).to.equal(httpStatus.BAD_REQUEST);
 			expect(res.body.code).to.equal(httpStatus.BAD_REQUEST);

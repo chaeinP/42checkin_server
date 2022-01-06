@@ -22,7 +22,7 @@
         "moduleResolution": "node",
         "sourceMap": true,
         "skipLibCheck": true,
-		"typeRoots": ["./node_modules/@types", "./src/@types/express.d.ts"],
+		"typeRoots": ["./node_modules/@types", "./src/@types"],
         "paths": {
             "@service/*": [ "./src/service/*" ],
             "@controllers/*": [ "./src/controllers/*" ],

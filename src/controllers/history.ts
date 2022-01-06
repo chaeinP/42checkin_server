@@ -9,7 +9,7 @@ import {errorHandler} from "@modules/error";
 const STATUS_OK = httpStatus.OK;
 export const getUserHistory = async (req: Request<{ login: string }, {}, {}, { page: string, listSize: string }>, res: Response) => {
     try {
-        logger.log('jwt:', req.user?.jwt, ', req.query:', JSON.stringify(req.query));
+        logger.log('jwt:', req.user?.jwt, ', req.query:', JSON.stringify(req.query), ', req.params:', JSON.stringify(req.params));
         const login = req.params.login;
         const page = req.query.page ? parseInt(req.query.page) : 1;
         const listSize = parseInt(req.query.listSize);

@@ -1,7 +1,7 @@
 import * as Sequelize from 'sequelize';
 import {DataTypes, Model, Optional} from 'sequelize';
 
-export interface ConfigAttributes {
+export interface IConfig {
     _id: number;
     env?: string;
     auth?: string;
@@ -22,9 +22,9 @@ export interface ConfigAttributes {
 export type configPk = "_id";
 export type configId = Config[configPk];
 export type configOptionalAttributes = "_id" | "env" | "begin_at" | "end_at" | "seocho" | "gaepo";
-export type configCreationAttributes = Optional<ConfigAttributes, configOptionalAttributes>;
+export type configCreationAttributes = Optional<IConfig, configOptionalAttributes>;
 
-export class Config extends Model<ConfigAttributes, configCreationAttributes> implements ConfigAttributes {
+export class Config extends Model<IConfig, configCreationAttributes> implements IConfig {
     _id: number;
     env?: string;
     auth?: string;

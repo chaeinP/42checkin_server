@@ -7,23 +7,6 @@ import httpStatus from 'http-status';
 import ApiError from '@modules/api.error';
 import {getPlanObject} from '@modules/util';
 
-/**
- * 유저 상태조회
- */
-export const userStatus = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        logger.log('req.user?.jwt:', req.user?.jwt);
-        const body = await userService.status(req.user.jwt);
-        logger.info(body);
-        logger.res(httpStatus.OK, body);
-        res.json(body).status(httpStatus.OK);
-    } catch (e) {
-        logger.error(e);
-        const statusCode = e.statusCode || httpStatus.INTERNAL_SERVER_ERROR;
-        errorHandler(new ApiError(statusCode, e.message, {stack:e.stack, isFatal: true}), req, res, next);
-    }
-};
-
 export const usingStatus = async (req: Request, res: Response, next: NextFunction) => {
     try {
         logger.log('req.user?.jwt:', req.user?.jwt);

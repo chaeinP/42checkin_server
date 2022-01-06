@@ -4,20 +4,21 @@ import {generateToken, IJwtUser} from '@modules/strategy.jwt';
 import logger from '@modules/logger';
 import ApiError from '@modules/api.error';
 import { CHECK_STATE, CLUSTER_CODE, CLUSTER_TYPE } from '@modules/cluster';
-import { Users } from '@models/users';
+import {IUser, Users} from '@models/users';
 import { noticer } from '@modules/discord';
-import {getLocalDate, getTimezoneDateString} from '@modules/util';
+import {getTimezoneDateString} from '@modules/util';
 import * as historyService from '@service/history.service';
 import * as configService from '@service/config.service';
 import * as usageService from '@service/usage.service';
 import axios from "axios";
+import {ICheckInResponse, IUserStatusResponse} from "@controllers/v1/user.controller";
 
 /**
  * 미들웨어에서 넘어온 user정보로 JWT token 생성
  * */
-export const login = async (user: Users): Promise<string> => {
-    logger.log('login:', user);
-    const found = await Users.findOne({
+export const login = async (user: IUser): Promise<string> => {
+    logger.log('user:', JSON.stringify(user));
+    let found = await Users.findOne({
         where: {
             login: user.login,
             deleted_at: {
@@ -26,43 +27,53 @@ export const login = async (user: Users): Promise<string> => {
         }
     });
 
-    //처음 사용하는 유저의 경우 db에 등록
+    // 처음 사용하는 유저의 경우 db에 등록
     if (!found) {
-        await user.save();
-        logger.log('User created:', user);
-    } else if (found.email !== user.email) {
-        found.email = user.email;
+        found = await Users.create({
+            login: user.login,
+            type: user.type,
+            email: user.email,
+            access_token: user.access_token,
+            refresh_token: user.refresh_token,
+            profile: user.profile,
+            created_at: new Date()
+        });
         await found.save();
+        logger.log('User created:', found);
+    } else {
+        logger.log('User login:', found);
     }
 
-    const u = found ? found : user;
-
-    return generateToken(u);
+    return generateToken(found);
 };
 
 /**
  * 어드민 여부 확인
  */
 export const isAdmin = async (id: number) => {
-    const user = await Users.findOne({
-        where: {
-            _id: id,
-            deleted_at: {
-                [Op.eq]: null
+    try {
+        const user = await Users.findOne({
+            where: {
+                _id: id,
+                deleted_at: {
+                    [Op.eq]: null
+                }
             }
-        }
-    });
-    logger.log('isAdmin:', user.type);
-    return user.type;
+        });
+        logger.log('isAdmin:', user?.type);
+        return ['admin'].includes(user?.type);
+    } catch (e) {
+        logger.error(e);
+    }
+
+    return null;
 };
 
 /**
  * 어드민 여부 확인
  */
 export const assertAdminPrivilege = async (id: number) => {
-    const userType = await isAdmin(id);
-    logger.log('IsAdmin:', userType);
-    if (userType !== 'admin') {
+    if (!await isAdmin(id)) {
         let msg = '관리자 권한이 필요한 접근입니다.'
         throw new ApiError(httpStatus.FORBIDDEN, msg, {stack: new Error(msg).stack});
     }
@@ -72,7 +83,7 @@ export const assertAdminPrivilege = async (id: number) => {
 /**
  * 사용자 정보
  */
-export const getUser = async (id: number) => {
+export const getUserById = async (id: number) => {
     return await Users.findOne({
         where: {
             _id: id,
@@ -86,21 +97,26 @@ export const getUser = async (id: number) => {
 /**
  * 유저 및 카드 체크인 처리
  */
-export const checkIn = async (userInfo: IJwtUser, cardId: string) => {
+export const checkIn = async (userId: number, cardId: number): Promise<ICheckInResponse> => {
     let notice = false;
 
-    logger.log('userInfo: ', userInfo, ', cardId: ', cardId);
-    if (!userInfo) {
+    logger.log('userId: ', userId, ', cardId: ', cardId);
+    if (!userId) {
         throw new ApiError(httpStatus.UNAUTHORIZED, '유저 정보 없음', {stack: new Error().stack});
     }
 
-    const userId = userInfo._id;
-    const user = await getUser(userId);
+    const user = await getUserById(userId);
+    const userPrevState = user?.state;
     if (['checkin'].includes(user.state?.toLowerCase())) {
-        throw new ApiError(httpStatus.CONFLICT, '이미 체크인 하셨습니다.', {stack: new Error().stack});
+        return {
+            result: true,
+            card_no: cardId,
+            prev_state: userPrevState,
+            state: 'checkIn',
+            notice: false
+        };
     }
 
-    const _cardId = parseInt(cardId);
     const cardOwner = await Users.findOne({
         where: {
             card_no: cardId,
@@ -114,10 +130,10 @@ export const checkIn = async (userInfo: IJwtUser, cardId: string) => {
         throw new ApiError(httpStatus.CONFLICT, '이미 사용중인 카드입니다.', {stack: new Error().stack});
     }
 
-    const clusterType = user.getClusterType(_cardId)
+    const clusterType = user.getClusterType(cardId)
     const { enterCnt, maxCnt, result } = await checkCanEnter(clusterType, 'checkIn'); //현재 이용자 수 확인
 
-    logger.log('login: ', user.login, 'card_no: ', _cardId, 'max: ', maxCnt, 'used: ', enterCnt);
+    logger.log('login: ', user.login, 'card_no: ', cardId, 'max: ', maxCnt, 'used: ', enterCnt);
     if (!result) {
         logger.error({use: enterCnt, max: maxCnt});
         throw new ApiError(httpStatus.CONFLICT, `[${enterCnt}/${maxCnt}]클러스터 출입 최대 인원을 초과했습니다.`, {stack: new Error().stack, isFatal:true});
@@ -125,9 +141,9 @@ export const checkIn = async (userInfo: IJwtUser, cardId: string) => {
 
     // Users table에 log_id를 남기면서 순서가 뒤바뀌어서 card_no가 null이 되는 현상이 발생.
     // card_no를 user에 미리 세팅하고 history 생성한다.
-    user.card_no = _cardId;
+    user.card_no = cardId;
     let history = await historyService.create(user, 'checkIn');
-    await user.setState('checkIn', user.login, _cardId, history._id);
+    await user.setState('checkIn', user.login, cardId, history._id);
 
     // 남은 인원이 5명이하인 경우, 몇 명 남았는지 디스코드로 노티
     if (enterCnt + 1 >= maxCnt - 5) {
@@ -141,6 +157,9 @@ export const checkIn = async (userInfo: IJwtUser, cardId: string) => {
 
     return {
         result: true,
+        card_no: cardId,
+        prev_state: userPrevState,
+        state: user.state,
         notice: notice
     };
 };
@@ -148,16 +167,15 @@ export const checkIn = async (userInfo: IJwtUser, cardId: string) => {
 /**
  * 유저 및 카드 체크아웃 처리
  */
-export const checkOut = async (userInfo: IJwtUser) => {
-    logger.log('userInfo: ', userInfo);
-    if (!userInfo) {
+export const checkOut = async (userId: number) => {
+    logger.log('userId: ', userId);
+    if (!userId) {
         throw new ApiError(httpStatus.UNAUTHORIZED, '유저 정보 없음', {stack: new Error().stack});
     }
 
-    const id = userInfo._id;
     const user = await Users.findOne({
         where: {
-            _id: id,
+            _id: userId,
             deleted_at: {
                 [Op.eq]: null
             }
@@ -196,7 +214,7 @@ export const checkOut = async (userInfo: IJwtUser) => {
 /**
  * 유저 및 클러스터 상태 조회
  */
-export const status = async (userInfo: IJwtUser) => {
+export const status = async (userInfo: IJwtUser): Promise<IUserStatusResponse> => {
     if (!userInfo) {
         logger.error('IJwtUser is null !!');
         let msg = '유저 정보 없음';
@@ -324,8 +342,8 @@ export const getUsingInfo = async () => {
     })
     // noinspection JSPotentiallyInvalidTargetOfIndexedPropertyAccess
     return {
-        [CLUSTER_CODE[0]]: gaepo,
-        [CLUSTER_CODE[1]]: seocho
+        'gaepo': gaepo,
+        'seocho': seocho
     };
 }
 

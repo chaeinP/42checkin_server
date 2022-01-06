@@ -8,7 +8,7 @@ import { Config as IConfig } from '../../../src/models/config';
 import {getTimeFormat, getTimezoneDate} from '../../../src/modules/util';
 // @ts-ignore
 import { getCookie } from '../mock';
-import {Sequelize} from "../../../src/models/database";
+import {Database} from "../../../src/models/database";
 import { getCallerInfo } from '../../../src/modules/util';
 import logger from '../../../src/modules/logger';
 
@@ -31,7 +31,7 @@ describe(`[${getCallerInfo()}] 최대 수용인원수 가까이 입장했을때,
 
     before(async () => {
         // 서버에서 디비가 연결될 경우 emit하는 값을 감지한 후 done()을 호출해, 테스트 케이스를 시작한다.
-        await Sequelize().authenticate();
+        await Database().authenticate();
         cookie = await getCookie();
         const forceCheckoutAll = (users: any) =>
             Promise.all(

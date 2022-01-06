@@ -5,7 +5,7 @@ import {Association, DataTypes, Model, Optional} from 'sequelize';
 import { History } from './history';
 import logger from "@modules/logger";
 
-export interface UsersAttributes {
+export interface IUser {
     _id: number;
     login: string;
     type?: string;
@@ -42,9 +42,9 @@ export type usersOptionalAttributes =
     | "deleted_at"
     | "updated_at"
     | "created_at";
-export type usersCreationAttributes = Optional<UsersAttributes, usersOptionalAttributes>;
+export type usersCreationAttributes = Optional<IUser, usersOptionalAttributes>;
 
-export class Users extends Model<UsersAttributes, usersCreationAttributes> implements UsersAttributes {
+export class Users extends Model<IUser, usersCreationAttributes> implements IUser {
     _id!: number;
     login!: string;
     type?: string;

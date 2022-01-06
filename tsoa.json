@@ -1,9 +1,13 @@
 {
+    "info": {
+        "title": "42Checkin API",
+        "version": "2.1.5"
+    },
     "entryFile": "src/app.ts",
     "noImplicitAdditionalProperties": "throw-on-extras",
-    "controllerPathGlobs": ["src/controllers/*.ts"],
+    "controllerPathGlobs": ["src/controllers/*.ts", "src/controllers/v1/*.ts"],
     "spec": {
-        "outputDirectory": "src/swagger",
+        "outputDirectory": "src",
         "specVersion": 3,
         "spec": {
             "servers": [
@@ -16,9 +20,30 @@
                     "description": "development"
                 }
             ]
+        },
+        "securityDefinitions": {
+            "CookieAuth": {
+                "type": "apiKey",
+                "name": "w_auth_local",
+                "in": "cookie"
+            },
+            "OAuth42": {
+                "type": "oauth2",
+                "flows": {
+                    "clientCredentials": {
+                        "type": "oauth2",
+                        "authorizationUrl": "http://localhost:3000/user/login",
+                        "tokenUrl": "http://localhost:3000/user/login/token",
+                        "refreshUrl": "http://localhost:3000/user/token/refresh",
+                        "scopes": []
+                    }
+                }
+            }
         }
     },
     "routes": {
-        "routesDir": "src/routes"
+        "routesDir": "src/routes",
+        "middleware": "express",
+        "authenticationModule": "src/modules/auth.tsoa.ts"
     }
 }

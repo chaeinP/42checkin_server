@@ -5,19 +5,19 @@ import { expect } from 'chai';
 import httpStatus from 'http-status';
 import { CLUSTER_CODE } from '../../../src/modules/cluster';
 // @ts-ignore
-import { getCookie } from '../mock';
-import {Sequelize} from "../../../src/models/database";
+import {getCookie, getUserLoginName} from '../mock';
+import {Database} from "../../../src/models/database";
 import logger from '../../../src/modules/logger';
 import { getCallerInfo } from '../../../src/modules/util';
 
 let sessionCookie = '';
 const logCardKeys = ['_id','login','type','card_no', 'actor','deleted_at','updated_at','created_at','User'];
-const logCheckinKeys = ['_id','login','state','card_no', 'created_at'];
+const logCheckinKeys = ['_id', 'login', 'state', 'card_no', 'log_id', 'created_at'];
 
 describe(`[${getCallerInfo()}] log api test`, async () => {
 	before(async () => {
         try {
-            await Sequelize().authenticate();
+            await Database().authenticate();
             sessionCookie = await getCookie();
         } catch(e) {
             console.log(e);
@@ -58,7 +58,7 @@ describe(`[${getCallerInfo()}] log api test`, async () => {
 		});
 	});
 
-	const userName = 'yurlee';
+	const userName = getUserLoginName();
 	describe((`[${getCallerInfo()}] [${userName}]가 사용한 카드 로그 조회`), () => {
 		it(`객체로된 배열 형태의 데이터를 반환하는가? 내부에 닉네임이 존재하는가?`, async () => {
 			const res = await request(app).get(`/log/user/${userName}`).query({page: 1, listSize: 50}).set('Cookie', [sessionCookie]);
