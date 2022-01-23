@@ -5,7 +5,7 @@ import httpStatus from 'http-status';
 import Sequelize, {Op} from 'sequelize';
 import {Users} from 'src/models/users';
 import {History} from '@models/history';
-import {now} from '@modules/util';
+import {now} from '@modules/utils';
 
 /**
  * 유저의 로그정보를 조회한다.

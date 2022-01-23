@@ -1,9 +1,11 @@
 import {Router} from "express";
-import {MonitorController} from "@controllers/v1/monitor.contoller";
+import {authCheck, MonitorController} from "@controllers/v1/monitor.contoller";
 import logger from "@modules/logger";
 import httpStatus from "http-status";
 import {errorHandler} from "@modules/error";
 import ApiError from "@modules/api.error";
+import passport from "passport";
+import appRootPath from "app-root-path";
 
 export const path = '/monitor';
 export const router = Router();
@@ -22,4 +24,4 @@ router.get('/health', async function healthCheck(req, res, next) {
 
 });
 router.get('/disk', new MonitorController().getDisk);
-router.get('/auth', new MonitorController().getAuth);
+router.get('/auth', authCheck);

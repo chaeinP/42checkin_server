@@ -1,14 +1,14 @@
 import {Op} from 'sequelize';
 import {CHECK_STATE, CLUSTER_TYPE} from '@modules/cluster';
 import {Users} from '@models/users';
-import {getTimezoneDateString} from '@modules/util';
+import {getTimezoneDateTimeString} from '@modules/utils';
 import * as configService from '@service/config.service';
-import {ICluster} from "@controllers/v1/cluster.controller";
+import {Cluster} from "@controllers/v1/cluster.controller";
 
 /**
  * 두 클러스터의 사용중인 카드의 카운트를 가져온다
  */
-export const getClustersUsing = async (): Promise<ICluster> => {
+export const getClustersUsing = async (): Promise<Cluster> => {
     const gaepo = await Users.count({
         where: {
             card_no: {
@@ -45,7 +45,7 @@ export const getClustersUsing = async (): Promise<ICluster> => {
 const checkCanEnter = async (clusterType: CLUSTER_TYPE, checkType?: CHECK_STATE) => {
     const enterCnt = (await getClustersUsing())[clusterType];
     // 최대인원을 넘었으면 다 찼으면 체크인 불가
-    const today = getTimezoneDateString(new Date()).slice(0,10);
+    const today = getTimezoneDateTimeString(new Date()).slice(0,10);
     const config = await configService.getConfigByDate(today, 'checkCanEnter');
     const maxCnt = config[clusterType];
     return {

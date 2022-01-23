@@ -76,6 +76,9 @@ export const sendErrorMessage = (error: IError) => {
     axios.post(`${SLACK_API}${env.slack.alarm}`, body).catch(err => logger.error(err));
 };
 
+export const notifyJobError = () => {
+
+}
 
 class SlackAttachmentBuilder {
 	color: string;

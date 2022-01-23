@@ -4,7 +4,7 @@ import httpStatus from 'http-status';
 import { Config } from '@models/config';
 import Sequelize, { Op } from 'sequelize';
 import logger from "@modules/logger";
-import {getTimezoneDateString} from '@modules/util';
+import {getTimezoneDateTimeString} from '@modules/utils';
 import context from "express-http-context";
 
 /**
@@ -17,7 +17,7 @@ export const getConfigByDate = async (date: string, comment?: string) => {
 	const node_env = env.node_env ? env.node_env : 'development';
 
     if (!date) {
-        date = getTimezoneDateString(new Date()).slice(0,10);
+        date = getTimezoneDateTimeString(new Date()).slice(0,10);
         logger.log(`Date is empty... Use today: ${date}`);
     }
 

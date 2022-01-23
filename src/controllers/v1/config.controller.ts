@@ -1,12 +1,12 @@
 import * as configService from '@service/config.service';
 import logger from '@modules/logger';
 import httpStatus from 'http-status';
-import {Body, Controller, Get, Put, Query, Route} from 'tsoa';
+import {Body, Controller, Get, Put, Query, Route, Security} from 'tsoa';
 import {NextFunction, Request, Response} from "express";
 import {errorHandler} from "@modules/error";
 import ApiError from "@modules/api.error";
 
-interface IConfig {
+interface ConfigModel {
     _id: number;
     env?: string;
     auth?: string;
@@ -26,8 +26,8 @@ interface IConfig {
 
 
 export class ConfigRequest {
-    env?: IConfig;
-    values?: IConfig;
+    env?: ConfigModel;
+    values?: ConfigModel;
     date: string
 }
 
@@ -38,7 +38,7 @@ export class ConfigController extends Controller {
      * @param query
      */
     @Get('/')
-    public async getConfig(@Query() query?: any): Promise<IConfig> {
+    public async getConfig(@Query() query?: any): Promise<ConfigModel> {
         let payload;
         let { date } = query;
         try {
@@ -60,8 +60,9 @@ export class ConfigController extends Controller {
      * @param config
      * @param jwt
      */
+    @Security('api_key')
     @Put('/')
-    public async setConfig(@Body() config: ConfigRequest): Promise<IConfig> {
+    public async setConfig(@Body() config: ConfigRequest): Promise<ConfigModel> {
         let payload;
         try {
             // 규격 변경으로 인한 하위 호환성 확보를 위한 방어코드
@@ -82,7 +83,7 @@ export class ConfigController extends Controller {
     }
 }
 
-export const getConfigRouter = async (req: Request, res: Response, next: NextFunction) => {
+export const getConfig = async (req: Request, res: Response, next: NextFunction) => {
     const controller = new ConfigController();
     let response;
     let statusCode;
@@ -98,7 +99,7 @@ export const getConfigRouter = async (req: Request, res: Response, next: NextFun
     return res.status(statusCode).send(response);
 }
 
-export const setConfigRouter = async (req: Request, res: Response, next: NextFunction) => {
+export const setConfig = async (req: Request, res: Response, next: NextFunction) => {
     const controller = new ConfigController();
     let response;
     let statusCode;

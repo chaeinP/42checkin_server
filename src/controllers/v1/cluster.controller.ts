@@ -1,12 +1,11 @@
-import {Controller, Get, Request, Route} from 'tsoa';
-import * as express from "express";
+import {Controller, Get, Route} from 'tsoa';
 import logger from "@modules/logger";
 import * as ClusterService from "@service/cluster.service";
 import httpStatus from "http-status";
 import {errorHandler} from "@modules/error";
 import ApiError from "@modules/api.error";
 
-export interface ICluster {
+export interface Cluster {
     gaepo: number,
     seocho: number
 }
@@ -17,7 +16,7 @@ export class ClusterController extends Controller {
      * 클러스터 상태조회
      */
     @Get('using')
-    public async using(): Promise<ICluster> {
+    public async using(): Promise<Cluster> {
         try {
             const result = await ClusterService.getClustersUsing();
 
@@ -33,7 +32,7 @@ export class ClusterController extends Controller {
 
 }
 
-export async function ClusterUsingRouter(req, res, next) {
+export async function ClusterUsing(req, res, next) {
     try {
         const controller = new ClusterController();
         const result = await controller.using();

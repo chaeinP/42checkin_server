@@ -1,5 +1,5 @@
 import { CHECK_STATE, CLUSTER_CODE, CLUSTER_TYPE } from '@modules/cluster';
-import { now } from '@modules/util';
+import { now } from '@modules/utils';
 import * as Sequelize from 'sequelize';
 import {Association, DataTypes, Model, Optional} from 'sequelize';
 import { History } from './history';

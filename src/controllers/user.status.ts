@@ -5,7 +5,7 @@ import { Request, Response, NextFunction } from 'express';
 import { errorHandler } from '@modules/error';
 import httpStatus from 'http-status';
 import ApiError from '@modules/api.error';
-import {getPlanObject} from '@modules/util';
+import {getPlanObject} from '@modules/utils';
 
 export const usingStatus = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -62,7 +62,7 @@ export const forceCheckout = async (req: Request, res: Response, next: NextFunct
     try {
         logger.log('req.user?.jwt:', req.user?.jwt, req.params?.userId);
         const { userId } = req.params;
-        const body = await userService.forceCheckOut(req.user.jwt, userId);
+        const body = await userService.forceCheckOut(req.user.jwt, parseInt(userId));
         logger.info(getPlanObject(body));
         logger.res(httpStatus.OK, body);
         res.json(body).status(httpStatus.OK);

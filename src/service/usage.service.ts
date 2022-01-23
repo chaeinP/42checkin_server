@@ -2,7 +2,7 @@ import {Sequelize, Op} from "sequelize";
 import logger from '../modules/logger';
 import { Users } from 'src/models/users';
 import { Usages } from '@models/usages';
-import { now } from '@modules/util';
+import { now } from '@modules/utils';
 import {IJwtUser} from "@modules/strategy.jwt";
 
 const DIVIDER_FOR_DURATION = 1000;

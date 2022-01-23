@@ -7,16 +7,14 @@ import swaggerUi from 'swagger-ui-express';
 import env from './modules/env';
 import passport from 'passport';
 import cron from 'node-schedule';
-import axios from 'axios';
 import logger from './modules/logger';
 
 import * as requestIp from 'request-ip';
 import * as mainRouter from '@routes/main.router';
 import {errorConverter, errorHandler} from '@modules/error';
-import {getTimezoneDate} from '@modules/util';
-import * as configService from '@service/config.service';
 
 import sourceMapSupport from 'source-map-support'
+import {check42Intra} from "@modules/intra.42";
 sourceMapSupport.install();
 
 const port = env.port || 3000;
@@ -30,30 +28,8 @@ function getOrigins() {
 	return origins;
 }
 
-/**
- * 42 intra 장애가 잦아서 slack 로그인 전환 여부 확인을 위한 health check
-*/
-const check42Intra = async () => {
-    let strategy;
-    const today = getTimezoneDate(new Date()).toISOString().slice(0, 10)
-    let config = await configService.getConfigByDate(today, '42checkin_no_logging');
-    try {
-        const res = await axios.get('https://intra.42.fr');
-        strategy = res.status === 200 ? '42' : 'Slack';
-    } catch (e) {
-        logger.error(e);
-        strategy = 'Slack';
-    }
-
-    if (config?.auth !== strategy) {
-        await configService.setConfigByDate(today,{
-            auth: strategy
-        });
-    }
-}
-
 (async() => {
-    cron.scheduleJob('*/3 * * * *', check42Intra);
+    cron.scheduleJob('*/1 * * * *', check42Intra);
 })();
 
 app.use(cookieParser());

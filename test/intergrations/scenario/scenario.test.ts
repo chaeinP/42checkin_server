@@ -2,7 +2,6 @@ import request from 'supertest';
 import { app } from '../../../src/app';
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
-import httpStatus from 'http-status';
 import { CLUSTER_CODE } from '../../../src/modules/cluster';
 import { Config as IConfig } from '../../../src/models/config';
 import {getTimeFormat, getTimezoneDate} from '../../../src/modules/util';
@@ -11,6 +10,7 @@ import { getCookie } from '../mock';
 import {Database} from "../../../src/models/database";
 import { getCallerInfo } from '../../../src/modules/util';
 import logger from '../../../src/modules/logger';
+import {apiStatus} from "../../../src/modules/api.status";
 
 let cookie = '';
 
@@ -49,7 +49,11 @@ describe(`[${getCallerInfo()}] 최대 수용인원수 가까이 입장했을때,
                 .then(async (res) => await forceCheckoutAll(res.body.list));
         await checkoutAllIn(CLUSTER_CODE.seocho);
         await checkoutAllIn(CLUSTER_CODE.gaepo);
-        const res = await request(app).get(`/user/using`).set('Cookie', [cookie])
+        let res = await request(app).get(`/user/using`).set('Cookie', [cookie])
+        logger.log(JSON.stringify(res));
+
+        // 테스트 시작 전에 이전 테스트 실패로 값이 변경된 상태일 수 있으므로 초기화 한다.
+        res = await request(app).put(`/config`).send({ env: { gaepo: 12, seocho: 34 }, today }).set('Cookie', [cookie]);
         logger.log(JSON.stringify(res));
     });
 
@@ -80,7 +84,7 @@ describe(`[${getCallerInfo()}] 최대 수용인원수 가까이 입장했을때,
             const cardID = 9;
             const res = await request(app).post(`/user/checkIn/${cardID}`).set('Cookie', [cookie]);
             expect(res.body.result).to.equal(true);
-            expect(res.body.notice).to.equal(true);
+            expect(res.body.payload?.notice).to.equal(true);
         });
     });
 
@@ -100,7 +104,8 @@ describe(`[${getCallerInfo()}] 최대 수용인원수 가까이 입장했을때,
             // 체크인
             const cardID = 9;
             const res = await request(app).post(`/user/checkIn/${cardID}`).set('Cookie', [cookie]);
-            expect(res.body.code).to.equal(httpStatus.CONFLICT);
+            expect(res.body.result).to.equal(false);
+            expect(res.body.code).to.equal(apiStatus.NOT_ACCEPTABLE);
         });
 
         it('최대수용가능 인원수를 원래대로 복구', async () => {

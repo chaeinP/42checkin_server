@@ -20,15 +20,25 @@ export const getLocalDate = (date: Date) => {
     return moment(date).tz(TZ);
 }
 
-export const getTimezoneDate = (dt : Date) => {
-    const offset = dt.getTimezoneOffset()
-    return  new Date(dt.getTime() - (offset*60*1000));
+/**
+ * Date Object에서 timezone 정보로 강제 계산한 Date Object를 반환한다
+ *
+ * @param {Date} date Local Date Object
+ * @return {Date} Date Object
+ */
+export const getTimezoneDate = (date : Date) => {
+    const offset = date.getTimezoneOffset()
+    return new Date(date.getTime() - (offset*60*1000));
 }
-export const getTimezoneDateString = (dt : Date) => {
-    return getDateString(getTimezoneDate(dt));
+export const getTimezoneDateTimeString = (dt : Date) => {
+    return getDateTimeString(getTimezoneDate(dt));
 }
 
-export const getDateString = (dt : Date) => {
+export const getTimezoneDateString = (dt : Date) => {
+    return getTimezoneDate(dt).toISOString().slice(0, 10);
+}
+
+export const getDateTimeString = (dt : Date) => {
     return dt.toISOString().replace('T', ' ').split('.')[0];
 }
 
@@ -39,6 +49,63 @@ export const getTimeNumber = (t : string) => {
     let seconds = data.length > 2 ? parseInt(data[2]) : 0;
 
     return (hour * 3600) + (minute * 60) + seconds;
+}
+
+/**
+ * diff 값을 Human readable String으로 변환
+ *
+ * @param diff miliseconds
+ * @param isShort
+ * @returns {string}
+ */
+export const getDateDiffString = (diff, isShort) => {
+    let diffDays = Math.floor(diff / 86400000); // days
+    let diffHrs = Math.floor((diff % 86400000) / 3600000); // hours
+    let diffMins = Math.round(((diff % 86400000) % 3600000) / 60000); // minutes
+    let diffSecs = Math.round(((diff % 86400000) % 3600000) % 60000); // seconds
+
+    let str = '';
+    if (diffDays > 0) {
+        str = `${diffDays}${isShort ? 'd' : ' days'} `;
+    }
+
+    if (diffHrs > 0) {
+        str += `${diffHrs}${isShort ? 'h' : ' hours'} `;
+    }
+
+    if (diffMins > 0) {
+        str += `${diffMins}${isShort ? 'm' : ' minutes'}`;
+    }
+
+    if (str.length < 1) {
+        str += `${diffSecs}${isShort ? 's' : ' seconds'}`;
+    }
+
+    return str;
+}
+
+/**
+ * diff 값을 일자, 시간, 분으로 계산
+ *
+ * @param diff miliseconds
+ * @returns {number[]}
+ */
+export const getDateDiffValues = (diff) => {
+    let diffDays = Math.floor(diff / 86400000); // days
+    let diffHrs = Math.floor((diff % 86400000) / 3600000); // hours
+    let diffMins = Math.round(((diff % 86400000) % 3600000) / 60000); // minutes
+
+    if (diffMins >= 60) {
+        diffHrs++;
+        diffMins = 0;
+    }
+
+    if (diffHrs >= 24) {
+        diffDays++;
+        diffHrs = 0;
+    }
+
+    return [diffDays, diffHrs, diffMins];
 }
 
 export const getPlanObject = (data: any) => {

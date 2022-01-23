@@ -1,48 +1,77 @@
 import * as express from "express";
+import {NextFunction} from "express";
 import * as userService from '@service/user.service';
-import {isAdmin} from '@service/user.service';
 import httpStatus from 'http-status';
 import logger from '@modules/logger';
 import ApiError from "@modules/api.error";
-import {getConfigByDate} from "@service/config.service";
-import {getTimeNumber, getTimezoneDate} from "@modules/util";
-import {Controller, Get, Path, Post, Request, Response, Route} from "tsoa";
+import {Controller, Example, Get, Path, Post, Request, Response, Route, Security} from "tsoa";
 import {errorHandler} from "@modules/error";
-import {NextFunction} from "express";
 import * as authService from "@service/auth.service";
 import env from "@modules/env";
+import {apiStatus} from "@modules/api.status";
 
-export interface ICheckInResponse {
+export interface CheckInResponse {
     /**
-     * Checkin Result
+     * HTTP status code
+     */
+    status: number;
+    /**
+     * Checkin result is Success or Fail
      */
     result: boolean;
     /**
-     * Card number
+     * API Result code
      */
-    card_no?: number;
+    code?: number;
     /**
-     * The User state after checkin
+     * Result message
      */
-    state?: string;
+    message?: string;
     /**
-     * The Previous user state before checkin. The value is 'checkIn' if duplicate checkin operation.
+     * Additional Data
      */
-    prev_state?: string;
-    /**
-     * A discord notification result when an available count is less than 5
-     */
-    notice?: boolean;
+    payload?: {
+        /**
+         * Card number
+         */
+        card_no?: number;
+        /**
+         * The User state after checkin
+         *
+         * @example 'checkIn', 'checkOut', 'null'
+         */
+        state?: string;
+        /**
+         * The Previous user state before checkin. The value is 'checkIn' if duplicate checkin operation.
+         */
+        prev_state?: string;
+        /**
+         * A discord notification result when an available count is less than 5
+         */
+        notice?: boolean;
+    }
 }
 
-export interface ICheckOutResponse {
+export interface CheckOutResponse {
+    /**
+     * HTTP status code
+     */
+    status: number;
     /**
      * CheckOut Result
      */
     result: boolean;
+    /**
+     * API Result code
+     */
+    code?: number;
+    /**
+     * Result message
+     */
+    message?: string;
 }
 
-export interface IUserStatus {
+export interface UserStatus {
     login: string,
     card: number,
     state: string,
@@ -52,8 +81,8 @@ export interface IUserStatus {
     profile_image_url: string
 }
 
-export interface IUserStatusResponse {
-    user: IUserStatus,
+export interface UserStatusResponse {
+    user: UserStatus,
     cluster: {
         gaepo: number,
         seocho: number
@@ -61,63 +90,159 @@ export interface IUserStatusResponse {
     isAdmin: boolean
 }
 
-const CheckInFail: ICheckInResponse = {
-    result: false,
+interface CheckInFail {
+    status: number;
+    result: boolean;
+    code?: number;
+    message?: string;
 }
 
-const CheckOutFail: ICheckOutResponse = {
-    result: false
+interface CheckOutFail {
+    status: number;
+    result: boolean;
+    code?: number;
+    message?: string;
 }
 
-/**
- * 특정 시간이 최소 시간과 최대 시간 사이에 있는지 검사한다
- * @param target 확인하려는 시간 문자열 ex) '12:00'
- * @param min 최소 시간
- * @param max 최대 시간
- *
- * @return boolean 시간이 범위에 있는지 여부
- */
-const isBetween = (target: string, min: any, max: any) => {
-    let now = getTimeNumber(target);
-    let checkin_at = (min !== null && min !== undefined) ? getTimeNumber(min) : -1;
-    let checkout_at = (max !== null && max !== undefined) ? getTimeNumber(max) : Number.MAX_SAFE_INTEGER;
-
-    let result = (now >= checkin_at) && (now < checkout_at);
-    if (!result) {
-        logger.log('now: ', now, ', checkin_at: ', checkin_at, ', checkout_at: ', checkout_at);
-        logger.log('now: ', getTimeNumber(target), ', min: ', min, ', max: ', max);
-    }
-
-    return result;
-}
-
-const isCheckAvailable = async (message: string) => {
-    // noinspection DuplicatedCode
-    const today = getTimezoneDate(new Date()).toISOString().slice(0, 10)
-    const config = await getConfigByDate(today);
-    if (!config) {
-        let msg = `해당 날짜(${today})의 설정값이 서버에 존재하지 않습니다.`;
-        logger.error(msg, 'date:', today, 'setting:', config);
-        throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, msg, {stack: new Error(msg).stack});
-    }
-
-    let now = getTimezoneDate(new Date()).toISOString().slice(11, 19);
-    if (!isBetween(now, config.checkin_at, config.checkout_at)) {
-        logger.log('now: ', now, ', checkin_at: ', config.checkin_at, ', checkout_at: ', config.checkout_at);
-        let open_at = config.open_at ? config.open_at : '';
-        let close_at = config.close_at ? config.close_at : '';
-        if (!config.checkin_at && !config.close_at) {
-            open_at = '00:00'
-            close_at = '24:00'
+@Route("v1/user")
+export class UserController extends Controller {
+    /**
+     * Checkin
+     */
+    @Example<CheckInResponse>({
+        status: httpStatus.OK,
+        result: true,
+        code: apiStatus.CONFLICT,
+        payload: {
+            card_no: 10,
+            state: 'checkIn',
+            prev_state: 'checkOut',
+            notice: false
         }
-        let msg = `${message}\n(가능시간: ${open_at} ~ ${close_at})`;
-        throw new ApiError(httpStatus.NOT_FOUND, msg, {
-            stack: new Error(msg).stack,
-            isFatal: false
-        });
+    })
+    @Response<CheckInResponse>(200, 'OK',{
+        status: httpStatus.OK,
+        result: true,
+        code: apiStatus.OK,
+        payload: {
+            card_no: 10,
+            state: 'checkIn',
+            prev_state: 'checkOut',
+            notice: false
+        }
+    })
+    @Response<CheckInResponse>(401, 'Unauthorized', {
+        status: httpStatus.UNAUTHORIZED,
+        code: apiStatus.UNAUTHORIZED,
+        message: "Unauthorized",
+        result: false,
+    })
+    @Response<CheckInResponse>(406, 'Not Acceptable', {
+        code: apiStatus.NOT_ACCEPTABLE,
+        message: "Not Acceptable",
+        result: false,
+        status: httpStatus.NOT_ACCEPTABLE
+    })
+    @Response<CheckInResponse>(500, 'Internal Server Error', {
+        status: httpStatus.INTERNAL_SERVER_ERROR,
+        code: apiStatus.INTERNAL_SERVER_ERROR,
+        message: "Internal Server Error",
+        result: false,
+    })
+    /**
+     * @param cardId The card number
+     * @example cardId "1"
+     * @example cardId "1024"
+     */
+    @Security('api_key')
+    @Post("/checkIn/{cardId}")
+    public async checkIn(
+        @Path() cardId: number,
+        @Request() req: express.Request,
+    ): Promise<CheckInResponse> {
+        try {
+            let userId = req.user?.jwt?._id;
+            if (userId === undefined) {
+                let msg = `사용자 정보 오류 ${userId}`;
+                errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, msg, {stack:new Error().stack, isFatal: true}), req, req.res, null);
+            }
+
+            const result = await userService.checkIn(userId, cardId);
+            logger.res(httpStatus.OK, result);
+            this.setStatus(httpStatus.OK);
+            return result;
+        } catch (e) {
+            logger.error(e);
+            const statusCode = e.statusCode || httpStatus.INTERNAL_SERVER_ERROR;
+            this.setStatus(statusCode);
+            errorHandler(new ApiError(statusCode, e.message, {stack:e.stack, isFatal: true}), req, req.res, null);
+        }
+
+        return {
+            status: httpStatus.INTERNAL_SERVER_ERROR,
+            result: false,
+            code: apiStatus.INTERNAL_SERVER_ERROR,
+            message: 'INTERNAL_SERVER_ERROR'
+        };
     }
 
-    return true;
+    @Security('api_key')
+    @Post("/checkOut")
+    public async checkOut(@Request() req: express.Request): Promise<CheckOutResponse> {
+        let userId = req.user?.jwt?._id;
+        if (userId === undefined) {
+            let msg = `사용자 정보 오류 ${userId}`;
+            errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, msg,
+                {stack:new Error().stack, isFatal: true}), req, req.res, null);
+            return {
+                status: httpStatus.INTERNAL_SERVER_ERROR,
+                result: false,
+                code: apiStatus.INTERNAL_SERVER_ERROR,
+                message: 'INTERNAL_SERVER_ERROR'
+            };
+        }
+
+        try {
+            const result = await userService.checkOut(userId);
+            logger.res(httpStatus.OK, result);
+            this.setStatus(httpStatus.OK);
+            return result;
+        } catch (e) {
+            logger.error(e);
+            const statusCode = e.statusCode || httpStatus.INTERNAL_SERVER_ERROR;
+            this.setStatus(statusCode);
+            errorHandler(new ApiError(statusCode, e.message,
+                {stack:e.stack, isFatal: true}), req, req.res, null);
+        }
+
+        return {
+            status: httpStatus.INTERNAL_SERVER_ERROR,
+            result: false,
+            code: apiStatus.INTERNAL_SERVER_ERROR,
+            message: 'INTERNAL_SERVER_ERROR'
+        };
+    }
+
+    /**
+     * 유저 상태조회
+     */
+    @Security('api_key')
+    @Get('/status')
+    public async status (@Request() req: express.Request): Promise<UserStatusResponse> {
+        try {
+            logger.log('req.user?.jwt:', req.user?.jwt);
+            const result = await userService.status(req.user.jwt);
+            logger.info(result);
+            logger.res(httpStatus.OK, result);
+
+            this.setStatus(httpStatus.OK)
+            return result;
+        } catch (e) {
+            logger.error(e);
+            const statusCode = e.statusCode || httpStatus.INTERNAL_SERVER_ERROR;
+            errorHandler(new ApiError(statusCode, e.message, {stack:e.stack, isFatal: true}), req, req.res, null);
+        }
+    };
 }
 
 export const login = async (req: express.Request, res: express.Response, next: NextFunction) => {
@@ -161,87 +286,7 @@ export const callback = async (req: express.Request, res: express.Response, next
     }
 };
 
-@Route("v1/user")
-export class UserController extends Controller {
-    @Post("/checkIn/{cardId}")
-    public async checkIn(
-        @Path() cardId: number,
-        @Request() req: express.Request,
-    ): Promise<ICheckInResponse> {
-        try {
-            let userId = req.user?.jwt?._id;
-            if (userId === undefined) {
-                let msg = `사용자 정보 오류 ${userId}`;
-                errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, msg, {stack:new Error().stack, isFatal: true}), null, null, null);
-                return CheckInFail;
-            }
-
-            const admin = await isAdmin(userId);
-            const available = admin && await isCheckAvailable('체크인 가능 시간이 아닙니다.');
-            if (!available) return CheckInFail;
-
-            const result = await userService.checkIn(userId, cardId);
-            logger.res(httpStatus.OK, result);
-            this.setStatus(httpStatus.OK);
-            return result;
-        } catch (e) {
-            logger.error(e);
-            const statusCode = e.statusCode || httpStatus.INTERNAL_SERVER_ERROR;
-            this.setStatus(statusCode);
-            errorHandler(new ApiError(statusCode, e.message, {stack:e.stack, isFatal: true}), req, null, null);
-        }
-
-        return CheckInFail;
-    }
-
-    @Post("/checkOut")
-    public async checkOut(@Request() req: express.Request): Promise<ICheckOutResponse> {
-        let userId = req.user?.jwt?._id;
-        if (userId === undefined) {
-            let msg = `사용자 정보 오류 ${userId}`;
-            errorHandler(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, msg,
-                {stack:new Error().stack, isFatal: true}), null, null, null);
-            return CheckOutFail;
-        }
-
-        try {
-            const result = await userService.checkOut(userId);
-            logger.res(httpStatus.OK, result);
-            this.setStatus(httpStatus.OK);
-            return result;
-        } catch (e) {
-            logger.error(e);
-            const statusCode = e.statusCode || httpStatus.INTERNAL_SERVER_ERROR;
-            this.setStatus(statusCode);
-            errorHandler(new ApiError(statusCode, e.message,
-                {stack:e.stack, isFatal: true}), req, null, null);
-        }
-
-        return CheckOutFail;
-    }
-
-    /**
-     * 유저 상태조회
-     */
-    @Get('/status')
-    public async status (@Request() req: express.Request): Promise<IUserStatusResponse> {
-        try {
-            logger.log('req.user?.jwt:', req.user?.jwt);
-            const result = await userService.status(req.user.jwt);
-            logger.info(result);
-            logger.res(httpStatus.OK, result);
-
-            this.setStatus(httpStatus.OK)
-            return result;
-        } catch (e) {
-            logger.error(e);
-            const statusCode = e.statusCode || httpStatus.INTERNAL_SERVER_ERROR;
-            errorHandler(new ApiError(statusCode, e.message, {stack:e.stack, isFatal: true}), req, null, null);
-        }
-    };
-}
-
-export async function CheckInRouter(req: express.Request, res, next) {
+export async function CheckIn(req: express.Request, res: express.Response, next) {
     try {
         const cardId = parseInt(req.params?.cardId);
         const controller = new UserController();
@@ -255,7 +300,7 @@ export async function CheckInRouter(req: express.Request, res, next) {
     }
 }
 
-export async function CheckOutRouter(req: express.Request, res, next) {
+export async function CheckOut(req: express.Request, res: express.Response, next) {
     try {
         const controller = new UserController();
         const result = await controller.checkOut(req);
@@ -268,7 +313,7 @@ export async function CheckOutRouter(req: express.Request, res, next) {
     }
 }
 
-export async function StatusRouter(req, res, next) {
+export async function Status(req: express.Request, res: express.Response, next) {
     try {
         const controller = new UserController();
         const result = await controller.status(req);

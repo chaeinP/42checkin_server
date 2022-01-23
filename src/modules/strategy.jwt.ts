@@ -22,6 +22,8 @@ const validate = (payload: any) => {
     context.set('login', payload?.username ? payload?.username : '');
     logger.log('payload:', payload);
 
+
+
 	return { _id: payload.sub, name: payload.username };
 };
 

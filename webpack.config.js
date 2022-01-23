@@ -12,8 +12,10 @@ dotenv.config({
     path: `.env.${process.env.NODE_ENV}`
 });
 const output_path = `dist.${process.env.NODE_ENV}`;
+const mode = NODE_ENV?.toLocaleString().startsWith('prod') ? 'production' : 'development';
 
 module.exports = {
+    mode: mode,
 	entry: './src/app.ts',
 	target: 'node',
 	externals: [nodeExternals()],
@@ -24,6 +26,8 @@ module.exports = {
 		filename: 'app.js',
 		path: path.resolve(__dirname, output_path)
 	},
+    // "^(inline-|hidden-|eval-)?(nosources-)?(cheap-(module-)?)?source-map$"
+    // devtool: 'eval-cheap-module-source-map',
 	devtool: 'source-map',
 	resolve: {
 		// Add `.ts` and `.tsx` as a resolvable extension.

@@ -1,9 +1,14 @@
-import {Controller, Example, Get, Route} from "tsoa";
+import {Controller, Example, Get, Request, Response, Route, Security} from "tsoa";
 import logger from "@modules/logger";
 import {Database} from "@models/database";
 import {exec} from 'child_process';
 import passport from "passport";
 import httpStatus from "http-status";
+import appRootPath from "app-root-path";
+import * as express from "express";
+import {errorHandler} from "@modules/error";
+import ApiError from "@modules/api.error";
+import {apiStatus} from "@modules/api.status";
 
 /**
  * User objects allow you to associate actions performed
@@ -11,7 +16,7 @@ import httpStatus from "http-status";
  * The User object contains common information across
  * every user in the system regardless of status and role.
  */
-export interface IHealthResponse {
+export interface HealthResponse {
     status?: string;
     /**
      * Error message
@@ -23,7 +28,7 @@ export interface IHealthResponse {
     version?: string;
 }
 
-export interface IDiskResponse {
+export interface DiskResponse {
     /**
      * Partition path
      */
@@ -36,9 +41,30 @@ export interface IDiskResponse {
     error?: string;
 }
 
-export interface IAuthResponse {
-    version?: string;
-    error?: string;
+export interface AuthResponse {
+    /**
+     * HTTP status code
+     */
+    status: number;
+    /**
+     * Checkin result is Success or Fail
+     */
+    result: boolean;
+    /**
+     * API Result code
+     */
+    code?: number;
+    /**
+     * Result message
+     */
+    message?: string;
+    /**
+     * Additional Data
+     */
+    payload?: {
+        user_id?: number;
+        login?: string;
+    }
 }
 
 @Route("v1/monitor")
@@ -46,17 +72,17 @@ export class MonitorController extends Controller {
     /**
      * Check server status whether it is alive or not
      */
-    @Example<IHealthResponse>({
+    @Example<HealthResponse>({
         status: "ok",
         message: "the server is healthy",
         version: "2.1.5"
     })
-    @Get("/health")
-    public async getHealth(): Promise<IHealthResponse> {
-        let response: IHealthResponse;
+    @Get("health")
+    public async getHealth(): Promise<HealthResponse> {
+        let response: HealthResponse;
         try {
             await Database().authenticate();
-            const pkg = require('../../package.json');
+            const pkg = require(appRootPath + '/package.json');
             response = {
                 version: pkg?.version
             };
@@ -74,8 +100,8 @@ export class MonitorController extends Controller {
         return response;
     }
 
-    @Get("/disk")
-    public async getDisk(): Promise<IDiskResponse> {
+    @Get("disk")
+    public async getDisk(): Promise<DiskResponse> {
         let diskInfo = {};
         try {
             exec("df -h", (error, stdout, stderr) => {
@@ -120,21 +146,68 @@ export class MonitorController extends Controller {
         return diskInfo;
     }
 
-    @Get("/auth")
-    public async getAuth(): Promise<IAuthResponse> {
-        let response: IAuthResponse;
-
-        try {
-            response = await passport.authenticate('jwt');
-            const pkg = require('../../package.json');
-            response['pkg'] = pkg?.version;
-            logger.res(httpStatus.OK, response);
-            this.setStatus(httpStatus.OK)
-        } catch (e) {
-            this.setStatus(httpStatus.INTERNAL_SERVER_ERROR)
-            return {error: e.message};
+    @Response<AuthResponse>(200, 'OK',{
+        status: 200,
+        result: true,
+        code: 2000,
+        payload: {
+            user_id: 42,
+            login: 'born2code'
         }
+    })
+    @Response<AuthResponse>(401, 'Unauthorized', {
+        status: 401,
+        code: 4010,
+        message: "Unauthorized",
+        result: false,
+    })
+    @Security('api_key')
+    @Get("/auth")
+    public async auth(@Request() req: express.Request): Promise<AuthResponse> {
+        const _self = this;
+        this.setStatus(httpStatus.INTERNAL_SERVER_ERROR)
 
-        return response;
-    };
+        return new Promise(((resolve, reject) => {
+            passport.authenticate('jwt', function(err, user, info) {
+                logger.log('err: ', err);
+                logger.log('user: ', user);
+                logger.log('info: ', info);
+
+                if (err || !user) {
+                    _self.setStatus(httpStatus.UNAUTHORIZED)
+                    return resolve({
+                        status: httpStatus['UNAUTHORIZED'],
+                        message: err?.message || info?.message,
+                        code: apiStatus['UNAUTHORIZED'],
+                        result: false
+                    })
+                }
+
+                _self.setStatus(httpStatus.OK)
+                return resolve({
+                    status: httpStatus['OK'],
+                    code: apiStatus['OK'],
+                    result: true,
+                    payload: {
+                        user_id: user?.jwt?._id,
+                        login: user?.jwt?.name
+
+                    }
+                })
+            })(req, req.res);
+        }));
+    }
+}
+
+export const authCheck = async (req, res, next) => {
+    try {
+        const controller = new MonitorController();
+        const result = await controller.auth(req);
+
+        res.status(controller.getStatus() || httpStatus.OK).json(result);
+    } catch (e) {
+        logger.error(e);
+        const statusCode = e.statusCode || httpStatus.INTERNAL_SERVER_ERROR;
+        errorHandler(new ApiError(statusCode, e.message, {stack:e.stack, isFatal: true}), req, res, () => {});
+    }
 }
