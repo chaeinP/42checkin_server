@@ -4,7 +4,7 @@ import httpStatus from 'http-status';
 import passport from 'passport';
 import logger from '@modules/logger';
 import { Users } from '@models/database';
-import { now } from './util';
+import { now } from './utils';
 import {Op} from "sequelize";
 
 let FortyTwoStrategy = require('passport-42').Strategy;

@@ -1,7 +1,7 @@
 import {dailyfile} from 'tracer';
 import tracer from 'cls-rtracer';
 import context from 'express-http-context';
-import {getPlanObject} from './util';
+import {getPlanObject} from './utils';
 import getCurrentLine from 'get-current-line';
 
 const rootFolder = './logs';

@@ -110,9 +110,9 @@ export class UserController extends Controller {
      * Checkin
      */
     @Example<CheckInResponse>({
-        status: httpStatus.OK,
+        status: 200, /* OK */
         result: true,
-        code: apiStatus.CONFLICT,
+        code: 2000, /* OK */
         payload: {
             card_no: 10,
             state: 'checkIn',
@@ -120,10 +120,22 @@ export class UserController extends Controller {
             notice: false
         }
     })
-    @Response<CheckInResponse>(200, 'OK',{
-        status: httpStatus.OK,
+    @Example<CheckInResponse>({
+        status: 200, /* OK */
         result: true,
-        code: apiStatus.OK,
+        code: 4090, /* CONFLICT */
+        message: '이미 체크인 상태입니다',
+        payload: {
+            card_no: 10,
+            state: 'checkIn',
+            prev_state: 'checkIn',
+            notice: false
+        }
+    })
+    @Response<CheckInResponse>(200, 'OK',{
+        status: 200, /* OK */
+        result: true,
+        code: 2000, /* OK */
         payload: {
             card_no: 10,
             state: 'checkIn',
@@ -132,20 +144,20 @@ export class UserController extends Controller {
         }
     })
     @Response<CheckInResponse>(401, 'Unauthorized', {
-        status: httpStatus.UNAUTHORIZED,
-        code: apiStatus.UNAUTHORIZED,
+        status: 401, /* UNAUTHORIZED */
+        code: 4010, /* UNAUTHORIZED */
         message: "Unauthorized",
         result: false,
     })
     @Response<CheckInResponse>(406, 'Not Acceptable', {
-        code: apiStatus.NOT_ACCEPTABLE,
+        status: 406, /* NOT_ACCEPTABLE */
+        code: 4060, /* NOT_ACCEPTABLE */
         message: "Not Acceptable",
-        result: false,
-        status: httpStatus.NOT_ACCEPTABLE
+        result: false
     })
     @Response<CheckInResponse>(500, 'Internal Server Error', {
-        status: httpStatus.INTERNAL_SERVER_ERROR,
-        code: apiStatus.INTERNAL_SERVER_ERROR,
+        status: 500, /* INTERNAL_SERVER_ERROR */
+        code: 5000,
         message: "Internal Server Error",
         result: false,
     })

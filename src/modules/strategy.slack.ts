@@ -2,7 +2,7 @@ import env from '@modules/env';
 import passport from 'passport';
 import logger from '@modules/logger';
 import {Users} from '@models/database';
-import {now} from './util';
+import {now} from './utils';
 import {Op} from "sequelize";
 
 const PassportStrategySlack = require('passport-slack-oauth2').Strategy;
