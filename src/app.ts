@@ -13,17 +13,17 @@ import * as requestIp from 'request-ip';
 import * as mainRouter from '@routes/main.router';
 import {errorConverter, errorHandler} from '@modules/error';
 
-import sourceMapSupport from 'source-map-support'
+// import sourceMapSupport from 'source-map-support'
 import {check42Intra} from "@modules/intra.42";
-sourceMapSupport.install();
+// sourceMapSupport.install();
 
 const port = env.port || 3000;
 export const app = express();
 
 function getOrigins() {
-	const origins = [env.url.client, env.url.admin];
+	const origins = [env.url.client!, env.url.admin!];
 	if (env.node_env === 'production') {
-		origins.push(env.url.client_old);
+		origins.push(env.url.client_old!);
 	}
 	return origins;
 }
@@ -49,7 +49,7 @@ app.use((req, res, next) => {
     }
 	next();
 });
-app.use('/docs', passport.authenticate('jwt'), swaggerUi.serve, swaggerUi.setup(require('./swagger.json')));
+app.use('/v1/docs', passport.authenticate('jwt'), swaggerUi.serve, swaggerUi.setup(require('./swagger.json')));
 app.use(mainRouter.path, mainRouter.router);
 app.use(errorConverter);
 app.use(errorHandler);
@@ -58,4 +58,3 @@ app.listen(port, () => {
     logger.log(`🚀 App listening on the port ${port}`);
     logger.log(`=================================`);
 });
-

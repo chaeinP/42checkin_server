@@ -18,7 +18,8 @@
         /*"noImplicitReturns": true,*/
         /*"noUnusedLocals": true,*/
         /*"strictNullChecks": true,*/
-        /*"noImplicitAny": true,*/
+        /* "noImplicitAny": true, */
+        // "strict": true, /* chaepark 추가 */
         "moduleResolution": "node",
         "sourceMap": true,
         "skipLibCheck": true,

@@ -29,10 +29,10 @@ export const check42Intra = async () => {
             logger.log('Profile empty:', user);
         }
 
-        await axios.get(`/v2/users/${user.login}`, {
-            headers: {
-            },
-        });
+        // await axios.get(`/v2/users/${user.login}`, {
+        //     headers: {
+        //     },
+        // });
 
         const res = await axios.get('https://intra.42.fr');
         strategy = res.status === 200 ? '42' : 'Slack';

@@ -1,3 +1,5 @@
+import { CheckOutResponse } from '@controllers/v1/user.controller';
+import { Usages } from './../models/usages';
 import moment from 'moment-timezone';
 import path from "path";
 
@@ -58,7 +60,7 @@ export const getTimeNumber = (t : string) => {
  * @param isShort
  * @returns {string}
  */
-export const getDateDiffString = (diff, isShort) => {
+export const getDateDiffString = (diff: number, isShort: boolean) => {
     let diffDays = Math.floor(diff / 86400000); // days
     let diffHrs = Math.floor((diff % 86400000) / 3600000); // hours
     let diffMins = Math.round(((diff % 86400000) % 3600000) / 60000); // minutes
@@ -90,7 +92,7 @@ export const getDateDiffString = (diff, isShort) => {
  * @param diff miliseconds
  * @returns {number[]}
  */
-export const getDateDiffValues = (diff) => {
+export const getDateDiffValues = (diff: number) => {
     let diffDays = Math.floor(diff / 86400000); // days
     let diffHrs = Math.floor((diff % 86400000) / 3600000); // hours
     let diffMins = Math.round(((diff % 86400000) % 3600000) / 60000); // minutes
@@ -108,12 +110,11 @@ export const getDateDiffValues = (diff) => {
     return [diffDays, diffHrs, diffMins];
 }
 
-export const getPlanObject = (data: any) => {
-    let result = { ...data};
+export const getPlainObject = (data: Usages[]) => {
+    let result = { list : [] }
     try {
-        if (Array.isArray(data?.list)) {
-            result.list = [];
-            for (let item of data?.list) {
+        if (Array.isArray(data)) {
+            for (let item of data) {
                 if (item.get) {
                     result.list.push(item.get({plain: true}))
                 } else {
@@ -122,7 +123,7 @@ export const getPlanObject = (data: any) => {
             }
         }
     } catch (e) {
-        result = data;
+        result = { list : data };
     }
 
     return result;
@@ -138,8 +139,15 @@ const stackReg2 = /at\s+(.*):(\d*):(\d*)/i;
  * Use CallSite to extract filename and number, for more info read: https://v8.dev/docs/stack-trace-api#customizing-stack-traces
  * @returns {string} filename and line number separated by a colon
  */
-const getRunStack = (depth) => {
-    let data = {
+const getRunStack = (depth:number) => {
+    let data: {
+        method: null | string;
+        path: null | string;
+        line: null | string;
+        pos: null | string;
+        file: null | string;
+        stack: null | string;
+    } = {
         method: null,
         path: null,
         line: null,
@@ -152,7 +160,7 @@ const getRunStack = (depth) => {
 
     // get call stack, and analyze it
     // get all file,method and line number
-    let stack = (new Error()).stack.split('\n')
+    let stack = (new Error()).stack!.split('\n')
     let stacklist = stack.length > depth ? stack.slice(depth) : stack.slice(stack.length - 1);
     let s =  stacklist[0],
         sp = stackReg.exec(s) || stackReg2.exec(s);

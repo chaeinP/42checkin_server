@@ -14,7 +14,7 @@ const validate = async (token: string, rt: string, profile: any) => {
         if (profile._json.cursus_users.length < 2) {
             logger.error('profile:', profile);
             let msg = `접근할 수 없는 유저입니다. ${profile}`;
-            throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, msg, {stack: new Error(msg).stack});
+            throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, null, msg, {stack: new Error(msg).stack});
 		} else {
             const user = new Users({
                 login: profile.username,
@@ -60,10 +60,10 @@ const strategeyCallback = (
                 found.access_token = user.access_token;
                 found.refresh_token = user.refresh_token;
                 found.updated_at = new Date();
-                
+
                 await found.save();
             }
-            
+
 			callback(null, { ft: found ? found : user });
 		})
 		.catch((err) => {

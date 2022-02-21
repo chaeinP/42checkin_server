@@ -64,10 +64,10 @@ export const getUsagesDaily = async (userInfo: IJwtUser, from: string, to: strin
         order: [ [Sequelize.literal('date'), 'ASC'] ],
     });
 
-    return { list: usages };
+    return usages;
 };
 
-export const getUsagesList = async (userInfo: IJwtUser, from: string, to: string): Promise<any> => {
+export const getUsagesList = async (userInfo: IJwtUser, from: string, to: string): Promise<Usages[]> => {
     // noinspection DuplicatedCode
     logger.log('userInfo:', JSON.stringify(userInfo), ', from:', from, ', to:', to);
     const user = await Users.findOne({
@@ -98,5 +98,5 @@ export const getUsagesList = async (userInfo: IJwtUser, from: string, to: string
         order: [ ['checkin_at', 'ASC'] ],
     });
 
-    return { list: usages };
+    return usages;
 };

@@ -10,7 +10,7 @@ import env from "@modules/env";
 import StrategyJwt from "@modules/strategy.jwt";
 import Strategy42 from "@modules/strategy.42";
 import StrategySlack from "@modules/strategy.slack";
-import {MonitorController} from "@controllers/v1/monitor.contoller";
+import {healthCheck, diskCheck, authCheck} from "@controllers/monitor.contoller";
 import {login, callback} from "@controllers/v1/user.controller";
 
 export const router = Router();
@@ -33,7 +33,10 @@ router.use(ConfigRouter.path, ConfigRouter.router);
 /**
  * API version에 독립적인 Route path
  */
-router.get('/healthCheck', new MonitorController().getHealth);
+router.get('/monitor/health', passport.authenticate('jwt'), healthCheck);
+router.get('/monitor/disk', passport.authenticate('jwt') , diskCheck);
+router.get('/monitor/auth', passport.authenticate('jwt') , authCheck);
+
 router.get('/user/login/', login, passport.authenticate(strategy, passportOptions));
 router.get('/user/login/callback/42', passport.authenticate('42', passportOptions), callback);
 router.get('/user/login/callback/slack', passport.authenticate('Slack', passportOptions), callback);

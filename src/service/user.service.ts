@@ -11,7 +11,7 @@ import * as historyService from '@service/history.service';
 import * as configService from '@service/config.service';
 import * as usageService from '@service/usage.service';
 import axios from "axios";
-import {CheckInResponse, CheckOutResponse, UserStatusResponse} from "@controllers/v1/user.controller";
+import {CheckInRes, CheckOutResponse, UserStatusResponse} from "@controllers/v1/user.controller";
 import {apiStatus} from '@modules/api.status'
 import {getConfigByDate} from "@service/config.service";
 
@@ -71,13 +71,13 @@ const isBetween = (target: string, min: any, max: any) => {
     return result;
 }
 
-const isCheckAvailable = async () => {
+export const isCheckAvailable = async () => {
     const today = getTimezoneDateString(new Date());
     const config = await getConfigByDate(today);
     if (!config) {
         let msg = `해당 날짜(${today})의 설정값이 서버에 존재하지 않습니다.`;
         logger.error(msg, 'date:', today, 'setting:', config);
-        throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, msg, {stack: new Error(msg).stack});
+        throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, null, msg, {stack: new Error(msg).stack});
     }
 
     let now = getTimezoneDate(new Date()).toISOString().slice(11, 19);
@@ -90,7 +90,7 @@ const isCheckAvailable = async () => {
 export const isAdmin = async (user: IUser) => {
     try {
         logger.log('isAdmin:', user?.type);
-        return ['admin'].includes(user?.type);
+        return ['admin'].includes(user?.type!);
     } catch (e) {
         logger.error(e);
     }
@@ -112,56 +112,8 @@ export const getUserById = async (id: number) => {
     });
 };
 
-/**
- * 유저 및 카드 체크인 처리
- */
-export const checkIn = async (userId: number, cardId: number): Promise<CheckInResponse> => {
-    let notice = false;
-
-    logger.log('userId: ', userId, ', cardId: ', cardId);
-    if (!userId) {
-        logger.error(`User(${userId}) not found`);
-        return {
-            status: httpStatus.UNAUTHORIZED,
-            result: false,
-            code: apiStatus.UNAUTHORIZED,
-            message: `사용자 정보 없음.`,
-        }
-    }
-
-    const user = await getUserById(userId);
-    const userPrevState = user?.state;
-    if (['checkin'].includes(user.state?.toLowerCase())) {
-        return {
-            status: httpStatus.OK,
-            result: true,
-            code: apiStatus.CONFLICT,
-            message: '이미 체크인 하셨습니다.',
-            payload: {
-                card_no: cardId,
-                prev_state: userPrevState,
-                state: 'checkIn',
-                notice: false
-            }
-        };
-    }
-
-    const admin = await isAdmin(user);
-    const available = admin && await isCheckAvailable();
-    if (!available) return {
-        status: httpStatus.NOT_ACCEPTABLE,
-        result: false,
-        code: apiStatus.CONFLICT,
-        message: '체크인 가능 시간이 아닙니다.',
-        payload: {
-            card_no: cardId,
-            prev_state: userPrevState,
-            state: 'checkIn',
-            notice: false
-        }
-    };;
-
-    const cardOwner = await Users.findOne({
+export const getCardOwner = async (cardId: number) => {
+    return await Users.findOne({
         where: {
             card_no: cardId,
             deleted_at: {
@@ -169,155 +121,36 @@ export const checkIn = async (userId: number, cardId: number): Promise<CheckInRe
             }
         }
     });
-    if (cardOwner) {
-        logger.error(`이미 사용중인 카드입니다, cardOwner: ${JSON.stringify(cardOwner)}`);
-        return {
-            status: httpStatus.CONFLICT,
-            result: false,
-            code: apiStatus.CONFLICT,
-            message: `이미 사용중인 카드입니다.`,
-        };
-    }
-
-    const clusterType = user.getClusterType(cardId)
-    const { enterCnt, maxCnt, result } = await checkCanEnter(clusterType, 'checkIn'); //현재 이용자 수 확인
-
-    logger.log('login: ', user.login, 'card_no: ', cardId, 'max: ', maxCnt, 'used: ', enterCnt);
-    if (!result) {
-        logger.error({use: enterCnt, max: maxCnt});
-        return {
-            status: httpStatus.NOT_ACCEPTABLE,
-            result: false,
-            code: apiStatus.NOT_ACCEPTABLE,
-            message: `[${enterCnt}/${maxCnt}] 클러스터 출입 최대 인원을 초과했습니다.`,
-            payload: {
-                card_no: cardId,
-                prev_state: userPrevState,
-                state: user.state,
-                notice: notice
-            }
-        };
-    }
-
-    // Users table에 log_id를 남기면서 순서가 뒤바뀌어서 card_no가 null이 되는 현상이 발생.
-    // card_no를 user에 미리 세팅하고 history 생성한다.
-    user.card_no = cardId;
-    let history = await historyService.create(user, 'checkIn');
-    await user.setState('checkIn', user.login, cardId, history._id);
-
-    // 남은 인원이 5명이하인 경우, 몇 명 남았는지 디스코드로 노티
-    if (enterCnt + 1 >= maxCnt - 5) {
-        try {
-            await noticer(CLUSTER_CODE[clusterType], maxCnt - enterCnt + 1);
-            notice = true;
-        } catch (e) {
-            logger.error(e);
-        }
-    }
-
-    return {
-        status: httpStatus.OK,
-        result: true,
-        code: apiStatus.OK,
-        payload: {
-            card_no: cardId,
-            prev_state: userPrevState,
-            state: user.state,
-            notice: notice
-        }
-    };
-};
-
-/**
- * 유저 및 카드 체크아웃 처리
- */
-export const checkOut = async (userId: number): Promise<CheckOutResponse> => {
-    logger.log('userId: ', userId);
-    if (!userId) {
-        throw new ApiError(httpStatus.UNAUTHORIZED, '유저 정보 없음', {stack: new Error().stack});
-    }
-
-    const user = await Users.findOne({
-        where: {
-            _id: userId,
-            deleted_at: {
-                [Op.eq]: null
-            }
-        }
-    });
-
-    const _user = Object.assign(user);
-    _user['profile'] = {};
-    logger.info('checkOut', JSON.stringify(_user));
-
-    if (!['checkin'].includes(user.state?.toLowerCase())) {
-        return {
-            status: httpStatus.OK,
-            result: true,
-            code: apiStatus.CONFLICT,
-            message: '이미 체크아웃 하셨습니다.'
-        }
-    }
-
-    await usageService.create(user, user.login);
-    let history = await historyService.create(user, 'checkOut');
-    const clusterType = user.getClusterType(user.card_no)
-    await user.setState('checkOut', user.login, null, history._id);
-
-    const { enterCnt, maxCnt } = await checkCanEnter(clusterType); //현재 이용자 수 확인
-    // 남은 인원이 5명이하인 경우, 몇 명 남았는지 디스코드로 노티
-    if (enterCnt >= maxCnt - 5) {
-        try {
-            await noticer(CLUSTER_CODE[clusterType], maxCnt - enterCnt - 1);
-        } catch (e) {
-            logger.error(e);
-        }
-    }
-
-    logger.info('checkOut', JSON.stringify(user));
-    return {
-        status: httpStatus.OK,
-        result: true,
-        code: apiStatus.OK,
-    };
-};
+}
 
 /**
  * 유저 및 클러스터 상태 조회
  */
-export const status = async (jwt: IJwtUser): Promise<UserStatusResponse> => {
-    if (!jwt) {
-        logger.error('IJwtUser is null !!');
-        let msg = '유저 정보 없음';
-        throw new ApiError(httpStatus.UNAUTHORIZED, msg, {stack: new Error(msg).stack});
-    }
-    const id = jwt._id;
+export const status = async (userId : number): Promise<UserStatusResponse> => {
     const user = await Users.findOne({
         where: {
-            '_id': id,
+            '_id': userId,
             deleted_at: {
                 [Op.eq]: null
             }
         }
     });
+
     if (!user) {
-        logger.error('jwt:', jwt);
-        let msg = `해당 사용자(${jwt._id})가 존재하지 않습니다.`;
-        throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, msg, {stack:new Error(msg).stack});
+        let msg = `해당 사용자(user._id : ${userId})가 존재하지 않습니다.`;
+        throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, null, msg, {stack:new Error(msg).stack});
     }
 
-    let rawProfile: any;
+    let rawProfile;
     try {
         rawProfile = JSON.parse(user.profile._raw);
     } catch (e) {
         logger.error(e);
     }
-
     let imageUrl = rawProfile?.image_url;
     if (!imageUrl) {
         let url = `https://cdn.intra.42.fr/users/${user.login}.jpg`;
         let res;
-
         try {
             res = await axios.get(url);
         } catch (e) {
@@ -336,7 +169,7 @@ export const status = async (jwt: IJwtUser): Promise<UserStatusResponse> => {
             checkout_at: user.checkout_at,
             profile_image_url: imageUrl
         },
-        cluster: await getUsingInfo(),
+        //cluster: await getUsingInfo(),
         isAdmin: user.type === 'admin'
     };
 };
@@ -453,7 +286,7 @@ export const getUsingInfo = async () => {
  * @param checkType
  * @returns
  */
-const checkCanEnter = async (clusterType: CLUSTER_TYPE, checkType?: CHECK_STATE) => {
+export const checkCanEnter = async (clusterType: CLUSTER_TYPE, checkType?: CHECK_STATE) => {
     const enterCnt = (await getUsingInfo())[clusterType];
     // 최대인원을 넘었으면 다 찼으면 체크인 불가
     const today = getTimezoneDateTimeString(new Date()).slice(0,10);

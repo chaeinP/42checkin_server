@@ -1,8 +1,8 @@
-import env from '@modules/env';
-
 import jwt from 'jsonwebtoken';
-import * as userService from './user.service';
+
 import {IUser} from "@models/users";
+import * as userService from '@service/user.service';
+import env from '@modules/env';
 
 export const getAuth = async (user: IUser) => {
 	const token = await userService.login(user);

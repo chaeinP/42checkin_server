@@ -1,10 +1,12 @@
-import {CLUSTER_CODE, clusterCondition} from '@modules/cluster';
-import logger from '../modules/logger';
-import ApiError from '@modules/api.error';
 import httpStatus from 'http-status';
 import Sequelize, {Op} from 'sequelize';
-import {Users} from 'src/models/users';
+
+import {Users} from '@models/users';
 import {History} from '@models/history';
+
+import {CLUSTER_CODE, clusterCondition} from '@modules/cluster';
+import logger from '@modules/logger';
+import ApiError from '@modules/api.error';
 import {now} from '@modules/utils';
 
 /**
@@ -80,7 +82,7 @@ export const create = async (user: Users, type: string): Promise<History> => {
 export const getCluster = async (clusterType: CLUSTER_CODE, page: number, listSize: number) => {
     if (!CLUSTER_CODE[clusterType]) {
         let msg = `존재하지 않는 클러스터 코드(${clusterType})입니다.`;
-        throw new ApiError(httpStatus.NOT_FOUND, msg, {stack: new Error(msg).stack});
+        throw new ApiError(httpStatus.NOT_FOUND, null, msg, {stack: new Error(msg).stack});
     }
     logger.log('clusterType:', clusterType, 'cluster:', CLUSTER_CODE[clusterType], 'page:', page, 'listSize:', listSize);
 
@@ -133,7 +135,7 @@ export const getCluster = async (clusterType: CLUSTER_CODE, page: number, listSi
 export const getCheckIn = async (clusterType: CLUSTER_CODE, page: number, listSize: number) => {
     if (!CLUSTER_CODE[clusterType]) {
         let msg = `존재하지 않는 클러스터 코드(${clusterType})입니다.`;
-        throw new ApiError(httpStatus.NOT_FOUND, msg, {stack: new Error(msg).stack});
+        throw new ApiError(httpStatus.NOT_FOUND, null, msg, {stack: new Error(msg).stack});
     }
     logger.log('clusterType:', clusterType, ',cluster:', CLUSTER_CODE[clusterType], ',page:', page, ',listSize:', listSize);
 

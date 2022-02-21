@@ -1,7 +1,7 @@
 import {dailyfile} from 'tracer';
 import tracer from 'cls-rtracer';
 import context from 'express-http-context';
-import {getPlanObject} from './utils';
+import {getPlainObject} from './utils';
 import getCurrentLine from 'get-current-line';
 
 const rootFolder = './logs';
@@ -253,7 +253,7 @@ const logger = {
     },
     res(httpStatus: number, response: any) {
         context.set('httpStatus', httpStatus);
-        return exports.filter.api ? net.log(getPlanObject(response)) : null;
+        return exports.filter.api ? net.log(getPlainObject(response)) : null;
     }
 };
 

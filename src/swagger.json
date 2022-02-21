@@ -1,0 +1,2558 @@
+{
+	"components": {
+		"examples": {},
+		"headers": {},
+		"parameters": {},
+		"requestBodies": {},
+		"responses": {},
+		"schemas": {
+			"CheckInRes": {
+				"properties": {
+					"card_no": {
+						"type": "number",
+						"format": "double",
+						"description": "Card number"
+					},
+					"state": {
+						"type": "string",
+						"description": "The User state after checkin"
+					},
+					"prev_state": {
+						"type": "string",
+						"description": "The Previous user state before checkin. The value is 'checkIn' if duplicate checkin operation."
+					},
+					"notice": {
+						"type": "boolean",
+						"description": "A discord notification result when an available count is less than 5"
+					}
+				},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ResJson_CheckInRes_": {
+				"properties": {
+					"status": {
+						"type": "number",
+						"format": "double"
+					},
+					"code": {
+						"type": "number",
+						"format": "double"
+					},
+					"result": {
+						"type": "boolean"
+					},
+					"message": {
+						"type": "string"
+					},
+					"payload": {
+						"$ref": "#/components/schemas/CheckInRes"
+					}
+				},
+				"required": [
+					"status",
+					"code",
+					"result"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ErrorJson": {
+				"properties": {
+					"status": {
+						"type": "number",
+						"format": "double"
+					},
+					"code": {
+						"type": "number",
+						"format": "double"
+					},
+					"result": {
+						"type": "boolean"
+					},
+					"message": {
+						"type": "string"
+					},
+					"stack": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"status",
+					"code",
+					"result",
+					"message"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ResJson_null_": {
+				"properties": {
+					"status": {
+						"type": "number",
+						"format": "double"
+					},
+					"code": {
+						"type": "number",
+						"format": "double"
+					},
+					"result": {
+						"type": "boolean"
+					},
+					"message": {
+						"type": "string"
+					},
+					"payload": {
+						"type": "number",
+						"enum": [
+							null
+						],
+						"nullable": true
+					}
+				},
+				"required": [
+					"status",
+					"code",
+					"result"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UserStatus": {
+				"properties": {
+					"login": {
+						"type": "string"
+					},
+					"card": {
+						"type": "number",
+						"format": "double"
+					},
+					"state": {
+						"type": "string"
+					},
+					"log_id": {
+						"type": "number",
+						"format": "double"
+					},
+					"checkin_at": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"checkout_at": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"profile_image_url": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"login",
+					"card",
+					"state",
+					"log_id",
+					"checkin_at",
+					"checkout_at",
+					"profile_image_url"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UserStatusJSON": {
+				"properties": {
+					"login": {
+						"type": "string"
+					},
+					"card": {
+						"type": "number",
+						"format": "double"
+					},
+					"state": {
+						"type": "string"
+					},
+					"log_id": {
+						"type": "number",
+						"format": "double"
+					},
+					"checkin_at": {
+						"type": "string"
+					},
+					"checkout_at": {
+						"type": "string"
+					},
+					"profile_image_url": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"login",
+					"card",
+					"state",
+					"log_id",
+					"checkin_at",
+					"checkout_at",
+					"profile_image_url"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UserStatusResponse": {
+				"properties": {
+					"user": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/UserStatus"
+							},
+							{
+								"$ref": "#/components/schemas/UserStatusJSON"
+							}
+						]
+					},
+					"isAdmin": {
+						"type": "boolean"
+					}
+				},
+				"required": [
+					"user",
+					"isAdmin"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ResJson_UserStatusResponse_": {
+				"properties": {
+					"status": {
+						"type": "number",
+						"format": "double"
+					},
+					"code": {
+						"type": "number",
+						"format": "double"
+					},
+					"result": {
+						"type": "boolean"
+					},
+					"message": {
+						"type": "string"
+					},
+					"payload": {
+						"$ref": "#/components/schemas/UserStatusResponse"
+					}
+				},
+				"required": [
+					"status",
+					"code",
+					"result"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UsageAttributes": {
+				"properties": {
+					"_id": {
+						"type": "number",
+						"format": "double"
+					},
+					"login": {
+						"type": "string"
+					},
+					"checkin_at": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"checkout_at": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"duration": {
+						"type": "number",
+						"format": "double"
+					},
+					"actor": {
+						"type": "string"
+					},
+					"deleted_at": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"updated_at": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"created_at": {
+						"type": "string",
+						"format": "date-time"
+					}
+				},
+				"required": [
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ResJson_UsageAttributes-Array_": {
+				"properties": {
+					"status": {
+						"type": "number",
+						"format": "double"
+					},
+					"code": {
+						"type": "number",
+						"format": "double"
+					},
+					"result": {
+						"type": "boolean"
+					},
+					"message": {
+						"type": "string"
+					},
+					"payload": {
+						"items": {
+							"$ref": "#/components/schemas/UsageAttributes"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"status",
+					"code",
+					"result"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UsageDaily": {
+				"properties": {
+					"login": {
+						"type": "string"
+					},
+					"date": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"seconds": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"login",
+					"date",
+					"seconds"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ResJson_UsageDaily-Array_": {
+				"properties": {
+					"status": {
+						"type": "number",
+						"format": "double"
+					},
+					"code": {
+						"type": "number",
+						"format": "double"
+					},
+					"result": {
+						"type": "boolean"
+					},
+					"message": {
+						"type": "string"
+					},
+					"payload": {
+						"items": {
+							"$ref": "#/components/schemas/UsageDaily"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"status",
+					"code",
+					"result"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ApiError": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"message": {
+						"type": "string"
+					},
+					"stack": {
+						"type": "string"
+					},
+					"statusCode": {
+						"type": "number",
+						"format": "double"
+					},
+					"apiCode": {
+						"type": "number",
+						"format": "double"
+					},
+					"isFatal": {
+						"type": "boolean"
+					},
+					"isNormal": {
+						"type": "boolean"
+					}
+				},
+				"required": [
+					"name",
+					"message",
+					"statusCode",
+					"apiCode",
+					"isFatal",
+					"isNormal"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ResJson_any_": {
+				"properties": {
+					"status": {
+						"type": "number",
+						"format": "double"
+					},
+					"code": {
+						"type": "number",
+						"format": "double"
+					},
+					"result": {
+						"type": "boolean"
+					},
+					"message": {
+						"type": "string"
+					},
+					"payload": {}
+				},
+				"required": [
+					"status",
+					"code",
+					"result"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Cluster": {
+				"properties": {
+					"gaepo": {
+						"type": "number",
+						"format": "double"
+					},
+					"seocho": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"gaepo",
+					"seocho"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ResJson_Cluster_": {
+				"properties": {
+					"status": {
+						"type": "number",
+						"format": "double"
+					},
+					"code": {
+						"type": "number",
+						"format": "double"
+					},
+					"result": {
+						"type": "boolean"
+					},
+					"message": {
+						"type": "string"
+					},
+					"payload": {
+						"$ref": "#/components/schemas/Cluster"
+					}
+				},
+				"required": [
+					"status",
+					"code",
+					"result"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"IConfig": {
+				"properties": {
+					"_id": {
+						"type": "number",
+						"format": "double"
+					},
+					"env": {
+						"type": "string"
+					},
+					"auth": {
+						"type": "string"
+					},
+					"begin_at": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"end_at": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"open_at": {
+						"type": "number",
+						"format": "double"
+					},
+					"close_at": {
+						"type": "number",
+						"format": "double"
+					},
+					"checkin_at": {
+						"type": "number",
+						"format": "double"
+					},
+					"checkout_at": {
+						"type": "number",
+						"format": "double"
+					},
+					"seocho": {
+						"type": "number",
+						"format": "double"
+					},
+					"gaepo": {
+						"type": "number",
+						"format": "double"
+					},
+					"actor": {
+						"type": "string"
+					},
+					"deleted_at": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"updated_at": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"created_at": {
+						"type": "string",
+						"format": "date-time"
+					}
+				},
+				"required": [
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ResJson_IConfig_": {
+				"properties": {
+					"status": {
+						"type": "number",
+						"format": "double"
+					},
+					"code": {
+						"type": "number",
+						"format": "double"
+					},
+					"result": {
+						"type": "boolean"
+					},
+					"message": {
+						"type": "string"
+					},
+					"payload": {
+						"$ref": "#/components/schemas/IConfig"
+					}
+				},
+				"required": [
+					"status",
+					"code",
+					"result"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ConfigUpdate": {
+				"properties": {
+					"gaepo": {
+						"type": "number",
+						"format": "double"
+					},
+					"seocho": {
+						"type": "number",
+						"format": "double"
+					},
+					"begin_at": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"end_at": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"open_at": {
+						"type": "number",
+						"format": "double"
+					},
+					"close_at": {
+						"type": "number",
+						"format": "double"
+					},
+					"auth": {
+						"type": "string"
+					}
+				},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ConfigRequest": {
+				"properties": {
+					"env": {
+						"$ref": "#/components/schemas/ConfigUpdate"
+					},
+					"values": {
+						"$ref": "#/components/schemas/ConfigUpdate"
+					},
+					"date": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"date"
+				],
+				"type": "object",
+				"additionalProperties": false,
+				"example": {
+					"values": {
+						"end_at": "2022-02-06",
+						"open_at": "08:00:00",
+						"close_at": "22:00:00",
+						"seocho": 300,
+						"gaepo": 400
+					},
+					"date": "2022-01-25"
+				}
+			},
+			"CLUSTER_CODE": {
+				"enum": [
+					0,
+					1
+				],
+				"type": "number"
+			}
+		},
+		"securitySchemes": {
+			"CookieAuth": {
+				"type": "apiKey",
+				"name": "w_auth_local",
+				"in": "cookie"
+			},
+			"OAuth42": {
+				"type": "oauth2",
+				"flows": {
+					"clientCredentials": {
+						"type": "oauth2",
+						"authorizationUrl": "http://localhost:3000/user/login",
+						"tokenUrl": "http://localhost:3000/user/login/token",
+						"refreshUrl": "http://localhost:3000/user/token/refresh",
+						"scopes": []
+					}
+				}
+			}
+		}
+	},
+	"info": {
+		"title": "42checkin",
+		"version": "2.2.7",
+		"description": "Cluster checkin service for 42 Seoul cadets.",
+		"license": {
+			"name": "MIT"
+		},
+		"contact": {
+			"name": "@ryukim, @yurlee, @ohjongin"
+		}
+	},
+	"openapi": "3.0.0",
+	"paths": {
+		"/v1/user/checkIn/{cardId}": {
+			"post": {
+				"operationId": "CheckIn",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ResJson_CheckInRes_"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 200,
+											"result": true,
+											"code": 2000,
+											"payload": {
+												"card_no": 10,
+												"state": "checkIn",
+												"prev_state": "checkOut",
+												"notice": false
+											}
+										}
+									},
+									"Example 2": {
+										"value": {
+											"status": 200,
+											"result": false,
+											"code": 4090,
+											"message": "이미 체크인 상태입니다",
+											"payload": {
+												"card_no": 10,
+												"state": "checkIn",
+												"prev_state": "checkIn",
+												"notice": false
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorJson"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 401,
+											"code": 4010,
+											"message": "사용자 정보 없음",
+											"result": false
+										}
+									}
+								}
+							}
+						}
+					},
+					"406": {
+						"description": "Not Acceptable",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorJson"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 406,
+											"code": 4060,
+											"message": "체크인 가능 시간이 아닙니다.",
+											"result": false
+										}
+									}
+								}
+							}
+						}
+					},
+					"409": {
+						"description": "Not Acceptable",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorJson"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 409,
+											"code": 4090,
+											"message": "이미 사용 중인 카드입니다. cardOwner: cadet",
+											"result": false
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorJson"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 500,
+											"code": 5000,
+											"message": "Internal Server Error",
+											"result": false
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"description": "유저 체크인",
+				"tags": [
+					"User"
+				],
+				"security": [
+					{
+						"CookieAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "cardId",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/v1/user/checkOut": {
+			"post": {
+				"operationId": "CheckOut",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ResJson_null_"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 200,
+											"code": 2000,
+											"result": true,
+											"message": "checkout"
+										}
+									},
+									"Example 2": {
+										"value": {
+											"status": 200,
+											"code": 4090,
+											"result": false,
+											"message": "이미 체크아웃 하셨습니다."
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorJson"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 401,
+											"code": 4010,
+											"result": false,
+											"message": "사용자 정보 없음"
+										}
+									}
+								}
+							}
+						}
+					},
+					"406": {
+						"description": "Not Acceptable",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorJson"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 406,
+											"code": 4060,
+											"message": "체크아웃 가능 시간이 아닙니다.",
+											"result": false
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorJson"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 500,
+											"code": 5000,
+											"message": "Internal Server Error",
+											"result": false
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"description": "유저 체크아웃",
+				"tags": [
+					"User"
+				],
+				"security": [
+					{
+						"CookieAuth": []
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/v1/user/status": {
+			"get": {
+				"operationId": "Status",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ResJson_UserStatusResponse_"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 200,
+											"code": 200,
+											"result": true,
+											"payload": {
+												"user": {
+													"login": "chaepark",
+													"card": 25,
+													"state": "checkIn",
+													"log_id": 5,
+													"checkin_at": "2022-02-02T07:59:24.000Z",
+													"checkout_at": null,
+													"profile_image_url": "https://cdn.intra.42.fr/users/chaepark.jpg"
+												},
+												"isAdmin": false
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorJson"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 401,
+											"code": 4010,
+											"result": false,
+											"message": "사용자 정보 없음"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorJson"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 500,
+											"code": 5000,
+											"message": "Internal Server Error",
+											"result": false
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"description": "유저 상태조회",
+				"tags": [
+					"User"
+				],
+				"security": [
+					{
+						"CookieAuth": []
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/v1/user/usage": {
+			"get": {
+				"operationId": "UserUsageList",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ResJson_UsageAttributes-Array_"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 200,
+											"code": 2000,
+											"result": true,
+											"payload": [
+												{
+													"_id": 1,
+													"login": "chaepark",
+													"checkin_at": "2022-02-02T07:29:20.000Z",
+													"checkout_at": "2022-02-02T07:39:41.000Z",
+													"duration": 622,
+													"actor": "chaepark",
+													"deleted_at": null,
+													"updated_at": null,
+													"created_at": "2022-02-02T07:39:41.000Z"
+												},
+												{
+													"_id": 2,
+													"login": "chaepark",
+													"checkin_at": "2022-02-02T07:39:59.000Z",
+													"checkout_at": "2022-02-02T07:58:15.000Z",
+													"duration": 1097,
+													"actor": "chaepark",
+													"deleted_at": null,
+													"updated_at": null,
+													"created_at": "2022-02-02T07:58:15.000Z"
+												}
+											]
+										}
+									},
+									"Example 2": {
+										"value": {
+											"status": 200,
+											"code": 4040,
+											"result": false,
+											"message": "주어진 기간 내 유저 사용 정보가 없습니다.",
+											"payload": []
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								},
+								"examples": {
+									"Example 1": {
+										"value": "Unauthorized"
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorJson"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 500,
+											"code": 5000,
+											"message": "Internal Server Error",
+											"result": false
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"description": "기간 내 유저 사용 정보 조회",
+				"tags": [
+					"User"
+				],
+				"security": [
+					{
+						"CookieAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "from",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"example": "2022-01-31"
+					},
+					{
+						"in": "query",
+						"name": "to",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"example": "2022-02-01"
+					}
+				]
+			}
+		},
+		"/v1/user/usage/daily": {
+			"get": {
+				"operationId": "UserUsageDaily",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ResJson_UsageDaily-Array_"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 200,
+											"code": 200,
+											"result": true,
+											"payload": [
+												{
+													"login": "chaepark",
+													"date": "2022-02-02",
+													"seconds": "502756"
+												},
+												{
+													"login": "chaepark",
+													"date": "2022-02-08",
+													"seconds": "576"
+												}
+											]
+										}
+									},
+									"Example 2": {
+										"value": {
+											"status": 200,
+											"code": 4040,
+											"result": false,
+											"message": "주어진 기간 내 유저의 일간 사용 정보가 없습니다.",
+											"payload": []
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								},
+								"examples": {
+									"Example 1": {
+										"value": "Unauthorized"
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorJson"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 500,
+											"code": 5000,
+											"message": "Internal Server Error",
+											"result": false
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"description": "기간 내 유저 일간 사용 정보 조회",
+				"tags": [
+					"User"
+				],
+				"security": [
+					{
+						"CookieAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "from",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"example": "2022-02-02"
+					},
+					{
+						"in": "query",
+						"name": "to",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"example": "2022-02-09"
+					}
+				]
+			}
+		},
+		"/v1/user/forceCheckout/{userId}": {
+			"get": {
+				"operationId": "ForceCheckOut",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"anyOf": [
+										{
+											"$ref": "#/components/schemas/ApiError"
+										},
+										{
+											"$ref": "#/components/schemas/ResJson_any_"
+										}
+									]
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 200,
+											"code": 200,
+											"result": true,
+											"message": "Force Checkout"
+										}
+									},
+									"Example 2": {
+										"value": {
+											"status": 200,
+											"code": 4030,
+											"result": false,
+											"message": "이미 체크아웃 상태입니다."
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "UNAUTHORIZED",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorJson"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 401,
+											"code": 4040,
+											"result": false,
+											"message": "사용자를 찾을 수 없습니다."
+										}
+									}
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "FORBIDDEN",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorJson"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 403,
+											"code": 4030,
+											"result": false,
+											"message": "접근 권한이 없습니다."
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorJson"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 500,
+											"code": 5000,
+											"message": "Internal Server Error",
+											"result": false
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"description": "강제 체크 아웃",
+				"tags": [
+					"User"
+				],
+				"security": [
+					{
+						"CookieAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "userId",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/v1/cluster/using": {
+			"get": {
+				"operationId": "Using",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ResJson_Cluster_"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 200,
+											"code": 2000,
+											"result": true,
+											"payload": {
+												"gaepo": 135,
+												"seocho": 110
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ResJson_null_"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 500,
+											"code": 5000,
+											"result": false,
+											"message": "서버 오류입니다.\n잠시 후 재시도하시거나,\n증상이 계속되면 관리자(slack:@ohjongin)에게 문의하세요."
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"description": "클러스터 좌석 수 조회",
+				"tags": [
+					"Cluster"
+				],
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/v1/config": {
+			"get": {
+				"operationId": "GetConfig",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ResJson_IConfig_"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 200,
+											"code": 2000,
+											"result": true,
+											"payload": {
+												"_id": 1,
+												"env": "production",
+												"auth": "42",
+												"begin_at": "2021-12-31T15:00:00.000Z",
+												"end_at": "2022-02-20T00:00:00.000Z",
+												"open_at": "08:00:00",
+												"close_at": "22:00:00",
+												"checkin_at": "08:00:00",
+												"checkout_at": "22:00:00",
+												"seocho": 200,
+												"gaepo": 300,
+												"actor": "chaepark",
+												"deleted_at": null,
+												"updated_at": "2022-01-25T08:24:28.376Z",
+												"created_at": "2021-12-31T15:00:00.000Z",
+												"_comment": 1
+											}
+										}
+									},
+									"Example 2": {
+										"value": {
+											"status": 200,
+											"code": 4040,
+											"result": false,
+											"message": "[production] 해당 날짜(2022-01-31)의 설정값이 서버에 존재하지 않습니다."
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorJson"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 500,
+											"code": 5000,
+											"result": false,
+											"message": "서버 오류입니다.\n잠시 후 재시도하시거나,\n증상이 계속되면 관리자(slack:@ohjongin)에게 문의하세요."
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"description": "클러스터 설정 값 조회",
+				"tags": [
+					"Config"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "date",
+						"required": false,
+						"schema": {
+							"type": "string"
+						},
+						"example": "2022-01-25"
+					}
+				]
+			},
+			"put": {
+				"operationId": "SetConfig",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ResJson_IConfig_"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 200,
+											"code": 200,
+											"result": true,
+											"payload": {
+												"_id": 1,
+												"env": "local",
+												"auth": "Slack",
+												"begin_at": "2022-01-24T00:00:00.000Z",
+												"end_at": "2022-02-06T00:00:00.000Z",
+												"open_at": "09:00:00",
+												"close_at": "21:00:00",
+												"checkin_at": "09:00:00",
+												"checkout_at": "22:00:00",
+												"seocho": 300,
+												"gaepo": 400,
+												"actor": "chaepark",
+												"deleted_at": null,
+												"updated_at": "2022-01-27T05:37:14.064Z",
+												"created_at": "2021-12-31T15:00:00.000Z",
+												"_comment": 1
+											}
+										}
+									},
+									"Example 2": {
+										"value": {
+											"status": 200,
+											"code": 4040,
+											"result": false,
+											"message": "[production] 해당 날짜(2022-01-31)의 설정값이 서버에 존재하지 않습니다."
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorJson"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 400,
+											"code": 4000,
+											"result": false,
+											"message": "업데이트 할 설정 값이 올바르지 않습니다. - production"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorJson"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 500,
+											"code": 5000,
+											"result": false,
+											"message": "서버 오류입니다.\n잠시 후 재시도하시거나,\n증상이 계속되면 관리자(slack:@ohjongin)에게 문의하세요."
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"description": "클러스터 설정 값 수정",
+				"tags": [
+					"Config"
+				],
+				"security": [
+					{
+						"CookieAuth": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ConfigRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/log/card/{cardId}": {
+			"get": {
+				"operationId": "GetCardHistory",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ResJson_any_"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 200,
+											"code": 2000,
+											"result": true,
+											"payload": {
+												"list": [
+													{
+														"_id": 13,
+														"login": "chaepark",
+														"type": "checkIn",
+														"card_no": 25,
+														"actor": null,
+														"deleted_at": null,
+														"updated_at": null,
+														"created_at": "2022-02-09T11:46:44.000Z",
+														"User": {
+															"state": "checkIn",
+															"_id": 1,
+															"login": "chaepark",
+															"card_no": 25,
+															"log_id": 13
+														}
+													},
+													{
+														"_id": 12,
+														"login": "chaepark",
+														"type": "checkOut",
+														"card_no": 25,
+														"actor": null,
+														"deleted_at": null,
+														"updated_at": null,
+														"created_at": "2022-02-08T04:18:03.000Z",
+														"User": {
+															"_id": 1,
+															"state": "checkIn",
+															"login": "chaepark",
+															"card_no": 25,
+															"log_id": 13
+														}
+													}
+												],
+												"lastPage": 3
+											}
+										}
+									},
+									"Example 2": {
+										"value": {
+											"status": 200,
+											"code": 4040,
+											"result": false,
+											"message": "card Id에 해당하는 정보가 없습니다.",
+											"payload": {
+												"list": [],
+												"lastPage": 3
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad_Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorJson"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 400,
+											"code": 4000,
+											"message": "쿼리 정보 없음",
+											"result": false
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								},
+								"examples": {
+									"Example 1": {
+										"value": "Unauthorized"
+									}
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorJson"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 403,
+											"code": 4030,
+											"result": false,
+											"message": "접근 권한이 없습니다."
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorJson"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 500,
+											"code": 5000,
+											"message": "Internal Server Error",
+											"result": false
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"description": "카드 히스토리 조회",
+				"tags": [
+					"History"
+				],
+				"security": [
+					{
+						"CookieAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "cardId",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						},
+						"example": "25"
+					},
+					{
+						"in": "query",
+						"name": "page",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						},
+						"example": "1"
+					},
+					{
+						"in": "query",
+						"name": "listSize",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						},
+						"example": "2"
+					}
+				]
+			}
+		},
+		"/v1/log/user/{login}": {
+			"get": {
+				"operationId": "GetUserHistory",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ResJson_any_"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 200,
+											"code": 2000,
+											"result": true,
+											"payload": {
+												"list": [
+													{
+														"_id": 13,
+														"login": "chaepark",
+														"type": "checkIn",
+														"card_no": 25,
+														"actor": null,
+														"deleted_at": null,
+														"updated_at": null,
+														"created_at": "2022-02-09T11:46:44.000Z",
+														"User": {
+															"state": "checkIn",
+															"_id": 1,
+															"login": "chaepark",
+															"card_no": 25,
+															"log_id": 13
+														}
+													},
+													{
+														"_id": 12,
+														"login": "chaepark",
+														"type": "checkOut",
+														"card_no": 25,
+														"actor": null,
+														"deleted_at": null,
+														"updated_at": null,
+														"created_at": "2022-02-08T04:18:03.000Z",
+														"User": {
+															"state": "checkIn",
+															"_id": 1,
+															"login": "chaepark",
+															"card_no": 25,
+															"log_id": 13
+														}
+													}
+												],
+												"lastPage": 7
+											}
+										}
+									},
+									"Example 2": {
+										"value": {
+											"status": 200,
+											"code": 4040,
+											"result": false,
+											"message": "login에 해당하는 정보가 없습니다.",
+											"payload": {
+												"list": [],
+												"lastPage": 3
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad_Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorJson"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 400,
+											"code": 4000,
+											"message": "쿼리 정보 없음",
+											"result": false
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								},
+								"examples": {
+									"Example 1": {
+										"value": "Unauthorized"
+									}
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorJson"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 403,
+											"code": 4030,
+											"result": false,
+											"message": "접근 권한이 없습니다."
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorJson"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 500,
+											"code": 5000,
+											"message": "Internal Server Error",
+											"result": false
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"description": "유저 히스토리 조회",
+				"tags": [
+					"History"
+				],
+				"security": [
+					{
+						"CookieAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "login",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"example": "chaepark"
+					},
+					{
+						"in": "query",
+						"name": "page",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						},
+						"example": "1"
+					},
+					{
+						"in": "query",
+						"name": "listSize",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						},
+						"example": "2"
+					}
+				]
+			}
+		},
+		"/v1/log/gaepo": {
+			"get": {
+				"operationId": "GetGaepoHistory",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ResJson_any_"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 200,
+											"code": 2000,
+											"result": true,
+											"payload": {
+												"list": [
+													{
+														"_id": 13,
+														"login": "chaepark",
+														"type": "checkIn",
+														"card_no": 25,
+														"actor": null,
+														"deleted_at": null,
+														"updated_at": null,
+														"created_at": "2022-02-09T11:46:44.000Z",
+														"User": {
+															"state": "checkIn",
+															"_id": 1,
+															"login": "chaepark",
+															"card_no": 25,
+															"log_id": 13
+														}
+													},
+													{
+														"_id": 12,
+														"login": "chaepark",
+														"type": "checkOut",
+														"card_no": 25,
+														"actor": null,
+														"deleted_at": null,
+														"updated_at": null,
+														"created_at": "2022-02-08T04:18:03.000Z",
+														"User": {
+															"_id": 1,
+															"state": "checkIn",
+															"login": "chaepark",
+															"card_no": 25,
+															"log_id": 13
+														}
+													}
+												],
+												"lastPage": 3
+											}
+										}
+									},
+									"Example 2": {
+										"value": {
+											"status": 200,
+											"code": 4040,
+											"result": false,
+											"message": "gaepo에 해당하는 정보가 없습니다.",
+											"payload": {
+												"list": [],
+												"lastPage": 0
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad_Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorJson"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 400,
+											"code": 4000,
+											"message": "쿼리 정보 없음",
+											"result": false
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								},
+								"examples": {
+									"Example 1": {
+										"value": "Unauthorized"
+									}
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorJson"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 403,
+											"code": 4030,
+											"result": false,
+											"message": "접근 권한이 없습니다."
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorJson"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 500,
+											"code": 5000,
+											"message": "Internal Server Error",
+											"result": false
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"description": "개포 클러스터 히스토리 조회",
+				"tags": [
+					"History"
+				],
+				"security": [
+					{
+						"CookieAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "page",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						},
+						"example": "1"
+					},
+					{
+						"in": "query",
+						"name": "listSize",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						},
+						"example": "2"
+					}
+				]
+			}
+		},
+		"/v1/log/seocho": {
+			"get": {
+				"operationId": "GetSeochoHistory",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ResJson_any_"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 200,
+											"code": 2000,
+											"result": true,
+											"payload": {
+												"list": [
+													{
+														"_id": 18,
+														"login": "chaepark",
+														"type": "checkOut",
+														"card_no": 1059,
+														"actor": null,
+														"deleted_at": null,
+														"updated_at": null,
+														"created_at": "2022-02-20T05:07:48.000Z",
+														"User": {
+															"state": "checkOut",
+															"_id": 1,
+															"login": "chaepark",
+															"card_no": null,
+															"log_id": 18
+														}
+													},
+													{
+														"_id": 17,
+														"login": "chaepark",
+														"type": "checkIn",
+														"card_no": 1059,
+														"actor": null,
+														"deleted_at": null,
+														"updated_at": null,
+														"created_at": "2022-02-20T05:07:44.000Z",
+														"User": {
+															"state": "checkOut",
+															"_id": 1,
+															"login": "chaepark",
+															"card_no": null,
+															"log_id": 18
+														}
+													}
+												],
+												"lastPage": 2
+											}
+										}
+									},
+									"Example 2": {
+										"value": {
+											"status": 200,
+											"code": 4040,
+											"result": false,
+											"message": "seocho에 해당하는 정보가 없습니다.",
+											"payload": {
+												"list": [],
+												"lastPage": 0
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad_Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorJson"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 400,
+											"code": 4000,
+											"message": "쿼리 정보 없음",
+											"result": false
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								},
+								"examples": {
+									"Example 1": {
+										"value": "Unauthorized"
+									}
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorJson"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 403,
+											"code": 4030,
+											"result": false,
+											"message": "접근 권한이 없습니다."
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorJson"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 500,
+											"code": 5000,
+											"message": "Internal Server Error",
+											"result": false
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"description": "서초 클러스터 히스토리 조회",
+				"tags": [
+					"History"
+				],
+				"security": [
+					{
+						"CookieAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "page",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						},
+						"example": "1"
+					},
+					{
+						"in": "query",
+						"name": "listSize",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						},
+						"example": "2"
+					}
+				]
+			}
+		},
+		"/v1/log/CheckIn/{type}": {
+			"get": {
+				"operationId": "GetCheckInUsers",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ResJson_any_"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 200,
+											"code": 2000,
+											"result": true,
+											"payload": {
+												"list": [
+													{
+														"_id": 1,
+														"created_at": "2022-02-20T06:10:16.000Z",
+														"state": "checkIn",
+														"login": "chaepark",
+														"card_no": 1059,
+														"log_id": 19
+													}
+												],
+												"lastPage": 1
+											}
+										}
+									},
+									"Example 2": {
+										"value": {
+											"status": 200,
+											"code": 4040,
+											"result": false,
+											"message": "seocho에 checkIn 유저가 없습니다.",
+											"payload": {
+												"list": [],
+												"lastPage": 0
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad_Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorJson"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 400,
+											"code": 4000,
+											"message": "쿼리 정보 없음",
+											"result": false
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								},
+								"examples": {
+									"Example 1": {
+										"value": "Unauthorized"
+									}
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorJson"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 403,
+											"code": 4030,
+											"result": false,
+											"message": "접근 권한이 없습니다."
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorJson"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 500,
+											"code": 5000,
+											"message": "Internal Server Error",
+											"result": false
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"description": "미반납 카드 조회 (type 0은 개포, 1은 서초)",
+				"tags": [
+					"History"
+				],
+				"security": [
+					{
+						"CookieAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "type",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/CLUSTER_CODE"
+						}
+					},
+					{
+						"in": "query",
+						"name": "page",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						},
+						"example": "1"
+					},
+					{
+						"in": "query",
+						"name": "listSize",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						},
+						"example": "5"
+					}
+				]
+			}
+		}
+	},
+	"servers": [
+		{
+			"url": "http://localhost:3000",
+			"description": "localhost"
+		},
+		{
+			"url": "https://api.checkin.dev.42seoul.io",
+			"description": "development"
+		}
+	]
+}

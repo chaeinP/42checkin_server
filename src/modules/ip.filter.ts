@@ -15,7 +15,7 @@ const ipFilter = (rules: Function[]) => async (req: Request, res: Response, next
 	} else {
         logger.log('Unauthorized IP', clientIp)
         let msg = `42Guest WiFi 접속 중에만 체크인이 가능합니다.\n☞ 현재 IP: ${clientIp}\n☞ 42Guest WiFi IP: ${env.ip.guest}`;
-        errorHandler(new ApiError(httpStatus.NOT_FOUND, msg, {
+        errorHandler(new ApiError(httpStatus.NOT_FOUND, null, msg, {
             stack: new Error(msg).stack,
             isFatal: false,
             isNormal: true
@@ -46,6 +46,6 @@ export const GuestWiFiIpFilter = async (req: Request, res: Response, next: NextF
     } catch (e) {
         logger.error(e);
         const statusCode = e.statusCode || httpStatus.INTERNAL_SERVER_ERROR;
-        errorHandler(new ApiError(statusCode, e.message, {stack:e.stack, isFatal: true}), req, res, next);
+        errorHandler(new ApiError(statusCode, null, e.message, {stack:e.stack, isFatal: true}), req, res, next);
     }
 };

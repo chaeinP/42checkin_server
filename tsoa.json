@@ -5,7 +5,7 @@
     },
     "entryFile": "src/app.ts",
     "noImplicitAdditionalProperties": "throw-on-extras",
-    "controllerPathGlobs": ["src/controllers/*.ts", "src/controllers/v1/*.ts"],
+    "controllerPathGlobs": ["src/controllers/v1/*.ts"],
     "spec": {
         "outputDirectory": "src",
         "specVersion": 3,
@@ -45,5 +45,15 @@
         "routesDir": "src/routes",
         "middleware": "express",
         "authenticationModule": "src/modules/auth.tsoa.ts"
+    },
+    "compilerOptions": {
+        "paths":{
+            "@service/*": [ "./src/service/*" ],
+            "@controllers/*": [ "./src/controllers/*" ],
+            "@modules/*": [ "./src/modules/*" ],
+            "@models/*": [ "./src/models/*" ],
+            "@routes/*": [ "./src/routes/*" ],
+            "@types/*": [ "./src/@types/*" ]
+        }
     }
 }
