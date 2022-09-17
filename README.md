@@ -2,6 +2,7 @@
 
 - 해당 저장소는 사회적 거리두기가 시행됨에 따라, 42서울 본과정생들의 클러스터 입장인원수를 파악하기 위한 서비스의 서버 프로젝트입니다. 클라이언트 프로젝트는 해당 [저장소](https://bitbucket.org/42seoul/checkin_front/src/master)로 이동해주세요.
 - 시설관리자를 위한 어드민 사이트의 클라이언트 프로젝트는 해당 [저장소](https://bitbucket.org/42seoul/admin_front/src/master/)에서 확인하실 수 있습니다.
+- 서비스 URL : [https://cluster.42seoul.io/](https://cluster.42seoul.io/)
 
 # 프로젝트 구조
 
